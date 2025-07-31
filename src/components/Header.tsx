@@ -24,7 +24,7 @@ const Header = () => {
   return (
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'glass-card border-b' : 'bg-transparent'
+        isScrolled || isMenuOpen ? 'glass-card border-b' : 'bg-transparent'
       }`}
     >
       <nav className="container mx-auto px-4 py-4">
@@ -65,7 +65,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 space-y-4 animate-fade-in">
+          <div className="md:hidden mt-4 space-y-4 animate-fade-in glass-card p-4 rounded-lg">
             {navItems.map((item) => (
               <a
                 key={item.name}
