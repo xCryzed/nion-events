@@ -1,4 +1,8 @@
 import { Star, Quote } from 'lucide-react';
+import abiomed from '@/assets/logos/abiomed-logo.png';
+import jj from '@/assets/logos/jj-logo.png';
+import hammer from '@/assets/logos/hammer-logo.png';
+import advancedLogistics from '@/assets/logos/advanced-logistics-logo.png';
 
 const Testimonials = () => {
   const testimonials = [
@@ -29,7 +33,10 @@ const Testimonials = () => {
   ];
 
   const partners = [
-    'TechCorp', 'InnovateLab', 'FutureVision', 'GlobalTech', 'CreativeHub', 'BusinessPro'
+    { name: 'Abiomed Europe GmbH', logo: abiomed },
+    { name: 'Johnson & Johnson', logo: jj },
+    { name: 'Hammer GmbH & Co. KG', logo: hammer },
+    { name: 'Advanced Logistics', logo: advancedLogistics },
   ];
 
   return (
@@ -93,16 +100,24 @@ const Testimonials = () => {
 
         {/* Partners */}
         <div className="text-center">
-          <h3 className="text-title mb-8 text-muted-foreground">
+          <h3 className="text-title mb-12 text-muted-foreground">
             Vertrauen von führenden Unternehmen
           </h3>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
             {partners.map((partner, index) => (
               <div 
                 key={index} 
-                className="text-xl font-semibold text-muted-foreground/60 hover:text-muted-foreground transition-colors duration-300"
+                className="glass-card p-6 hover-lift group transition-all duration-300"
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
-                {partner}
+                <img 
+                  src={partner.logo} 
+                  alt={`${partner.name} Logo`}
+                  className="w-full h-16 object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300 filter brightness-0 invert group-hover:filter-none"
+                />
+                <p className="text-sm text-muted-foreground mt-3 group-hover:text-foreground transition-colors">
+                  {partner.name}
+                </p>
               </div>
             ))}
           </div>
