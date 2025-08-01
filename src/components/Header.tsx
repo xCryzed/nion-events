@@ -18,6 +18,7 @@ const Header = () => {
     { name: 'Home', href: '#home' },
     { name: 'Leistungen', href: '#services' },
     { name: 'Referenzen', href: '#testimonials' },
+    { name: 'Presse', href: '/presse' },
     { name: 'Kontakt', href: '#contact' },
   ];
 
@@ -34,7 +35,7 @@ const Header = () => {
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">N</span>
             </div>
-            <span className="text-xl font-bold">NION Eventmanagement</span>
+            <span className="text-xl font-bold">NION Events</span>
           </div>
 
           {/* Desktop Navigation */}

@@ -5,6 +5,7 @@ import DJServices from '@/components/DJServices';
 import Testimonials from '@/components/Testimonials';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
+import CookieBanner from '@/components/CookieBanner';
 
 const Index = () => {
   return (
@@ -18,6 +19,7 @@ const Index = () => {
         <Contact />
       </main>
       <Footer />
+      <CookieBanner />
     </div>
   );
 };

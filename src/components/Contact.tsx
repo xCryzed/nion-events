@@ -10,7 +10,10 @@ const Contact = () => {
     name: '',
     email: '',
     company: '',
-    message: ''
+    message: '',
+    callbackTime: '',
+    eventType: '',
+    venue: ''
   });
   const { toast } = useToast();
 
@@ -24,10 +27,18 @@ const Contact = () => {
     });
     
     // Reset form
-    setFormData({ name: '', email: '', company: '', message: '' });
+    setFormData({ 
+      name: '', 
+      email: '', 
+      company: '', 
+      message: '', 
+      callbackTime: '', 
+      eventType: '', 
+      venue: '' 
+    });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -131,6 +142,64 @@ const Contact = () => {
                   onChange={handleChange}
                   className="bg-card border-border/50 focus:border-primary"
                   placeholder="Ihr Unternehmen"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="eventType" className="block text-sm font-medium mb-2">
+                    Art des Events
+                  </label>
+                  <select
+                    id="eventType"
+                    name="eventType"
+                    value={formData.eventType}
+                    onChange={handleChange}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value="">Bitte wählen</option>
+                    <option value="hochzeit">Hochzeit</option>
+                    <option value="firmenveranstaltung">Firmenveranstaltung</option>
+                    <option value="konferenz">Konferenz</option>
+                    <option value="gala">Gala-Event</option>
+                    <option value="geburtstag">Geburtstag</option>
+                    <option value="produktpräsentation">Produktpräsentation</option>
+                    <option value="messe">Messe</option>
+                    <option value="sonstiges">Sonstiges</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="callbackTime" className="block text-sm font-medium mb-2">
+                    Gewünschte Rückrufzeit
+                  </label>
+                  <select
+                    id="callbackTime"
+                    name="callbackTime"
+                    value={formData.callbackTime}
+                    onChange={handleChange}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value="">Bitte wählen</option>
+                    <option value="vormittag">Vormittag (9-12 Uhr)</option>
+                    <option value="nachmittag">Nachmittag (12-17 Uhr)</option>
+                    <option value="abend">Abend (17-19 Uhr)</option>
+                    <option value="flexibel">Flexibel</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="venue" className="block text-sm font-medium mb-2">
+                  Gewünschter Veranstaltungsort
+                </label>
+                <Input
+                  id="venue"
+                  name="venue"
+                  type="text"
+                  value={formData.venue}
+                  onChange={handleChange}
+                  className="bg-card border-border/50 focus:border-primary"
+                  placeholder="z.B. Berlin, Hotel XY, eigene Location..."
                 />
               </div>
 

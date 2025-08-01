@@ -13,7 +13,7 @@ const Footer = () => {
       { name: 'Über uns', href: '#' },
       { name: 'Team', href: '#' },
       { name: 'Karriere', href: '#' },
-      { name: 'Presse', href: '#' },
+      { name: 'Presse', href: '/presse' },
     ],
     services: [
       { name: 'Eventplanung', href: '#services' },
@@ -22,9 +22,9 @@ const Footer = () => {
       { name: 'Live-Marketing', href: '#services' },
     ],
     legal: [
-      { name: 'Impressum', href: '#' },
-      { name: 'Datenschutz', href: '#' },
-      { name: 'AGB', href: '#' },
+      { name: 'Impressum', href: '/impressum' },
+      { name: 'Datenschutz', href: '/datenschutz' },
+      { name: 'AGB', href: '/agb' },
       { name: 'Cookies', href: '#' },
     ],
   };
@@ -40,7 +40,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">N</span>
               </div>
-              <span className="text-xl font-bold">NION Eventmanagement</span>
+              <span className="text-xl font-bold">NION Events</span>
             </div>
             
             <p className="text-body text-muted-foreground max-w-md">
@@ -131,7 +131,7 @@ const Footer = () => {
         <div className="py-6 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-sm text-muted-foreground">
-              © 2024 NION Eventmanagement. Alle Rechte vorbehalten.
+              © 2024 NION Events. Alle Rechte vorbehalten.
             </p>
             <div className="flex items-center space-x-6">
               <a 
