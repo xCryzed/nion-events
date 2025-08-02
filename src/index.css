@@ -124,4 +124,28 @@
   .container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
+
+  /* Custom Scrollbar Styling */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, hsl(262 83% 58%), hsl(280 100% 70%));
+    @apply rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, hsl(262 83% 68%), hsl(280 100% 80%));
+  }
+
+  /* Firefox Scrollbar */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(262 83% 58%) hsl(240 10% 8%);
+  }
 }

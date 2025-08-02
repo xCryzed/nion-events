@@ -10,7 +10,7 @@ const Footer = () => {
 
   const footerLinks = {
     company: [
-      { name: 'Über uns', href: '#' },
+      { name: 'Unternehmen', href: '#unternehmen' },
       { name: 'Team', href: '#' },
       { name: 'Karriere', href: '#' },
       { name: 'Presse', href: '/presse' },
@@ -42,9 +42,9 @@ const Footer = () => {
               </div>
               <span className="text-xl font-bold">NION Events</span>
             </div>
-            
+
             <p className="text-body text-muted-foreground max-w-md">
-              Wir verwandeln Ihre Visionen in unvergessliche Events. 
+              Wir verwandeln Ihre Visionen in unvergessliche Events.
               Professionell, kreativ und mit Leidenschaft für Details.
             </p>
 
@@ -81,7 +81,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
-                  <a 
+                  <a
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                   >
@@ -92,20 +92,26 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Services Links */}
+          {/* Services List */}
           <div>
             <h4 className="font-semibold text-foreground mb-4">Leistungen</h4>
             <ul className="space-y-3">
-              {footerLinks.services.map((link) => (
-                <li key={link.name}>
-                  <a 
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
-                    {link.name}
-                  </a>
-                </li>
-              ))}
+              <li className="flex items-center text-sm text-muted-foreground">
+                <span className="w-1.5 h-1.5 bg-primary rounded-full mr-3"></span>
+                DJ & Musik
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <span className="w-1.5 h-1.5 bg-primary rounded-full mr-3"></span>
+                Eventplanung
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <span className="w-1.5 h-1.5 bg-primary rounded-full mr-3"></span>
+                Hochzeiten & Feiern
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <span className="w-1.5 h-1.5 bg-primary rounded-full mr-3"></span>
+                Corporate Events
+              </li>
             </ul>
           </div>
 
@@ -115,7 +121,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
-                  <a 
+                  <a
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                   >
@@ -134,14 +140,14 @@ const Footer = () => {
               © 2024 NION Events. Alle Rechte vorbehalten.
             </p>
             <div className="flex items-center space-x-6">
-              <a 
-                href="#" 
+              <a
+                href="#"
                 className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
               >
                 Sitemap
               </a>
-              <a 
-                href="#" 
+              <a
+                href="#"
                 className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
               >
                 Newsletter

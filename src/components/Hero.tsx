@@ -2,14 +2,32 @@ import { ArrowRight, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import heroImage from '@/assets/hero-image.jpg';
 
+const calculateDynamicStats = () => {
+  const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+  const now = new Date();
+  const daysSinceStartOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
+  const weeksSinceStartOfYear = Math.floor(daysSinceStartOfYear / 7);
+
+  const successfulEvents = 500 + Math.floor(daysSinceStartOfYear * 0.5);
+  const clients = 80 + weeksSinceStartOfYear;
+  const yearsExperience = new Date().getFullYear() - 2019;
+
+  return {
+    events: `${successfulEvents}+`,
+    clients: `${clients}+`,
+    years: `${yearsExperience}+`,
+    support: '24/7'
+  };
+};
+
 const Hero = () => {
   return (
     <section id="home" className="relative min-h-screen flex items-center bg-gradient-hero overflow-hidden">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
-        <img 
-          src={heroImage} 
-          alt="NION Eventmanagement - Professionelle Events" 
+        <img
+          src={heroImage}
+          alt="NION Eventmanagement - Professionelle Events"
           className="w-full h-full object-cover opacity-30"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/40" />
@@ -25,16 +43,16 @@ const Hero = () => {
           </div>
 
           {/* Main Heading */}
-          <h1 className="text-display mb-6 animate-fade-in-up">
-            Außergewöhnliche{' '}
-            <span className="text-gradient">Events</span>{' '}
-            perfekt inszeniert
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-fade-in-up">
+            <span className="block sm:inline">Außergewöhnliche{' '}</span>
+            <span className="text-gradient block sm:inline">Events{' '}</span>
+            <span className="block sm:inline">perfekt inszeniert</span>
           </h1>
 
           {/* Subheading */}
           <p className="text-body-large text-muted-foreground mb-8 max-w-2xl animate-fade-in-up">
-            Von der ersten Idee bis zur erfolgreichen Umsetzung – NION Eventmanagement 
-            verwandelt Ihre Vision in ein unvergessliches Erlebnis. Professionell, 
+            Von der ersten Idee bis zur erfolgreichen Umsetzung – NION Eventmanagement
+            verwandelt Ihre Vision in ein unvergessliches Erlebnis. Professionell,
             kreativ und mit Leidenschaft für Details.
           </p>
 
@@ -44,9 +62,10 @@ const Hero = () => {
               Projekt starten
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="group bg-transparent border-border/50 hover:bg-card/50 backdrop-blur-sm"
+              onClick={() => window.location.href = '/portfolio'}
             >
               <Play className="mr-2 w-4 h-4 group-hover:scale-110 transition-transform" />
               Portfolio ansehen
@@ -55,21 +74,24 @@ const Hero = () => {
 
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 animate-scale-in">
-            {[
-              { number: '500+', label: 'Erfolgreiche Events' },
-              { number: '50+', label: 'Zufriedene Kunden' },
-              { number: '10+', label: 'Jahre Erfahrung' },
-              { number: '24/7', label: 'Support' },
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-gradient mb-2">
-                  {stat.number}
+            {(() => {
+              const stats = calculateDynamicStats();
+              return [
+                { number: stats.events, label: 'Erfolgreiche Events' },
+                { number: stats.clients, label: 'Zufriedene Kunden' },
+                { number: stats.years, label: 'Jahre Erfahrung' },
+                { number: stats.support, label: 'Support' },
+              ].map((stat, index) => (
+                <div key={index} className="text-center">
+                  <div className="text-2xl md:text-3xl font-bold text-gradient mb-2">
+                    {stat.number}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+              ));
+            })()}
           </div>
         </div>
       </div>

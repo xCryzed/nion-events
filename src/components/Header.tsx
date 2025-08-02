@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import nionLogo from '@/assets/NION_Logo_weiß.svg';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,36 +17,40 @@ const Header = () => {
   }, []);
 
   const navItems = [
-    { name: 'Home', href: '#home' },
+    { name: 'Unternehmen', href: '#about' },
     { name: 'Leistungen', href: '#services' },
     { name: 'Referenzen', href: '#testimonials' },
-    { name: 'Presse', href: '/presse' },
     { name: 'Kontakt', href: '#contact' },
   ];
 
   return (
-    <header 
+    <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled || isMenuOpen ? 'glass-card border-b' : 'bg-transparent'
       }`}
     >
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
-          <a 
-            href="/" 
-            className="flex items-center space-x-2 hover-scale cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              window.history.pushState({}, '', '/');
-            }}
+          {/* Logo Placeholder */}
+          <Link
+            to="/"
+            className="flex items-center space-x-3 hover-scale cursor-pointer group"
           >
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">N</span>
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-primary rounded-xl blur opacity-25 group-hover:opacity-40 transition-opacity duration-300"></div>
+              <div className="relative w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                <span className="text-white font-bold text-lg">N</span>
+              </div>
             </div>
-            <span className="text-xl font-bold">NION Events</span>
-          </a>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold text-gradient bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                NION Events
+              </span>
+              <span className="text-xs text-muted-foreground font-medium tracking-wide">
+                Eventmanagement
+              </span>
+            </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
