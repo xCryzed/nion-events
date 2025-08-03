@@ -95,10 +95,7 @@ const CookieBanner = () => {
                         Nur erforderliche
                       </Button>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <Button variant="ghost" onClick={rejectAll} className="w-full">
-                        Alle ablehnen
-                      </Button>
+                    <div className="flex justify-center">
                       <Button variant="ghost" onClick={openSettings} className="w-full">
                         <Settings className="w-4 h-4 mr-2" />
                         Einstellungen
