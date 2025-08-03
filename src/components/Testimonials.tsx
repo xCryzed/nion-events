@@ -37,7 +37,7 @@ const Testimonials = () => {
       name: 'Dr. Sarah Weber',
       position: 'Geschäftsführerin',
       company: 'TechCorp GmbH',
-      content: 'NION hat unsere Jahreskonferenz zu einem unvergesslichen Erlebnis gemacht. Die professionelle Planung und kreative Umsetzung haben alle Erwartungen übertroffen.',
+      content: 'Nino hat den 18. Geburtstag unserer Tochter zu einem unvergesslichen Event werden lassen. Alle waren total begeistert und wir haben bis in die frühen Morgenstunden durchgetanzt. Einfach mega. Vielen lieben Dank, Nino.',
       rating: 5,
       image: 'https://images.unsplash.com/photo-1494790108755-2616b612b1c4?w=150&h=150&fit=crop&crop=face'
     },

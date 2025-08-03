@@ -40,8 +40,8 @@ const Footer = () => {
     {
       name: 'Soundcloud', icon: () => (
         <svg className="w-5 h-5" fill="#ffffff" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-             viewBox="-271 345.8 256 111.2" ><g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+             viewBox="-271 345.8 256 111.2" ><g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+          <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
           <g id="SVGRepo_iconCarrier"> <g> <path
             d="M-238.4,398.1c-0.8,0-1.4,0.6-1.5,1.5l-2.3,28l2.3,27.1c0.1,0.8,0.7,1.5,1.5,1.5c0.8,0,1.4-0.6,1.5-1.5l2.6-27.1l-2.6-28 C-237,398.7-237.7,398.1-238.4,398.1z"></path>
             <path
