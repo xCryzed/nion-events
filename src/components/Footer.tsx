@@ -213,7 +213,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center text-sm text-muted-foreground">
                 <CheckCircle className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0"/>
-                Full Service
+                Full-Service
               </li>
             </ul>
           </div>

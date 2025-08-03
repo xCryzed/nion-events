@@ -1,42 +1,54 @@
-import { Calendar, Users, Lightbulb, Award, Zap, Shield } from 'lucide-react';
+import { Headphones, Volume2, Lightbulb, Heart, Briefcase, Star, Package, Camera } from 'lucide-react';
 
 const Services = () => {
   const services = [
     {
-      icon: Calendar,
-      title: 'Eventplanung',
-      description: 'Komplette Planung und Koordination Ihrer Veranstaltung von A bis Z.',
-      features: ['Terminplanung', 'Location-Scouting', 'Budgetmanagement']
+      icon: Headphones,
+      title: 'Musik & Entertainment',
+      description: 'Professioneller DJ-Service für jeden Anlass – von Club bis Gala',
+      features: ['Individuelle Musikauswahl nach Kundenwunsch', 'Moderation & Animation auf Wunsch', 'DJ + Live-Musiker kombinierbar']
     },
     {
-      icon: Users,
-      title: 'Konferenzen & Meetings',
-      description: 'Professionelle Business-Events für maximale Wirkung und Erfolg.',
-      features: ['Hybride Events', 'Streaming-Lösungen', 'Networking-Formate']
+      icon: Volume2,
+      title: 'Licht-, Ton- & Veranstaltungstechnik',
+      description: 'Verleih von Licht- und Tontechnik für Events jeder Größe',
+      features: ['Modernes Equipment & Bühnentechnik', 'Auf- & Abbau durch erfahrene Techniker', 'Technische Betreuung vor Ort']
     },
     {
       icon: Lightbulb,
-      title: 'Kreative Konzepte',
-      description: 'Innovative Ideen und maßgeschneiderte Event-Konzepte.',
-      features: ['Themenentwicklung', 'Storytelling', 'Erlebnisdesign']
+      title: 'Konzeption & Eventplanung',
+      description: 'Individuelle Eventkonzeption: von der Idee bis zur Umsetzung',
+      features: ['Ablaufplanung & Timemanagement', 'Locationberatung & -scouting', 'Moodboards & Konzepte']
     },
     {
-      icon: Award,
-      title: 'Gala-Events',
-      description: 'Exklusive Veranstaltungen mit höchstem Anspruch an Qualität.',
-      features: ['Awards-Zeremonien', 'Firmenjubiläen', 'Produktlaunches']
+      icon: Heart,
+      title: 'Private Events',
+      description: 'Geburtstagsfeiern, Hochzeiten, Abibälle & Familienfeste',
+      features: ['Geburtstagsfeiern (18., 30., 50., ...)', 'Hochzeiten & Verlobungsfeiern', 'Abibälle & Abschlussfeiern']
     },
     {
-      icon: Zap,
-      title: 'Live-Marketing',
-      description: 'Emotionale Markenerlebnisse, die in Erinnerung bleiben.',
-      features: ['Messeauftritte', 'Roadshows', 'Pop-up Events']
+      icon: Briefcase,
+      title: 'Business-Events & Corporate Solutions',
+      description: 'Firmenfeiern, Produktpräsentationen & Galaabende',
+      features: ['Firmenfeiern & Sommerfeste', 'Produktpräsentationen & Markeninszenierungen', 'Team-Building-Events & Incentives']
     },
     {
-      icon: Shield,
-      title: 'Full-Service',
-      description: 'Rundum-Betreuung mit persönlichem Ansprechpartner.',
-      features: ['24/7 Support', 'Vor-Ort-Betreuung', 'Nachbetreuung']
+      icon: Star,
+      title: 'Spezialformate & Besonderes',
+      description: 'Silent-Disco, Motto-Partys & Hybrid-Events',
+      features: ['Silent-Disco (Kopfhörerpartys)', 'Open-Air-Events & Pop-up-Veranstaltungen', 'Hybrid-Events & Streaming-Technik']
+    },
+    {
+      icon: Package,
+      title: 'Full Service oder individuell buchbar',
+      description: 'Alles aus einer Hand oder einzeln buchbar nach Ihren Bedürfnissen',
+      features: ['Musik, Technik, Planung, Durchführung', 'Einzeln buchbar: DJ, Technik oder Planung', 'Persönlicher Ansprechpartner']
+    },
+    {
+      icon: Camera,
+      title: 'Foto & Videoproduktion',
+      description: 'Hochzeitsfotografie, Aftermovies & Business-Videodreh',
+      features: ['Hochzeitsfotografie & -videos in Kino-Qualität', 'Dynamische Aftermovies für Events', 'Imagefilme & Corporate Videos']
     },
   ];
 

@@ -1,9 +1,13 @@
 import { Star, Quote, TrendingUp, Users, Award, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import abiomed from '@/assets/logos/abiomed-logo.png';
-import jj from '@/assets/logos/jj-logo.png';
-import hammer from '@/assets/logos/hammer-logo.png';
-import advancedLogistics from '@/assets/logos/advanced-logistics-logo.png';
+import abiomed from '@/assets/logos/abiomed-logo.svg';
+import jnj from '@/assets/logos/jnj-logo.svg';
+import hammer from '@/assets/logos/hammer-logo.svg';
+import nox from '@/assets/logos/nox-logo.svg';
+import apollo from '@/assets/logos/apollo-logo.svg';
+import himmerich from '@/assets/logos/himmerich-logo.svg'
+import dasLiebig from '@/assets/logos/das-liebig-logo.png';
+import joy from '@/assets/logos/joy-logo.svg'
 
 const Testimonials = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -55,9 +59,13 @@ const Testimonials = () => {
 
   const partners = [
     { name: 'Abiomed Europe GmbH', logo: abiomed },
-    { name: 'Johnson & Johnson', logo: jj },
+    { name: 'Johnson & Johnson', logo: jnj },
     { name: 'Hammer GmbH & Co. KG', logo: hammer },
-    { name: 'Advanced Logistics', logo: advancedLogistics },
+    { name: 'NOX ', logo: nox },
+    { name: 'Apollo', logo: apollo },
+    { name: 'Himmerich', logo: himmerich },
+    { name: 'DAS LIEBIG', logo: dasLiebig },
+    { name: 'JOY event & media', logo: joy }
   ];
 
   const partnerStats = [
