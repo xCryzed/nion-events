@@ -1,4 +1,4 @@
-import { Star, Quote, TrendingUp, Users, Award, Sparkles } from 'lucide-react';
+import { Star, Quote } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import abiomed from '@/assets/logos/abiomed-logo.svg';
 import jnj from '@/assets/logos/jnj-logo.svg';
@@ -8,10 +8,12 @@ import apollo from '@/assets/logos/apollo-logo.svg';
 import himmerich from '@/assets/logos/himmerich-logo.svg'
 import dasLiebig from '@/assets/logos/das-liebig-logo.png';
 import joy from '@/assets/logos/joy-logo.svg'
+import rent2night from '@/assets/logos/rent2night-logo.svg'
 
 const Testimonials = () => {
   const [isVisible, setIsVisible] = useState(false);
-  
+  const [shuffledPartners, setShuffledPartners] = useState<typeof partners>([]);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -58,22 +60,30 @@ const Testimonials = () => {
   ];
 
   const partners = [
-    { name: 'Abiomed Europe GmbH', logo: abiomed },
-    { name: 'Johnson & Johnson', logo: jnj },
-    { name: 'Hammer GmbH & Co. KG', logo: hammer },
-    { name: 'NOX ', logo: nox },
-    { name: 'Apollo', logo: apollo },
-    { name: 'Himmerich', logo: himmerich },
-    { name: 'DAS LIEBIG', logo: dasLiebig },
-    { name: 'JOY event & media', logo: joy }
+    { name: 'Abiomed Europe GmbH', logo: abiomed, website: 'https://www.abiomed.com/de-de' },
+    { name: 'Johnson & Johnson', logo: jnj, website: 'https://www.jnj.com' },
+    { name: 'Hammer GmbH & Co. KG', logo: hammer, website: 'https://www.hammer-ac.de/' },
+    { name: 'NOX Aachen', logo: nox, website: 'https://www.nox.ac/' },
+    { name: 'Apollo Aachen', logo: apollo, website: 'https://apollo-aachen.de/' },
+    { name: 'Diskothek Himmerich', logo: himmerich, website: 'https://www.himmerich.de' },
+    { name: 'DAS LIEBIG', logo: dasLiebig, website: 'https://www.dasliebig.de' },
+    { name: 'JOY event & media GmbH & Co. KG', logo: joy, website: 'https://www.joy-event-media.de/' },
+    { name: 'Rent2Night Eventmanagement', logo: rent2night, website: 'https://rent2night.de/' }
   ];
 
-  const partnerStats = [
-    { icon: Users, label: 'Kunden', value: '500+', color: 'text-blue-400' },
-    { icon: Award, label: 'Auszeichnungen', value: '15+', color: 'text-yellow-400' },
-    { icon: TrendingUp, label: 'Erfolgsrate', value: '98%', color: 'text-green-400' },
-    { icon: Sparkles, label: 'Events', value: '1000+', color: 'text-purple-400' }
-  ];
+  const shuffleArray = (array: typeof partners) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  useEffect(() => {
+    setShuffledPartners(shuffleArray(partners));
+  }, []);
+
 
   return (
     <section id="testimonials" className="section-padding">
@@ -84,7 +94,7 @@ const Testimonials = () => {
             Was unsere <span className="text-gradient">Kunden</span> sagen
           </h2>
           <p className="text-body-large text-muted-foreground">
-            Überzeugen Sie sich selbst von der Qualität unserer Arbeit. 
+            Überzeugen Sie sich selbst von der Qualität unserer Arbeit.
             Hier sind einige Stimmen unserer zufriedenen Kunden.
           </p>
         </div>
@@ -92,14 +102,14 @@ const Testimonials = () => {
         {/* Testimonials */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
           {testimonials.map((testimonial, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className={`glass-card p-8 hover-lift relative overflow-hidden group ${isVisible ? 'animate-fade-in' : 'opacity-0'}`}
               style={{ animationDelay: `${index * 0.2}s` }}
             >
               {/* Animated background glow */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
+
               {/* Content */}
               <div className="relative z-10">
                 {/* Quote Icon */}
@@ -122,8 +132,8 @@ const Testimonials = () => {
                 {/* Author */}
                 <div className="flex items-center">
                   <div className="relative">
-                    <img 
-                      src={testimonial.image} 
+                    <img
+                      src={testimonial.image}
                       alt={testimonial.name}
                       className="w-12 h-12 rounded-full object-cover mr-4 ring-2 ring-primary/20 group-hover:ring-primary/50 transition-all duration-300"
                     />
@@ -143,80 +153,45 @@ const Testimonials = () => {
           ))}
         </div>
 
-        {/* Partners Section - Enhanced */}
-        <div className="relative">
-          {/* Background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 rounded-3xl blur-3xl" />
-          
-          <div className="relative glass-card p-12 rounded-3xl border-primary/20">
-            {/* Stats Row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
-              {partnerStats.map((stat, index) => (
-                <div 
+        {/* Partners Section */}
+        <div className="relative py-20">
+          <div className="text-center mb-16">
+            <h3 className="text-4xl font-bold mb-6 text-foreground">
+              Vertrauen von <span className="text-gradient">führenden Unternehmen</span>
+            </h3>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Diese renommierten Unternehmen setzen auf unsere Expertise für ihre wichtigsten Events
+            </p>
+          </div>
+
+          {/* Horizontal scrolling partners */}
+          <div className="relative overflow-hidden py-12">
+            <div className="flex animate-scroll-infinite">
+              {/* Triple the array for seamless infinite scroll */}
+              {[...shuffledPartners, ...shuffledPartners, ...shuffledPartners].map((partner, index) => (
+                <div
                   key={index}
-                  className={`text-center group ${isVisible ? 'animate-fade-in' : 'opacity-0'}`}
-                  style={{ animationDelay: `${index * 0.1}s` }}
+                  className="flex-shrink-0 mx-6 group"
                 >
-                  <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                    <stat.icon className={`w-8 h-8 ${stat.color}`} />
-                  </div>
-                  <div className="text-3xl font-bold text-gradient mb-2">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Partners Title */}
-            <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold mb-4">
-                Vertrauen von <span className="text-gradient">führenden Unternehmen</span>
-              </h3>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Diese Weltklasse-Unternehmen vertrauen auf unsere Expertise für ihre wichtigsten Events
-              </p>
-            </div>
-
-            {/* Enhanced Partner Logos */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {partners.map((partner, index) => (
-                <div 
-                  key={index} 
-                  className={`relative group cursor-pointer ${isVisible ? 'animate-scale-in' : 'opacity-0'}`}
-                  style={{ animationDelay: `${0.5 + index * 0.1}s` }}
-                >
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  {/* Card */}
-                  <div className="relative glass-card p-8 rounded-2xl border-border/50 group-hover:border-primary/50 transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-primary/10 transform group-hover:-translate-y-2">
-                    <div className="flex flex-col items-center">
-                      <div className="w-20 h-20 mb-4 relative">
-                        <img 
-                          src={partner.logo} 
-                          alt={`${partner.name} Logo`}
-                          className="w-full h-full object-contain filter brightness-0 invert opacity-60 group-hover:filter-none group-hover:opacity-100 transition-all duration-500"
-                        />
-                        {/* Shine effect */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                      </div>
-                      <p className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors text-center leading-tight">
-                        {partner.name}
-                      </p>
+                  <a
+                    href={partner.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <div className="w-56 h-40 flex items-center justify-center p-6 rounded-xl bg-background/50 border border-border/30 hover:border-primary/50 transition-all duration-500 hover:bg-background/80 group-hover:scale-110 hover:shadow-lg hover:shadow-primary/20">
+                      <img
+                        src={partner.logo}
+                        alt={`${partner.name} Logo`}
+                        className="max-w-full max-h-full object-contain transition-all duration-300"
+                      />
                     </div>
-                  </div>
+                    <p className="text-center mt-4 text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                      {partner.name}
+                    </p>
+                  </a>
                 </div>
               ))}
-            </div>
-
-            {/* Call to action */}
-            <div className="text-center mt-12">
-              <p className="text-muted-foreground mb-6">
-                Werden Sie Teil unserer Erfolgsgeschichte
-              </p>
-              <button className="btn-hero group">
-                Ihr nächstes Event planen
-                <Sparkles className="ml-2 w-4 h-4 group-hover:rotate-12 transition-transform" />
-              </button>
             </div>
           </div>
         </div>
