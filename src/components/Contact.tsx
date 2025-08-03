@@ -19,22 +19,22 @@ const Contact = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Simulate form submission
     toast({
       title: "Nachricht gesendet!",
       description: "Wir melden uns innerhalb von 24 Stunden bei Ihnen.",
     });
-    
+
     // Reset form
-    setFormData({ 
-      name: '', 
-      email: '', 
-      company: '', 
-      message: '', 
-      callbackTime: '', 
-      eventType: '', 
-      venue: '' 
+    setFormData({
+      name: '',
+      email: '',
+      company: '',
+      message: '',
+      callbackTime: '',
+      eventType: '',
+      venue: ''
     });
   };
 
@@ -49,7 +49,7 @@ const Contact = () => {
     {
       icon: Phone,
       title: 'Telefon',
-      content: '+49 (0) 123 456 789',
+      content: '+49 1575 2046096',
       description: 'Mo-Fr 9:00-18:00 Uhr'
     },
     {
@@ -59,16 +59,10 @@ const Contact = () => {
       description: 'Antwort binnen 24h'
     },
     {
-      icon: MapPin,
-      title: 'Adresse',
-      content: 'Musterstraße 123, 12345 Berlin',
-      description: 'Termin nach Vereinbarung'
-    },
-    {
       icon: Clock,
       title: 'Öffnungszeiten',
       content: 'Mo-Fr 9:00-18:00',
-      description: 'Notfall-Hotline 24/7'
+      description: 'Flexible Termine möglich'
     },
   ];
 
@@ -81,7 +75,7 @@ const Contact = () => {
             Lassen Sie uns <span className="text-gradient">sprechen</span>
           </h2>
           <p className="text-body-large text-muted-foreground">
-            Haben Sie ein Event-Projekt im Kopf? Kontaktieren Sie uns für eine 
+            Haben Sie ein Event-Projekt im Kopf? Kontaktieren Sie uns für eine
             kostenlose Erstberatung und lassen Sie uns gemeinsam Ihre Vision verwirklichen.
           </p>
         </div>
@@ -261,13 +255,13 @@ const Contact = () => {
             {/* Emergency Contact */}
             <div className="glass-card p-6 bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
               <h4 className="font-semibold text-foreground mb-2">
-                Notfall-Hotline
+                Event-Support
               </h4>
               <p className="text-body text-foreground mb-1">
-                +49 (0) 123 456 789
+                Verfügbar während Ihres Events
               </p>
               <p className="text-sm text-muted-foreground">
-                24/7 verfügbar für laufende Events
+                Direkte Hotline erhält man vorab des Events
               </p>
             </div>
           </div>

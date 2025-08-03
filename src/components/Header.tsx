@@ -31,16 +31,17 @@ const Header = () => {
     >
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo Placeholder */}
           <Link
             to="/"
             className="flex items-center space-x-3 hover-scale cursor-pointer group"
           >
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-primary rounded-xl blur opacity-25 group-hover:opacity-40 transition-opacity duration-300"></div>
-              <div className="relative w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                <span className="text-white font-bold text-lg">N</span>
-              </div>
+              <img
+                src={nionLogo}
+                alt="NION Events Logo"
+                className="relative w-10 h-10 object-contain filter brightness-0 invert group-hover:scale-105 transition-transform duration-300"
+              />
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold text-gradient bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -63,9 +64,11 @@ const Header = () => {
                 {item.name}
               </a>
             ))}
-            <Button className="btn-hero">
-              Beratung anfragen
-            </Button>
+            <a href="#contact">
+              <Button className="btn-hero">
+                Beratung anfragen
+              </Button>
+            </a>
           </div>
 
           {/* Mobile Menu Button */}
@@ -91,9 +94,11 @@ const Header = () => {
                 {item.name}
               </a>
             ))}
-            <Button className="btn-hero w-full mt-4">
-              Beratung anfragen
-            </Button>
+            <a href="#contact">
+              <Button className="btn-hero w-full mt-4">
+                Beratung anfragen
+              </Button>
+            </a>
           </div>
         )}
       </nav>

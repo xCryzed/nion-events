@@ -8,7 +8,7 @@ const Impressum = () => {
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="text-4xl font-bold mb-8 text-center">Impressum</h1>
-          
+
           <div className="prose prose-invert max-w-none space-y-6">
             <section>
               <h2 className="text-2xl font-semibold mb-4">Angaben gemäß § 5 TMG</h2>
@@ -23,7 +23,7 @@ const Impressum = () => {
             <section>
               <h2 className="text-2xl font-semibold mb-4">Kontakt</h2>
               <div className="glass-card p-6 rounded-lg">
-                <p className="mb-2"><strong>Telefon:</strong> +49 (0)30 12345678</p>
+                <p className="mb-2"><strong>Telefon:</strong> +49 1575 2046096</p>
                 <p className="mb-2"><strong>E-Mail:</strong> info@nion-events.de</p>
               </div>
             </section>
@@ -64,16 +64,16 @@ const Impressum = () => {
               <h2 className="text-2xl font-semibold mb-4">Haftungsausschluss</h2>
               <h3 className="text-xl font-medium mb-2">Haftung für Inhalte</h3>
               <p className="text-muted-foreground mb-4">
-                Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den 
-                allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht 
-                unter der Verpflichtung, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach 
+                Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den
+                allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht
+                unter der Verpflichtung, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach
                 Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
               </p>
 
               <h3 className="text-xl font-medium mb-2">Haftung für Links</h3>
               <p className="text-muted-foreground">
-                Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. 
-                Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der 
+                Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben.
+                Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der
                 verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.
               </p>
             </section>
