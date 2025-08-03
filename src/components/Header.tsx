@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import nionLogo from '@/assets/NION_Logo_weiß.svg';
+import nionLogo from '@/assets/nion-logo-white.svg';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

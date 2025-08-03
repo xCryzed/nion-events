@@ -17,7 +17,7 @@ import {
   CheckCircle,
   Camera
 } from 'lucide-react';
-import nionLogo from '@/assets/NION_Logo_weiß.svg';
+import nionLogo from '@/assets/nion-logo-white.svg';
 
 const openCookieSettings = () => {
   // Trigger cookie banner to show again

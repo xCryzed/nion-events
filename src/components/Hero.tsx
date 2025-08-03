@@ -1,4 +1,4 @@
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight, Play, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import heroImage from '@/assets/hero-image.jpg';
 
@@ -51,7 +51,7 @@ const Hero = () => {
 
           {/* Subheading */}
           <p className="text-body-large text-muted-foreground mb-8 max-w-2xl animate-fade-in-up">
-            Von der ersten Idee bis zur erfolgreichen Umsetzung – NION Eventmanagement
+            Von der ersten Idee bis zur erfolgreichen Umsetzung – NION Events
             verwandelt Ihre Vision in ein unvergessliches Erlebnis. Professionell,
             kreativ und mit Leidenschaft für Details.
           </p>
@@ -98,6 +98,18 @@ const Hero = () => {
 
       {/* Decorative Elements */}
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent" />
+
+      {/* Scroll Down Indicator */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div className="flex flex-col items-center cursor-pointer group" onClick={() => {
+          document.getElementById('unternehmen')?.scrollIntoView({ behavior: 'smooth' });
+        }}>
+          <div className="w-6 h-10 border-2 border-muted-foreground/50 rounded-full flex justify-center group-hover:border-primary transition-colors">
+            <div className="w-1 h-3 bg-muted-foreground/50 rounded-full mt-2 group-hover:bg-primary transition-colors animate-pulse"></div>
+          </div>
+          <ChevronDown className="w-4 h-4 text-muted-foreground/50 mt-2 group-hover:text-primary transition-colors" />
+        </div>
+      </div>
     </section>
   );
 };

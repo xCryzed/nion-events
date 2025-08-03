@@ -1,5 +1,5 @@
 import { Award, Heart, Users, Zap } from 'lucide-react';
-import ninoPortrait from '@/assets/nino-portrait.webp';
+import nionPortrait from '@/assets/nion-portrait.webp';
 
 const About = () => {
     const values = [
@@ -61,17 +61,17 @@ const About = () => {
                           <div className="absolute -bottom-4 -right-4 w-8 h-8 bg-gradient-accent rounded-xl opacity-80 rotate-45"></div>
 
                           {/* Main Image */}
-                          <div className="relative bg-card rounded-3xl p-2 shadow-2xl">
+                          <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                               <img
-                                src={ninoPortrait}
+                                src={nionPortrait}
                                 alt="Nino Bergen, Gründer von NION Events"
-                                className="w-full h-[500px] object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700"
+                                className="w-full h-[500px] object-cover object-top group-hover:scale-105 transition-transform duration-700"
                               />
 
                               {/* Overlay Info Card */}
                               <div className="absolute bottom-6 left-6 right-6 bg-card/95 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-xl">
                                   <h3 className="text-xl font-bold text-foreground mb-2">Nino Bergen</h3>
-                                  <p className="text-primary font-semibold mb-3">Gründer & DJ</p>
+                                  <p className="text-primary font-semibold mb-3">Geschäftsführer</p>
                                   <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                     <span className="flex items-center">
                       <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>

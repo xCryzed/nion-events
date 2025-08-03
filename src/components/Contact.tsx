@@ -76,15 +76,8 @@ const Contact = () => {
       icon: Phone,
       title: 'Telefon',
       content: '+49 1575 2046096',
-      description: 'Mo-Fr 9:00-18:00 Uhr',
+      description: 'Erreichbar rund um die Uhr',
       href: 'tel:+4915752046096'
-    },
-    {
-      icon: Mail,
-      title: 'E-Mail',
-      content: 'info@nion-events.de',
-      description: 'Antwort binnen 24h',
-      href: 'mailto:info@nion-events.de'
     },
     {
       icon: () => (
@@ -96,6 +89,13 @@ const Contact = () => {
       content: '+49 1575 2046096',
       description: 'Direkte Nachricht',
       href: 'https://wa.me/4915752046096'
+    },
+    {
+      icon: Mail,
+      title: 'E-Mail',
+      content: 'info@nion-events.de',
+      description: 'Antwort innerhalb 24h',
+      href: 'mailto:info@nion-events.de'
     },
     {
       icon: Clock,
@@ -125,7 +125,7 @@ const Contact = () => {
             <div>
               <h3 className="text-title mb-4">Nachricht senden</h3>
               <p className="text-body text-muted-foreground mb-8">
-                Erzählen Sie uns von Ihrem Projekt. Wir melden uns innerhalb von 24 Stunden bei Ihnen.
+                Erzählen Sie uns von Ihrem Vorhaben und wir melden und schnellstmöglich bei Ihnen zurück.
               </p>
             </div>
 
@@ -310,15 +310,15 @@ const Contact = () => {
           </div>
 
           {/* Contact Information */}
-          <div className="space-y-8">
+          <div className="space-y-8 flex-col h-full">
             <div>
               <h3 className="text-title mb-4">Kontaktinformationen</h3>
               <p className="text-body text-muted-foreground mb-8">
-                Erreichen Sie uns über verschiedene Kanäle. Wir sind gerne für Sie da.
+                Sie erreichen uns unkompliziert über Ihren bevorzugten Kommunikationsweg.
               </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 flex-1">
               {contactInfo.map((info, index) => {
                 const isClickable = info.href;
 
@@ -358,42 +358,6 @@ const Contact = () => {
                 );
               })}
             </div>
-          </div>
-        </div>
-
-        {/* Google Review Section - Full Width */}
-        <div className="mt-16 max-w-2xl mx-auto">
-          <div className="glass-card p-8 text-center bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
-            <h3 className="text-title mb-4 text-foreground">
-              Bewerten Sie unsere Arbeit
-            </h3>
-
-            {/* 5 Stars */}
-            <div className="flex justify-center mb-4">
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} className="w-6 h-6 text-accent mx-1" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
-              ))}
-            </div>
-
-            <p className="text-muted-foreground mb-6">
-              Ihre Meinung ist uns wichtig. Teilen Sie Ihre Erfahrung mit anderen und helfen Sie uns dabei,
-              noch bessere Events zu gestalten.
-            </p>
-
-            <Button
-              onClick={() => window.open('https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID', '_blank')}
-              className="btn-hero group"
-            >
-              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              Bei Google bewerten
-            </Button>
           </div>
         </div>
       </div>
