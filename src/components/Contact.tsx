@@ -272,7 +272,7 @@ const Contact = () => {
                       <FormLabel>Veranstaltungsort (falls bereits bekannt)</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="z.B. Berlin, Hotel XY, eigene Location..."
+                          placeholder="z.B. DAS LIEBIG..."
                           className="bg-card border-border/50 focus:border-primary"
                           {...field}
                         />
@@ -291,7 +291,7 @@ const Contact = () => {
                       <FormControl>
                         <Textarea
                           rows={5}
-                          placeholder="Beschreiben Sie Ihr Event-Projekt..."
+                          placeholder="Beschreiben Sie Ihr Vorhaben..."
                           className="bg-card border-border/50 focus:border-primary"
                           {...field}
                         />
