@@ -102,46 +102,11 @@ const Footer = () => {
                     href={link.href}
                     className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                   >
-                    <link.icon className="w-4 h-4 mr-2" />
+                    <link.icon className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0" />
                     {link.name}
                   </a>
                 </li>
               ))}
-            </ul>
-          </div>
-
-          {/* Services List */}
-          <div>
-            <h4 className="font-semibold text-foreground mb-4">Leistungen</h4>
-            <ul className="space-y-3">
-              <li className="flex items-center text-sm text-muted-foreground">
-                <Disc3 className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
-                Professioneller DJ-Service
-              </li>
-              <li className="flex items-center text-sm text-muted-foreground">
-                <Lightbulb className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
-                Licht-, Ton- & Veranstaltungstechnik
-              </li>
-              <li className="flex items-center text-sm text-muted-foreground">
-                <Calendar className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
-                Konzeption & Eventplanung
-              </li>
-              <li className="flex items-center text-sm text-muted-foreground">
-                <Home className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
-                Private Events
-              </li>
-              <li className="flex items-center text-sm text-muted-foreground">
-                <Briefcase className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
-                Business-Events & Corporate Solutions
-              </li>
-              <li className="flex items-center text-sm text-muted-foreground">
-                <Star className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
-                Spezialformate & Besonderes
-              </li>
-              <li className="flex items-center text-sm text-muted-foreground">
-                <CheckCircle className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
-                Full Service Dienstleistungen
-              </li>
             </ul>
           </div>
 
@@ -156,7 +121,7 @@ const Footer = () => {
                       onClick={openCookieSettings}
                       className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                     >
-                      <link.icon className="w-4 h-4 mr-2" />
+                      <link.icon className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0" />
                       {link.name}
                     </button>
                   ) : (
@@ -164,7 +129,7 @@ const Footer = () => {
                       href={link.href}
                       className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                     >
-                      <link.icon className="w-4 h-4 mr-2" />
+                      <link.icon className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0" />
                       {link.name}
                     </a>
                   )}
@@ -172,6 +137,42 @@ const Footer = () => {
               ))}
             </ul>
           </div>
+
+          {/* Services List */}
+          <div>
+            <h4 className="font-semibold text-foreground mb-4">Leistungen</h4>
+            <ul className="space-y-3">
+              <li className="flex items-center text-sm text-muted-foreground">
+                <Disc3 className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0" />
+                Professioneller DJ-Service
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <Lightbulb className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0" />
+                Licht-, Ton und Technik
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <Calendar className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0" />
+                Konzeption & Eventplanung
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <Home className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0" />
+                Private Events
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <Briefcase className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0" />
+                Business-Events
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <Star className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0" />
+                Spezialformate
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <CheckCircle className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0" />
+                Full Service
+              </li>
+            </ul>
+          </div>
+
         </div>
 
         {/* Bottom Bar */}
