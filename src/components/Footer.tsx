@@ -1,4 +1,22 @@
-import { Facebook, Instagram, Mail, Phone, Cookie } from 'lucide-react';
+import {
+  Facebook,
+  Instagram,
+  Mail,
+  Phone,
+  Cookie,
+  FileText,
+  Shield,
+  ScrollText,
+  Building2,
+  Users,
+  Disc3,
+  Lightbulb,
+  Calendar,
+  Home,
+  Briefcase, Star,
+  CheckCircle
+} from 'lucide-react';
+import nionLogo from '@/assets/NION_Logo_weiß.svg';
 
 const openCookieSettings = () => {
   // Trigger cookie banner to show again
@@ -20,20 +38,14 @@ const Footer = () => {
 
   const footerLinks = {
     company: [
-      { name: 'Unternehmen', href: '#unternehmen' },
-      { name: 'Team', href: '#' },
-    ],
-    services: [
-      { name: 'Eventplanung', href: '#services' },
-      { name: 'Konferenzen', href: '#services' },
-      { name: 'Gala-Events', href: '#services' },
-      { name: 'Live-Marketing', href: '#services' },
+      { name: 'Unternehmen', href: '#unternehmen', icon: Building2 },
+      { name: 'Team', href: '#', icon: Users },
     ],
     legal: [
-      { name: 'Cookies', href: '#', isButton: true },
-      { name: 'Impressum', href: '/impressum' },
-      { name: 'Datenschutz', href: '/datenschutz' },
-      { name: 'AGB', href: '/agb' },
+      { name: 'Cookies', href: '#', isButton: true, icon: Cookie },
+      { name: 'Impressum', href: '/impressum', icon: FileText },
+      { name: 'Datenschutz', href: '/datenschutz', icon: Shield },
+      { name: 'AGB', href: '/agb', icon: ScrollText },
     ],
   };
 
@@ -44,11 +56,8 @@ const Footer = () => {
         <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Company Info */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">N</span>
-              </div>
-              <span className="text-xl font-bold">NION Events</span>
+            <div className="flex items-center">
+              <img src={nionLogo} alt="NION Events Logo" className="h-16 w-auto" />
             </div>
 
             <p className="text-body text-muted-foreground max-w-md">
@@ -91,8 +100,9 @@ const Footer = () => {
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
+                    className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                   >
+                    <link.icon className="w-4 h-4 mr-2" />
                     {link.name}
                   </a>
                 </li>
@@ -105,20 +115,32 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4">Leistungen</h4>
             <ul className="space-y-3">
               <li className="flex items-center text-sm text-muted-foreground">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full mr-3"></span>
-                DJ & Musik
+                <Disc3 className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
+                Professioneller DJ-Service
               </li>
               <li className="flex items-center text-sm text-muted-foreground">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full mr-3"></span>
-                Eventplanung
+                <Lightbulb className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
+                Licht-, Ton- & Veranstaltungstechnik
               </li>
               <li className="flex items-center text-sm text-muted-foreground">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full mr-3"></span>
-                Hochzeiten & Feiern
+                <Calendar className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
+                Konzeption & Eventplanung
               </li>
               <li className="flex items-center text-sm text-muted-foreground">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full mr-3"></span>
-                Corporate Events
+                <Home className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
+                Private Events
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <Briefcase className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
+                Business-Events & Corporate Solutions
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <Star className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
+                Spezialformate & Besonderes
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <CheckCircle className="w-3.5 h-3.5 text-primary mr-3 flex-shrink-0" />
+                Full Service Dienstleistungen
               </li>
             </ul>
           </div>
@@ -134,14 +156,15 @@ const Footer = () => {
                       onClick={openCookieSettings}
                       className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                     >
-                      <Cookie className="w-4 h-4 mr-2" />
+                      <link.icon className="w-4 h-4 mr-2" />
                       {link.name}
                     </button>
                   ) : (
                     <a
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
+                      className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                     >
+                      <link.icon className="w-4 h-4 mr-2" />
                       {link.name}
                     </a>
                   )}

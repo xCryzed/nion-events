@@ -230,8 +230,12 @@ const Contact = () => {
             </div>
 
             <div className="space-y-6">
-              {contactInfo.map((info, index) => (
-                <div key={index} className="glass-card p-6 hover-lift">
+              {contactInfo.map((info, index) => {
+                const isClickable = info.title === 'Telefon' || info.title === 'E-Mail';
+                const href = info.title === 'Telefon' ? `tel:${info.content}` :
+                  info.title === 'E-Mail' ? `mailto:${info.content}` : '#';
+
+                const CardContent = () => (
                   <div className="flex items-start">
                     <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center mr-4 flex-shrink-0">
                       <info.icon className="w-6 h-6 text-white" />
@@ -248,8 +252,24 @@ const Contact = () => {
                       </p>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+
+                return (
+                  <div key={index}>
+                    {isClickable ? (
+                      <a href={href} className="block">
+                        <div className="glass-card p-6 hover-lift cursor-pointer transition-all duration-300 hover:shadow-glow">
+                          <CardContent />
+                        </div>
+                      </a>
+                    ) : (
+                      <div className="glass-card p-6 hover-lift">
+                        <CardContent />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Emergency Contact */}

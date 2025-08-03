@@ -70,9 +70,9 @@ const CookieBanner = () => {
   if (!showBanner) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background/95 backdrop-blur border-t animate-slide-up">
+    <div className="fixed bottom-0 left-0 right-0 z-50 p-3 md:p-4 bg-background/95 backdrop-blur border-t animate-slide-up">
       <div className="container mx-auto max-w-6xl">
-        <div className="glass-card p-6 rounded-lg">
+        <div className="glass-card p-4 md:p-6 rounded-lg">
           <div className="flex items-start gap-4">
             <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
               <Cookie className="h-4 w-4 text-primary" />
@@ -81,30 +81,29 @@ const CookieBanner = () => {
               {!showSettings ? (
                 <>
                   <h3 className="font-semibold mb-2">Cookie-Einstellungen</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-sm text-muted-foreground mb-6">
                     Wir verwenden Cookies, um Ihnen die bestmögliche Erfahrung auf unserer Website zu bieten.
                     Einige Cookies sind für die Funktionalität der Website erforderlich, während andere uns helfen,
                     die Nutzung zu analysieren und Inhalte zu personalisieren.
                   </p>
-                  <div className="flex flex-wrap gap-3">
-                    <Button size="sm" onClick={acceptAll}>
-                      Alle akzeptieren
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={acceptEssential}>
-                      Nur erforderliche
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={rejectAll}>
-                      Alle ablehnen
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={openSettings}>
-                      <Settings className="w-4 h-4 mr-2" />
-                      Einstellungen
-                    </Button>
-                    <Button variant="ghost" size="sm" asChild>
-                      <a href="/datenschutz" className="text-xs">
-                        Datenschutz
-                      </a>
-                    </Button>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <Button onClick={acceptAll} className="w-full">
+                        Alle akzeptieren
+                      </Button>
+                      <Button variant="outline" onClick={acceptEssential} className="w-full">
+                        Nur erforderliche
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <Button variant="ghost" onClick={rejectAll} className="w-full">
+                        Alle ablehnen
+                      </Button>
+                      <Button variant="ghost" onClick={openSettings} className="w-full">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Einstellungen
+                      </Button>
+                    </div>
                   </div>
                 </>
               ) : (
@@ -119,51 +118,51 @@ const CookieBanner = () => {
                       <div className="text-xs text-muted-foreground">Immer aktiv</div>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-card/50 rounded-lg">
-                      <div>
+                    <div className="flex items-center justify-between p-4 bg-card/50 rounded-lg">
+                      <div className="flex-1 mr-4">
                         <h4 className="font-medium text-sm">Analytische Cookies</h4>
-                        <p className="text-xs text-muted-foreground">Helfen uns, die Website-Nutzung zu verstehen</p>
+                        <p className="text-xs text-muted-foreground mt-1">Helfen uns, die Website-Nutzung zu verstehen</p>
                       </div>
                       <button
                         onClick={() => handlePreferenceChange('analytics')}
-                        className={`w-10 h-6 rounded-full ${preferences.analytics ? 'bg-primary' : 'bg-gray-300'} relative transition-colors`}
+                        className={`w-12 h-7 rounded-full ${preferences.analytics ? 'bg-primary' : 'bg-gray-300'} relative transition-colors flex-shrink-0`}
                       >
-                        <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform ${preferences.analytics ? 'translate-x-5' : 'translate-x-1'}`} />
+                        <div className={`w-5 h-5 bg-white rounded-full absolute top-1 transition-transform ${preferences.analytics ? 'translate-x-6' : 'translate-x-1'}`} />
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-card/50 rounded-lg">
-                      <div>
+                    <div className="flex items-center justify-between p-4 bg-card/50 rounded-lg">
+                      <div className="flex-1 mr-4">
                         <h4 className="font-medium text-sm">Marketing Cookies</h4>
-                        <p className="text-xs text-muted-foreground">Für personalisierte Werbung und Inhalte</p>
+                        <p className="text-xs text-muted-foreground mt-1">Für personalisierte Werbung und Inhalte</p>
                       </div>
                       <button
                         onClick={() => handlePreferenceChange('marketing')}
-                        className={`w-10 h-6 rounded-full ${preferences.marketing ? 'bg-primary' : 'bg-gray-300'} relative transition-colors`}
+                        className={`w-12 h-7 rounded-full ${preferences.marketing ? 'bg-primary' : 'bg-gray-300'} relative transition-colors flex-shrink-0`}
                       >
-                        <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform ${preferences.marketing ? 'translate-x-5' : 'translate-x-1'}`} />
+                        <div className={`w-5 h-5 bg-white rounded-full absolute top-1 transition-transform ${preferences.marketing ? 'translate-x-6' : 'translate-x-1'}`} />
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-card/50 rounded-lg">
-                      <div>
+                    <div className="flex items-center justify-between p-4 bg-card/50 rounded-lg">
+                      <div className="flex-1 mr-4">
                         <h4 className="font-medium text-sm">Funktionale Cookies</h4>
-                        <p className="text-xs text-muted-foreground">Erweiterte Website-Funktionen und Personalisierung</p>
+                        <p className="text-xs text-muted-foreground mt-1">Erweiterte Website-Funktionen und Personalisierung</p>
                       </div>
                       <button
                         onClick={() => handlePreferenceChange('functional')}
-                        className={`w-10 h-6 rounded-full ${preferences.functional ? 'bg-primary' : 'bg-gray-300'} relative transition-colors`}
+                        className={`w-12 h-7 rounded-full ${preferences.functional ? 'bg-primary' : 'bg-gray-300'} relative transition-colors flex-shrink-0`}
                       >
-                        <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform ${preferences.functional ? 'translate-x-5' : 'translate-x-1'}`} />
+                        <div className={`w-5 h-5 bg-white rounded-full absolute top-1 transition-transform ${preferences.functional ? 'translate-x-6' : 'translate-x-1'}`} />
                       </button>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-3">
-                    <Button size="sm" onClick={savePreferences}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Button onClick={savePreferences} className="w-full">
                       Einstellungen speichern
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => setShowSettings(false)}>
+                    <Button variant="outline" onClick={() => setShowSettings(false)} className="w-full">
                       Zurück
                     </Button>
                   </div>
