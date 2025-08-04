@@ -77,7 +77,7 @@ const Footer = () => {
   const footerLinks = {
     company: [
       {name: 'Unternehmen', href: '#unternehmen', icon: Building2},
-      {name: 'Team', href: '#', icon: Users},
+      {name: 'Team', href: '#team', icon: Users},
     ],
     legal: [
       {name: 'Cookies', href: '#', isButton: true, icon: Cookie},
