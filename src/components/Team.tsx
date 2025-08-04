@@ -115,9 +115,9 @@ const Team = () => {
     <section id="team" className="section-padding relative overflow-hidden">
       {/* Background with gradient and floating elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/10 to-background"></div>
-      <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-r from-primary/3 via-transparent to-accent/3 rounded-full blur-3xl"></div>
+      <div className="absolute top-20 left-5 sm:left-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/5 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-5 sm:right-10 w-64 sm:w-96 h-64 sm:h-96 bg-accent/5 rounded-full blur-3xl"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] sm:w-[800px] h-[200px] sm:h-[400px] bg-gradient-to-r from-primary/3 via-transparent to-accent/3 rounded-full blur-3xl"></div>
 
       {/* Floating particles */}
       <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-primary/30 rounded-full animate-pulse"></div>

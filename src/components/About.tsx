@@ -29,8 +29,8 @@ const About = () => {
     <section id="unternehmen" className="py-32 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-secondary/20 to-background"></div>
-      <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-primary rounded-full blur-3xl opacity-10"></div>
-      <div className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-accent rounded-full blur-3xl opacity-10"></div>
+      <div className="absolute top-20 right-10 sm:right-20 w-64 sm:w-96 h-64 sm:h-96 bg-gradient-primary rounded-full blur-3xl opacity-10"></div>
+      <div className="absolute bottom-20 left-10 sm:left-20 w-60 sm:w-80 h-60 sm:h-80 bg-gradient-accent rounded-full blur-3xl opacity-10"></div>
 
       <div className="container relative z-10">
         {/* Header Section */}

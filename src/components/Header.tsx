@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import {ArrowRight, Menu, X} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import nionLogo from '@/assets/nion-logo-white.svg';
@@ -67,7 +67,8 @@ const Header = () => {
               ))}
               <a href="#contact">
                 <Button className="btn-hero">
-                  Beratung anfragen
+                  Projekt starten
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </a>
             </div>
@@ -97,7 +98,8 @@ const Header = () => {
               ))}
               <a href="#contact">
                 <Button className="btn-hero w-full mt-4">
-                  Beratung anfragen
+                  Projekt starten
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </a>
             </div>

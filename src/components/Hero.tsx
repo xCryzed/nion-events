@@ -100,14 +100,24 @@ const Hero = () => {
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent" />
 
       {/* Scroll Down Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="flex flex-col items-center cursor-pointer group" onClick={() => {
-          document.getElementById('unternehmen')?.scrollIntoView({ behavior: 'smooth' });
-        }}>
-          <div className="w-6 h-10 border-2 border-muted-foreground/50 rounded-full flex justify-center group-hover:border-primary transition-colors">
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
+        <div
+          className="flex flex-col items-center cursor-pointer group hover:cursor-pointer"
+          onClick={() => {
+            const target = document.getElementById('unternehmen');
+            if (target) {
+              target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              });
+            }
+          }}
+          style={{ cursor: 'pointer' }}
+        >
+          <div className="w-6 h-10 border-2 border-muted-foreground/50 rounded-full flex justify-center group-hover:border-primary transition-colors pointer-events-auto">
             <div className="w-1 h-3 bg-muted-foreground/50 rounded-full mt-2 group-hover:bg-primary transition-colors animate-pulse"></div>
           </div>
-          <ChevronDown className="w-4 h-4 text-muted-foreground/50 mt-2 group-hover:text-primary transition-colors" />
+          <ChevronDown className="w-4 h-4 text-muted-foreground/50 mt-2 group-hover:text-primary transition-colors pointer-events-none" />
         </div>
       </div>
     </section>

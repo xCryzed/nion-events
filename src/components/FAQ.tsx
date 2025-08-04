@@ -248,8 +248,8 @@ const FAQ = () => {
     <section id="faq" className="section-padding bg-muted/30">
       {/* Background Elements */}
       <div className="absolute inset-0"></div>
-      <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-primary rounded-full blur-3xl opacity-5"></div>
-      <div className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-accent rounded-full blur-3xl opacity-5"></div>
+      <div className="absolute top-20 right-10 sm:right-20 w-64 sm:w-96 h-64 sm:h-96 bg-gradient-primary rounded-full blur-3xl opacity-5"></div>
+      <div className="absolute bottom-20 left-10 sm:left-20 w-60 sm:w-80 h-60 sm:h-80 bg-gradient-accent rounded-full blur-3xl opacity-5"></div>
 
       <div className="container relative z-10">
         {/* Header */}
