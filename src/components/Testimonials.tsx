@@ -91,6 +91,7 @@ const Testimonials = () => {
           <h2 className="text-headline mb-6">
             Was unsere <span className="text-gradient">Kunden</span> sagen
           </h2>
+          <div className="w-24 h-1 bg-gradient-primary rounded-full mx-auto mb-8"></div>
           <p className="text-body-large text-muted-foreground">
             Überzeugen Sie sich selbst von der Qualität unserer Arbeit.
             Hier sind einige Stimmen unserer zufriedenen Kunden.
@@ -187,6 +188,7 @@ const Testimonials = () => {
             <h3 className="text-4xl font-bold mb-6 text-foreground">
               Vertrauen von <span className="text-gradient">führenden Unternehmen</span>
             </h3>
+            <div className="w-24 h-1 bg-gradient-primary rounded-full mx-auto mb-8"></div>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               Diese renommierten Unternehmen setzen auf unsere Expertise für ihre wichtigsten Events
             </p>

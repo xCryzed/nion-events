@@ -121,7 +121,8 @@ const Contact = () => {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-headline mb-6">
-            Lassen Sie uns <span className="text-gradient">sprechen</span>
+            <span className="text-foreground">Lassen Sie uns </span><span className="text-gradient">sprechen</span>
+            <div className="w-24 h-1 bg-gradient-primary rounded-full mx-auto mt-8"></div>
           </h2>
           <p className="text-body-large text-muted-foreground">
             Haben Sie ein Event-Projekt im Kopf? Kontaktieren Sie uns für eine

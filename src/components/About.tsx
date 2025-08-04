@@ -40,7 +40,7 @@ const About = () => {
             <span className="text-sm text-muted-foreground font-medium tracking-wide">DJ- & EVENTMANAGEMENT MIT LEIDENSCHAFT UND SYSTEM</span>
           </div>
           <h2 className="text-5xl lg:text-6xl font-bold mb-6">
-            <span className="text-foreground">NION Events</span>
+            <span className="text-foreground">NION </span><span className="text-gradient">Events</span>
           </h2>
           <div className="w-24 h-1 bg-gradient-primary rounded-full mx-auto mb-8"></div>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
@@ -217,13 +217,9 @@ const About = () => {
                     <span className="text-primary font-semibold text-sm tracking-wider">MEINE VISION</span>
                   </div>
 
-                  <h3 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mb-6">
-                    NION Events
-                  </h3>
-
                   <div className="space-y-4 text-lg leading-relaxed max-w-3xl mx-auto">
                     <p className="text-foreground">
-                      steht für maßgeschneiderte Eventlösungen – von stilvollen Hochzeitsfeiern bis hin zu großen Firmenevents.
+                      Maßgeschneiderte Eventlösungen – von stilvollen Hochzeitsfeiern bis hin zu großen Firmenevents.
                       Durch meine umfassende Erfahrung garantiere ich Ihnen eine professionelle Umsetzung auf höchstem Niveau.
                     </p>
                   </div>

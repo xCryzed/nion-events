@@ -126,9 +126,10 @@ const Team = () => {
 
       <div className="container relative z-10">
         <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-display text-gradient mb-6">
-            Das Team
+          <h2 className="text-display mb-6">
+            <span className="text-foreground">Das </span><span className="text-gradient">Team</span>
           </h2>
+          <div className="w-24 h-1 bg-gradient-primary rounded-full mx-auto mb-8"></div>
           <p className="text-body-large text-muted-foreground max-w-3xl mx-auto">
             Lernen Sie das kreative Powerhouse hinter NION Events kennen.
             Jeder bringt einzigartige Talente und Leidenschaft mit, um Ihre Vision zum Leben zu erwecken.

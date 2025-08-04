@@ -60,6 +60,7 @@ const Services = () => {
           <h2 className="text-headline mb-6">
             Unsere <span className="text-gradient">Leistungen</span>
           </h2>
+          <div className="w-24 h-1 bg-gradient-primary rounded-full mx-auto mb-8"></div>
           <p className="text-body-large text-muted-foreground">
             Von der ersten Idee bis zur perfekten Umsetzung – wir bieten Ihnen 
             alle Services aus einer Hand für unvergessliche Events.
