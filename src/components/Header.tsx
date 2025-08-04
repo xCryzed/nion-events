@@ -22,6 +22,7 @@ const Header = () => {
     { name: 'Referenzen', href: '#testimonials' },
     { name: 'Kontakt', href: '#contact' },
     { name: 'Team', href: '#team' },
+    { name: 'FAQ', href: '#faq' },
   ];
 
   return (
