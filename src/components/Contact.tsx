@@ -35,7 +35,6 @@ const formSchema = z.object({
     .optional()
     .refine((value) => {
       if (!value) return true; // Optional field
-      // German mobile number validation (with or without country code)
       const mobileRegex = /^(\+49|0049|0)?1[5-7][0-9]{8,9}$/;
       return mobileRegex.test(value.replace(/\s/g, ''));
     }, {
@@ -186,7 +185,7 @@ const Contact = () => {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Telefonnummer (optional)</FormLabel>
+                        <FormLabel>Telefonnummer</FormLabel>
                         <FormControl>
                           <Input
                             type="tel"
@@ -204,7 +203,7 @@ const Contact = () => {
                     name="company"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Unternehmen (optional)</FormLabel>
+                        <FormLabel>Unternehmen</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Ihr Unternehmen"

@@ -208,10 +208,6 @@ const About = () => {
 
               {/* Main card */}
               <div className="relative bg-gradient-to-br from-card/80 via-card/60 to-card/80 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-primary/20 hover:border-primary/40 transition-all duration-500 shadow-2xl">
-                {/* Decorative elements */}
-                <div className="absolute top-6 right-6 w-12 h-12 bg-gradient-primary rounded-2xl flex items-center justify-center rotate-12 group-hover:rotate-0 transition-transform duration-500">
-                  <span className="text-white text-lg font-bold">🚀</span>
-                </div>
                 <div className="absolute bottom-6 left-6 w-8 h-8 bg-gradient-accent rounded-xl opacity-60 rotate-45 group-hover:rotate-90 transition-transform duration-700"></div>
 
                 {/* Content */}
