@@ -194,12 +194,13 @@ const Testimonials = () => {
 
           {/* Horizontal scrolling partners */}
           <div className="relative overflow-hidden py-12">
-            <div className="flex animate-scroll-infinite">
-              {/* Triple the array for seamless infinite scroll */}
-              {[...shuffledPartners, ...shuffledPartners, ...shuffledPartners].map((partner, index) => (
+            <div className="flex animate-scroll-smooth" style={{ width: 'max-content' }}>
+              {/* Sextuple the array for truly seamless infinite scroll */}
+              {[...shuffledPartners, ...shuffledPartners, ...shuffledPartners, ...shuffledPartners, ...shuffledPartners, ...shuffledPartners].map((partner, index) => (
                 <div
-                  key={index}
+                  key={`${partner.name}-${index}`}
                   className="flex-shrink-0 mx-6 group"
+                  style={{ minWidth: '224px' }}
                 >
                   <a
                     href={partner.website}

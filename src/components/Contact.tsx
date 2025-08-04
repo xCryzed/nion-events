@@ -30,6 +30,17 @@ const formSchema = z.object({
     message: "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
   }),
   phone: z.string().optional(),
+  mobile: z
+    .string()
+    .optional()
+    .refine((value) => {
+      if (!value) return true; // Optional field
+      // German mobile number validation (with or without country code)
+      const mobileRegex = /^(\+49|0049|0)?1[5-7][0-9]{8,9}$/;
+      return mobileRegex.test(value.replace(/\s/g, ''));
+    }, {
+      message: "Bitte geben Sie eine gültige deutsche Mobilnummer ein.",
+    }),
   company: z.string().optional(),
   eventType: z.string().optional(),
   callbackTime: z.string().optional(),

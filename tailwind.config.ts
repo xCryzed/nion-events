@@ -101,9 +101,9 @@ export default {
 					'0%': { transform: 'translateX(0)' },
 					'100%': { transform: 'translateX(-50%)' }
 				},
-				'scroll-infinite': {
+				'scroll-smooth': {
 					'0%': { transform: 'translateX(0)' },
-					'100%': { transform: 'translateX(-33.333%)' }
+					'100%': { transform: 'translateX(-50%)' }
 				}
 			},
 			animation: {
@@ -114,7 +114,8 @@ export default {
 				'scale-in': 'scale-in 0.5s ease-out',
 				'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
 				'scroll': 'scroll 30s linear infinite',
-				'scroll-infinite': 'scroll-infinite 60s linear infinite'
+				'scroll-infinite': 'scroll-infinite 60s linear infinite',
+				'scroll-smooth': 'scroll-smooth 60s linear infinite',
 			}
 		}
 	},
