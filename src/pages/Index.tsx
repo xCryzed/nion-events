@@ -7,6 +7,7 @@ import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import CookieBanner from '@/components/CookieBanner';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import Team from "@/components/Team.tsx";
 
 const Index = () => {
   return (
@@ -18,6 +19,7 @@ const Index = () => {
         <Services />
         <Testimonials />
         <Contact />
+        <Team />
       </main>
       <Footer />
       <CookieBanner />

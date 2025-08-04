@@ -21,6 +21,7 @@ const Header = () => {
     { name: 'Leistungen', href: '#services' },
     { name: 'Referenzen', href: '#testimonials' },
     { name: 'Kontakt', href: '#contact' },
+    { name: 'Team', href: '#team' },
   ];
 
   return (
@@ -34,7 +35,8 @@ const Header = () => {
           <div className="flex items-center justify-between">
             <Link
               to="/"
-              className="flex items-center space-x-4 hover-scale cursor-pointer group"
+              className="flex items-center space-x-2 hover-scale cursor-pointer group"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
               <div className="relative">
                 <div className="absolute -inset-2 rounded-xl blur opacity-25 group-hover:opacity-40 transition-opacity duration-300"></div>
@@ -44,8 +46,8 @@ const Header = () => {
                   className="relative w-12 h-12 object-contain filter brightness-0 invert group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-bold text-gradient bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <div className="flex flex-col group">
+                <span className="text-xl font-bold text-gradient bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
                   Events
                 </span>
               </div>
