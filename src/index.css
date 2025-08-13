@@ -175,21 +175,6 @@
     @apply transition-transform duration-300 hover:scale-105;
   }
 
-  /* Mobile-friendly partner scroll animation */
-  @media (max-width: 767px) {
-    .animate-scroll-partners {
-      animation: none !important;
-    }
-  }
-
-  /* Ensure logos are visible on load for mobile browsers */
-  @media (max-width: 767px) {
-    .grid img {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
   @keyframes fadeIn {
     from {
       opacity: 0;
