@@ -114,6 +114,7 @@ const Header = () => {
     { name: 'Kontakt', href: '#contact' },
     { name: 'Team', href: '#team' },
     { name: 'FAQ', href: '#faq' },
+    { name: 'Administration', href: '/administration', isRoute: true },
   ];
 
   return (
@@ -148,13 +149,23 @@ const Header = () => {
               {/* Desktop Navigation */}
               <div className="hidden md:flex items-center space-x-8">
                 {navItems.map((item) => (
-                    <a
-                        key={item.name}
-                        href={item.href}
-                        className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
-                    >
-                      {item.name}
-                    </a>
+                    item.isRoute ? (
+                        <Link
+                            key={item.name}
+                            to={item.href}
+                            className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
+                        >
+                          {item.name}
+                        </Link>
+                    ) : (
+                        <a
+                            key={item.name}
+                            href={item.href}
+                            className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
+                        >
+                          {item.name}
+                        </a>
+                    )
                 ))}
                 {user ? (
                     <DropdownMenu>
@@ -178,8 +189,7 @@ const Header = () => {
                 ) : (
                     <Link to="/auth">
                       <Button className="btn-hero">
-                        Login
-                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        Anmelden
                       </Button>
                     </Link>
                 )}
@@ -199,14 +209,25 @@ const Header = () => {
             {isMenuOpen && (
                 <div className="md:hidden mt-4 space-y-4 animate-fade-in glass-card p-4">
                   {navItems.map((item) => (
-                      <a
-                          key={item.name}
-                          href={item.href}
-                          className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
-                          onClick={() => setIsMenuOpen(false)}
-                      >
-                        {item.name}
-                      </a>
+                      item.isRoute ? (
+                          <Link
+                              key={item.name}
+                              to={item.href}
+                              className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                              onClick={() => setIsMenuOpen(false)}
+                          >
+                            {item.name}
+                          </Link>
+                      ) : (
+                          <a
+                              key={item.name}
+                              href={item.href}
+                              className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                              onClick={() => setIsMenuOpen(false)}
+                          >
+                            {item.name}
+                          </a>
+                      )
                   ))}
                   {user ? (
                       <div className="pt-4 border-t border-border">
@@ -226,8 +247,7 @@ const Header = () => {
                   ) : (
                       <Link to="/auth">
                         <Button className="btn-hero w-full mt-4">
-                          Login
-                          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          Anmelden
                         </Button>
                       </Link>
                   )}

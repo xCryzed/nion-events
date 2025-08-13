@@ -14,6 +14,51 @@ export type Database = {
     }
     public: {
         Tables: {
+            contact_requests: {
+                Row: {
+                    callback_time: string | null
+                    company: string | null
+                    created_at: string
+                    email: string
+                    event_type: string | null
+                    id: string
+                    message: string
+                    mobile: string | null
+                    name: string
+                    phone: string | null
+                    updated_at: string
+                    venue: string | null
+                }
+                Insert: {
+                    callback_time?: string | null
+                    company?: string | null
+                    created_at?: string
+                    email: string
+                    event_type?: string | null
+                    id?: string
+                    message: string
+                    mobile?: string | null
+                    name: string
+                    phone?: string | null
+                    updated_at?: string
+                    venue?: string | null
+                }
+                Update: {
+                    callback_time?: string | null
+                    company?: string | null
+                    created_at?: string
+                    email?: string
+                    event_type?: string | null
+                    id?: string
+                    message?: string
+                    mobile?: string | null
+                    name?: string
+                    phone?: string | null
+                    updated_at?: string
+                    venue?: string | null
+                }
+                Relationships: []
+            }
             profiles: {
                 Row: {
                     created_at: string
