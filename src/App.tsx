@@ -10,6 +10,7 @@ import Datenschutz from "./pages/Datenschutz";
 import Impressum from "./pages/Impressum";
 import AGB from "./pages/AGB";
 import Presse from "./pages/Presse";
+import Auth from "@/pages/Auth.tsx";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/impressum" element={<Impressum />} />
           <Route path="/agb" element={<AGB />} />
           <Route path="/presse" element={<Presse />} />
+          <Route path="/auth" element={<Auth />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

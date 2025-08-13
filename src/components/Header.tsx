@@ -1,12 +1,21 @@
 import { useState, useEffect } from 'react';
-import {ArrowRight, Menu, X} from 'lucide-react';
+import {ArrowRight, Menu, X, LogOut} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
+import { useToast } from '@/components/ui/use-toast';
 import nionLogo from '@/assets/nion-logo-white.svg';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [userProfile, setUserProfile] = useState<{first_name: string | null, last_name: string | null} | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +24,88 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        (event, session) => {
+          setSession(session);
+          setUser(session?.user ?? null);
+
+          // Fetch user profile when authenticated
+          if (session?.user) {
+            setTimeout(() => {
+              fetchUserProfile(session.user.id);
+            }, 0);
+          } else {
+            setUserProfile(null);
+          }
+        }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+
+      if (data) {
+        setUserProfile(data);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast({
+          title: "Fehler beim Abmelden",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Erfolgreich abgemeldet",
+          description: "Sie wurden erfolgreich abgemeldet.",
+        });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const getInitials = () => {
+    if (!userProfile?.first_name || !userProfile?.last_name) return 'N';
+    return (userProfile.first_name.charAt(0) + userProfile.last_name.charAt(0)).toUpperCase();
+  };
+
+  const getDisplayName = () => {
+    if (!userProfile?.first_name || !userProfile?.last_name) return 'Benutzer';
+    return `${userProfile.first_name} ${userProfile.last_name}`;
+  };
 
   const navItems = [
     { name: 'Unternehmen', href: '#unternehmen' },
@@ -26,87 +117,125 @@ const Header = () => {
   ];
 
   return (
-    <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled || isMenuOpen ? 'glass-card' : 'bg-transparent'
-        }`}
-      >
-        <nav className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link
-              to="/"
-              className="flex items-center space-x-2 hover-scale cursor-pointer group"
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            >
-              <div className="relative">
-                <div className="absolute -inset-2 rounded-xl blur opacity-25 group-hover:opacity-40 transition-opacity duration-300"></div>
-                <img
-                  src={nionLogo}
-                  alt="NION Events Logo"
-                  className="relative w-12 h-12 object-contain filter brightness-0 invert group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <div className="flex flex-col group">
+      <>
+        <header
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+                isScrolled || isMenuOpen ? 'glass-card' : 'bg-transparent'
+            }`}
+        >
+          <nav className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <Link
+                  to="/"
+                  className="flex items-center space-x-2 hover-scale cursor-pointer group"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              >
+                <div className="relative">
+                  <div className="absolute -inset-2 rounded-xl blur opacity-25 group-hover:opacity-40 transition-opacity duration-300"></div>
+                  <img
+                      src={nionLogo}
+                      alt="NION Events Logo"
+                      className="relative w-12 h-12 object-contain filter brightness-0 invert group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="flex flex-col group">
                 <span className="text-xl font-bold text-gradient bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
                   Events
                 </span>
+                </div>
+              </Link>
+
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex items-center space-x-8">
+                {navItems.map((item) => (
+                    <a
+                        key={item.name}
+                        href={item.href}
+                        className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
+                    >
+                      {item.name}
+                    </a>
+                ))}
+                {user ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="flex items-center gap-3 p-2 h-auto">
+                          <Avatar className="w-8 h-8">
+                            <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
+                              {getInitials()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-foreground font-medium">{getDisplayName()}</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Abmelden
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                ) : (
+                    <Link to="/auth">
+                      <Button className="btn-hero">
+                        Login
+                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
+                )}
               </div>
-            </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {navItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
-                >
-                  {item.name}
-                </a>
-              ))}
-              <a href="#contact">
-                <Button className="btn-hero">
-                  Projekt starten
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </a>
+              {/* Mobile Menu Button */}
+              <button
+                  className="md:hidden text-foreground"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  aria-label="Toggle menu"
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden text-foreground"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-
-          {/* Mobile Navigation */}
-          {isMenuOpen && (
-            <div className="md:hidden mt-4 space-y-4 animate-fade-in glass-card p-4">
-              {navItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </a>
-              ))}
-              <a href="#contact">
-                <Button className="btn-hero w-full mt-4">
-                  Projekt starten
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </a>
-            </div>
-          )}
-        </nav>
-      </header>
-    </>
+            {/* Mobile Navigation */}
+            {isMenuOpen && (
+                <div className="md:hidden mt-4 space-y-4 animate-fade-in glass-card p-4">
+                  {navItems.map((item) => (
+                      <a
+                          key={item.name}
+                          href={item.href}
+                          className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                          onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.name}
+                      </a>
+                  ))}
+                  {user ? (
+                      <div className="pt-4 border-t border-border">
+                        <div className="flex items-center gap-3 p-2 mb-2">
+                          <Avatar className="w-8 h-8">
+                            <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
+                              {getInitials()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-foreground font-medium">{getDisplayName()}</span>
+                        </div>
+                        <Button onClick={handleLogout} className="w-full" variant="outline">
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Abmelden
+                        </Button>
+                      </div>
+                  ) : (
+                      <Link to="/auth">
+                        <Button className="btn-hero w-full mt-4">
+                          Login
+                          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                      </Link>
+                  )}
+                </div>
+            )}
+          </nav>
+        </header>
+      </>
   );
 };
 
