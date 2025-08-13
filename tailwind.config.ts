@@ -104,6 +104,10 @@ export default {
 				'scroll-smooth': {
 					'0%': { transform: 'translateX(0)' },
 					'100%': { transform: 'translateX(-50%)' }
+				},
+				'scroll-partners': {
+					'0%': { transform: 'translateX(0)' },
+					'100%': { transform: 'translateX(-33.333%)' }
 				}
 			},
 			animation: {
@@ -116,6 +120,7 @@ export default {
 				'scroll': 'scroll 30s linear infinite',
 				'scroll-infinite': 'scroll-infinite 60s linear infinite',
 				'scroll-smooth': 'scroll-smooth 60s linear infinite',
+				'scroll-partners': 'scroll-partners 45s linear infinite',
 			}
 		}
 	},
