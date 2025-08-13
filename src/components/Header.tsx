@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import {ArrowRight, Menu, X, LogOut} from 'lucide-react';
+import { Menu, X, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -15,6 +15,7 @@ const Header = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [userProfile, setUserProfile] = useState<{first_name: string | null, last_name: string | null} | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -36,9 +37,11 @@ const Header = () => {
           if (session?.user) {
             setTimeout(() => {
               fetchUserProfile(session.user.id);
+              checkAdminRole(session.user.id);
             }, 0);
           } else {
             setUserProfile(null);
+            setIsAdmin(false);
           }
         }
     );
@@ -50,6 +53,7 @@ const Header = () => {
 
       if (session?.user) {
         fetchUserProfile(session.user.id);
+        checkAdminRole(session.user.id);
       }
     });
 
@@ -74,6 +78,21 @@ const Header = () => {
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+    }
+  };
+
+  const checkAdminRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .eq('role', 'administrator')
+          .single();
+
+      setIsAdmin(!error && !!data);
+    } catch (error) {
+      setIsAdmin(false);
     }
   };
 
@@ -114,7 +133,6 @@ const Header = () => {
     { name: 'Kontakt', href: '#contact' },
     { name: 'Team', href: '#team' },
     { name: 'FAQ', href: '#faq' },
-    { name: 'Administration', href: '/administration', isRoute: true },
   ];
 
   return (
@@ -149,23 +167,13 @@ const Header = () => {
               {/* Desktop Navigation */}
               <div className="hidden md:flex items-center space-x-8">
                 {navItems.map((item) => (
-                    item.isRoute ? (
-                        <Link
-                            key={item.name}
-                            to={item.href}
-                            className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
-                        >
-                          {item.name}
-                        </Link>
-                    ) : (
-                        <a
-                            key={item.name}
-                            href={item.href}
-                            className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
-                        >
-                          {item.name}
-                        </a>
-                    )
+                    <a
+                        key={item.name}
+                        href={item.href}
+                        className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
+                    >
+                      {item.name}
+                    </a>
                 ))}
                 {user ? (
                     <DropdownMenu>
@@ -180,6 +188,16 @@ const Header = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
+                        {isAdmin && (
+                            <>
+                              <DropdownMenuItem asChild>
+                                <Link to="/administration" className="cursor-pointer flex items-center">
+                                  <Settings className="mr-2 h-4 w-4" />
+                                  Administration
+                                </Link>
+                              </DropdownMenuItem>
+                            </>
+                        )}
                         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                           <LogOut className="mr-2 h-4 w-4" />
                           Abmelden
@@ -209,26 +227,24 @@ const Header = () => {
             {isMenuOpen && (
                 <div className="md:hidden mt-4 space-y-4 animate-fade-in glass-card p-4">
                   {navItems.map((item) => (
-                      item.isRoute ? (
-                          <Link
-                              key={item.name}
-                              to={item.href}
-                              className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
-                              onClick={() => setIsMenuOpen(false)}
-                          >
-                            {item.name}
-                          </Link>
-                      ) : (
-                          <a
-                              key={item.name}
-                              href={item.href}
-                              className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
-                              onClick={() => setIsMenuOpen(false)}
-                          >
-                            {item.name}
-                          </a>
-                      )
+                      <a
+                          key={item.name}
+                          href={item.href}
+                          className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                          onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.name}
+                      </a>
                   ))}
+                  {isAdmin && (
+                      <Link
+                          to="/administration"
+                          className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                          onClick={() => setIsMenuOpen(false)}
+                      >
+                        Administration
+                      </Link>
+                  )}
                   {user ? (
                       <div className="pt-4 border-t border-border">
                         <div className="flex items-center gap-3 p-2 mb-2">
