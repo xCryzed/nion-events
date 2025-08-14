@@ -1,5 +1,5 @@
 import {Award, Heart, MapPin, Users, Zap} from 'lucide-react';
-import nionPortrait from '@/assets/nion-portrait.webp';
+import nionPortrait from '../assets/nion-portrait.webp';
 
 const About = () => {
   const values = [
