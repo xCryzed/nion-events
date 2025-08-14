@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { trackEvent, trackError } from '@/hooks/use-google-analytics';
 import { supabase } from '@/integrations/supabase/client';
+import { useFormPersistence } from '@/hooks/use-form-persistence';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -163,6 +164,8 @@ const Angebot = () => {
         },
     });
 
+    const { clearStorage } = useFormPersistence(form, 'angebot-form-data');
+
     const validateCurrentStep = async () => {
         let isValid = true;
 
@@ -299,6 +302,9 @@ const Angebot = () => {
 
             const angebotsnummer = insertedData?.offer_number;
             console.log('Event request saved successfully with offer number:', angebotsnummer);
+
+            // Clear localStorage and show success
+            clearStorage();
             setIsSuccess(true);
             toast({
                 title: 'Anfrage erfolgreich gesendet!',

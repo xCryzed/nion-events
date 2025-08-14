@@ -27,6 +27,7 @@ const Auth = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
 
+
     useEffect(() => {
         // Set up auth state listener FIRST
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -146,6 +147,13 @@ const Auth = () => {
                 });
             }
         } else {
+            // Clear form data on successful signup
+            setFormData({
+                email: '',
+                password: '',
+                firstName: '',
+                lastName: ''
+            });
             toast({
                 title: "Registrierung erfolgreich",
                 description: "Bitte überprüfen Sie Ihre E-Mails zur Bestätigung.",
@@ -192,14 +200,16 @@ const Auth = () => {
                     variant: "destructive"
                 });
             }
+        } else {
+            // Form will be cleared automatically when user is redirected
         }
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData(prev => ({
-            ...prev,
+        setFormData({
+            ...formData,
             [e.target.name]: e.target.value
-        }));
+        });
     };
 
     return (

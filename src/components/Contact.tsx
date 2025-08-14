@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useFormPersistence } from '@/hooks/use-form-persistence';
 import {
     Form,
     FormControl,
@@ -62,6 +63,7 @@ const Contact = () => {
             name: "",
             email: "",
             phone: "",
+            mobile: "",
             company: "",
             eventType: "",
             callbackTime: "",
@@ -69,6 +71,8 @@ const Contact = () => {
             message: "",
         },
     });
+
+    const { clearStorage } = useFormPersistence(form, 'contact-form-data');
 
     const onSubmit = async (values: FormData) => {
         try {
@@ -140,7 +144,8 @@ const Contact = () => {
                 description: "Wir melden uns innerhalb von 24 Stunden bei Ihnen.",
             });
 
-            // Reset form
+            // Clear localStorage and reset form
+            clearStorage();
             form.reset();
         } catch (error) {
             console.error('Error submitting contact request:', error);
