@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useGoogleAnalytics, trackPageView } from "@/hooks/use-google-analytics";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { useEffect } from "react";
 import Index from "./pages/Index";
 import Portfolio from "./pages/Portfolio";
@@ -46,6 +47,14 @@ const PageTracker = () => {
 };
 
 const App = () => {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
+  );
+};
+
+const AppContent = () => {
   useGoogleAnalytics();
 
   return (

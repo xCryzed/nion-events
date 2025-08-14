@@ -1,6 +1,9 @@
+// @ts-expect-error - Deno imports are not recognized by TypeScript in the main project
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+// @ts-expect-error - npm imports are valid in Deno runtime
 import { Resend } from "npm:resend@2.0.0";
 
+// @ts-expect-error - Deno global is available in Deno runtime
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {

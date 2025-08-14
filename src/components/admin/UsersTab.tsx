@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { trackError } from '@/hooks/use-google-analytics';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -48,6 +49,9 @@ const UsersTab = () => {
 
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError);
+        trackError(profilesError.message, 'data_fetch', 'users_tab', {
+          query_type: 'fetch_profiles'
+        });
         return;
       }
 
@@ -69,6 +73,7 @@ const UsersTab = () => {
       setUsers(usersWithRoles);
     } catch (error) {
       console.error('Error fetching users:', error);
+      trackError(error instanceof Error ? error : 'Users fetch failed', 'data_fetch', 'users_tab');
     }
   };
 

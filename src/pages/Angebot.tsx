@@ -16,7 +16,7 @@ import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { trackEvent } from '@/hooks/use-google-analytics';
+import { trackEvent, trackError } from '@/hooks/use-google-analytics';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -289,6 +289,11 @@ const Angebot = () => {
 
             if (error) {
                 console.error('Supabase error:', error);
+                trackError(error.message, 'form_submission', 'angebot_form', {
+                    event_title: data.veranstaltungstitel,
+                    guest_count: data.gasteanzahl,
+                    error_code: error.code || 'unknown'
+                });
                 throw error;
             }
 
@@ -302,6 +307,11 @@ const Angebot = () => {
             });
         } catch (error) {
             console.error('Error submitting event request:', error);
+            trackError(error instanceof Error ? error : 'Event request submission failed', 'form_submission', 'angebot_form', {
+                event_title: data.veranstaltungstitel,
+                guest_count: data.gasteanzahl,
+                location_option: data.locationOption
+            });
             toast({
                 title: 'Fehler beim Senden',
                 description: 'Bitte versuchen Sie es erneut oder kontaktieren Sie uns direkt.',
@@ -386,8 +396,13 @@ const Angebot = () => {
                       <div className="text-center">
                           <Button
                             onClick={() => {
-                                trackEvent('click', 'navigation', 'angebot_success_homepage');
-                                window.location.href = '/';
+                                try {
+                                    trackEvent('click', 'navigation', 'angebot_success_homepage');
+                                    window.location.href = '/';
+                                } catch (error) {
+                                    trackError(error instanceof Error ? error : 'Navigation tracking failed', 'analytics', 'angebot_success');
+                                    window.location.href = '/';
+                                }
                             }}
                             className="btn-hero"
                           >

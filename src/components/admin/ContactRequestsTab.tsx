@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { trackError } from '@/hooks/use-google-analytics';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
@@ -38,6 +39,9 @@ const ContactRequestsTab = () => {
 
       if (error) {
         console.error('Error fetching contact requests:', error);
+        trackError(error.message, 'data_fetch', 'contact_requests_tab', {
+          query_type: 'fetch_all_contact_requests'
+        });
         toast({
           title: "Fehler beim Laden",
           description: "Die Kontaktanfragen konnten nicht geladen werden.",
@@ -49,6 +53,7 @@ const ContactRequestsTab = () => {
       setContactRequests(data || []);
     } catch (error) {
       console.error('Error fetching contact requests:', error);
+      trackError(error instanceof Error ? error : 'Contact requests fetch failed', 'data_fetch', 'contact_requests_tab');
     }
   };
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { trackError } from '@/hooks/use-google-analytics';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -98,6 +99,9 @@ const AdminDashboard = () => {
             });
         } catch (error) {
             console.error('Error fetching dashboard stats:', error);
+            trackError(error instanceof Error ? error : 'Dashboard stats fetch failed', 'data_fetch', 'admin_dashboard', {
+                attempted_queries: ['contact_requests', 'profiles', 'recent_contacts']
+            });
         } finally {
             setLoading(false);
         }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { trackError } from '@/hooks/use-google-analytics';
 import { Menu, X, LogOut, Settings, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -73,6 +74,10 @@ const Header = () => {
 
       if (error) {
         console.error('Error fetching profile:', error);
+        trackError(error.message, 'data_fetch', 'header_component', {
+          user_id: userId,
+          query_type: 'user_profile'
+        });
         return;
       }
 
@@ -81,6 +86,9 @@ const Header = () => {
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      trackError(error instanceof Error ? error : 'Profile fetch failed', 'data_fetch', 'header_component', {
+        user_id: userId
+      });
     }
   };
 
@@ -95,6 +103,10 @@ const Header = () => {
 
       setIsAdmin(!error && !!data);
     } catch (error) {
+      console.error('Error checking admin role:', error);
+      trackError(error instanceof Error ? error : 'Admin role check failed', 'authentication', 'header_component', {
+        user_id: userId
+      });
       setIsAdmin(false);
     }
   };
@@ -103,6 +115,10 @@ const Header = () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
+        console.error('Logout error:', error);
+        trackError(error.message, 'authentication', 'header_component', {
+          action: 'logout'
+        });
         toast({
           title: "Fehler beim Abmelden",
           description: error.message,
@@ -116,6 +132,7 @@ const Header = () => {
       }
     } catch (error) {
       console.error('Logout error:', error);
+      trackError(error instanceof Error ? error : 'Logout failed', 'authentication', 'header_component');
     }
   };
 

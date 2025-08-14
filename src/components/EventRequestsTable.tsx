@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { trackError } from '@/hooks/use-google-analytics';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -76,6 +77,9 @@ const EventRequestsTable = () => {
 
             if (error) {
                 console.error('Error fetching event requests:', error);
+                trackError(error.message, 'data_fetch', 'event_requests_table', {
+                    query_type: 'fetch_all_requests'
+                });
                 toast({
                     title: "Fehler beim Laden",
                     description: "Die Angebotsanfragen konnten nicht geladen werden.",
@@ -87,6 +91,7 @@ const EventRequestsTable = () => {
             setEventRequests(data || []);
         } catch (error) {
             console.error('Error fetching event requests:', error);
+            trackError(error instanceof Error ? error : 'Event requests fetch failed', 'data_fetch', 'event_requests_table');
         } finally {
             setLoading(false);
         }
@@ -121,6 +126,11 @@ const EventRequestsTable = () => {
 
             if (error) {
                 console.error('Supabase error:', error);
+                trackError(error.message, 'data_update', 'event_requests_table', {
+                    request_id: requestId,
+                    new_status: newStatus,
+                    error_code: error.code || 'unknown'
+                });
                 throw error;
             }
 
@@ -142,8 +152,12 @@ const EventRequestsTable = () => {
 
         } catch (error) {
             console.error('Error updating status:', error);
+            trackError(error instanceof Error ? error : 'Status update failed', 'data_update', 'event_requests_table', {
+                request_id: requestId,
+                new_status: newStatus
+            });
             toast({
-                title: 'Fehler beim Status-Update',
+                title: 'Fehler beim Aktualisieren',
                 description: `Der Status konnte nicht aktualisiert werden: ${error?.message || 'Unbekannter Fehler'}`,
                 variant: 'destructive',
             });

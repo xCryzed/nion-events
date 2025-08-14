@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { trackEvent } from '@/hooks/use-google-analytics';
+import { trackEvent, trackError } from '@/hooks/use-google-analytics';
 import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -91,6 +91,14 @@ const Contact = () => {
 
             if (error) {
                 console.error('Error submitting contact request:', error);
+                trackError(error.message, 'form_submission', 'contact_form', {
+                    form_data: {
+                        name: values.name,
+                        email: values.email,
+                        event_type: values.eventType
+                    },
+                    error_code: error.code || 'unknown'
+                });
                 toast({
                     title: "Fehler beim Senden",
                     description: "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
@@ -121,6 +129,9 @@ const Contact = () => {
                 console.log('Email notification sent successfully');
             } catch (emailError) {
                 console.error('Error sending email notification:', emailError);
+                trackError(emailError instanceof Error ? emailError : 'Email notification failed', 'email_service', 'contact_form', {
+                    form_data: { name: values.name, email: values.email }
+                });
                 // Don't show error to user, as the main form submission was successful
             }
 
@@ -133,6 +144,13 @@ const Contact = () => {
             form.reset();
         } catch (error) {
             console.error('Error submitting contact request:', error);
+            trackError(error instanceof Error ? error : 'Contact form submission failed', 'form_submission', 'contact_form', {
+                form_data: {
+                    name: values.name,
+                    email: values.email,
+                    event_type: values.eventType
+                }
+            });
             toast({
                 title: "Fehler beim Senden",
                 description: "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
@@ -217,7 +235,13 @@ const Contact = () => {
                                   <Button
                                     size="lg"
                                     className="bg-gradient-primary text-white hover:opacity-90 transition-all duration-300 shadow-glow hover:shadow-xl hover:scale-105 px-8 py-4"
-                                    onClick={() => trackEvent('click', 'conversion', 'contact_cta_angebot')}
+                                    onClick={() => {
+                                        try {
+                                            trackEvent('click', 'conversion', 'contact_cta_angebot');
+                                        } catch (error) {
+                                            trackError(error instanceof Error ? error : 'Event tracking failed', 'analytics', 'contact_form');
+                                        }
+                                    }}
                                   >
                                       Jetzt Angebot erstellen
                                       <Send className="ml-2 w-5 h-5" />
