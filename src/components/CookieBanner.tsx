@@ -31,6 +31,7 @@ const CookieBanner = () => {
   const acceptAll = () => {
     const allPreferences = { essential: true, analytics: true, marketing: true, functional: true };
     localStorage.setItem('cookieConsent', JSON.stringify(allPreferences));
+    window.dispatchEvent(new Event('cookieConsentChanged'));
     setShowBanner(false);
     setShowSettings(false);
   };
@@ -38,6 +39,7 @@ const CookieBanner = () => {
   const acceptEssential = () => {
     const essentialOnly = { essential: true, analytics: false, marketing: false, functional: false };
     localStorage.setItem('cookieConsent', JSON.stringify(essentialOnly));
+    window.dispatchEvent(new Event('cookieConsentChanged'));
     setShowBanner(false);
     setShowSettings(false);
   };
@@ -45,12 +47,14 @@ const CookieBanner = () => {
   const rejectAll = () => {
     const rejected = { essential: true, analytics: false, marketing: false, functional: false };
     localStorage.setItem('cookieConsent', JSON.stringify(rejected));
+    window.dispatchEvent(new Event('cookieConsentChanged'));
     setShowBanner(false);
     setShowSettings(false);
   };
 
   const savePreferences = () => {
     localStorage.setItem('cookieConsent', JSON.stringify(preferences));
+    window.dispatchEvent(new Event('cookieConsentChanged'));
     setShowBanner(false);
     setShowSettings(false);
   };
