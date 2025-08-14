@@ -1,187 +1,128 @@
-import { useEffect } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { trackError } from '@/hooks/use-google-analytics';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-    dataLayer: any[];
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+  error?: Error;
+  errorInfo?: ErrorInfo;
+}
+
+class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    // Update state so the next render will show the fallback UI
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+
+    // Track the error in Google Analytics
+    trackError(error, 'react_error_boundary', 'global', {
+      error_info: {
+        componentStack: errorInfo.componentStack?.substring(0, 1000), // Limit length
+        error_boundary: true
+      },
+      props: {
+        children_type: typeof this.props.children
+      }
+    });
+
+    this.setState({
+      error,
+      errorInfo
+    });
+  }
+
+  handleReload = () => {
+    try {
+      trackError('User initiated reload after error', 'user_action', 'error_boundary');
+      window.location.reload();
+    } catch (reloadError) {
+      console.error('Error during reload:', reloadError);
+    }
+  };
+
+  handleRetry = () => {
+    try {
+      trackError('User retry after error', 'user_action', 'error_boundary');
+      this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+    } catch (retryError) {
+      console.error('Error during retry:', retryError);
+    }
+  };
+
+  render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
+      return (
+        <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+          <Card className="glass-card max-w-lg">
+            <CardHeader className="text-center">
+              <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="w-8 h-8 text-destructive" />
+              </div>
+              <CardTitle className="text-xl text-destructive">Ups, etwas ist schief gelaufen</CardTitle>
+              <CardDescription>
+                Ein unerwarteter Fehler ist aufgetreten. Das Problem wurde automatisch gemeldet.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-sm text-muted-foreground bg-muted/30 p-4 rounded-lg">
+                <p className="font-medium mb-2">Technische Details:</p>
+                <code className="text-xs break-all">
+                  {this.state.error?.message || 'Unbekannter Fehler'}
+                </code>
+              </div>
+
+              <div className="flex gap-3">
+                <Button onClick={this.handleRetry} variant="outline" className="flex-1">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Erneut versuchen
+                </Button>
+                <Button onClick={this.handleReload} className="flex-1">
+                  Seite neu laden
+                </Button>
+              </div>
+
+              <div className="text-center">
+                <a
+                  href="/"
+                  className="text-sm text-primary hover:underline"
+                  onClick={() => {
+                    try {
+                      trackError('User navigated to home after error', 'user_action', 'error_boundary');
+                    } catch (e) {
+                      console.error('Error tracking navigation:', e);
+                    }
+                  }}
+                >
+                  Zurück zur Startseite
+                </a>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    return this.props.children;
   }
 }
 
-const GA_TRACKING_ID = 'G-K8X4NT6DHP';
-
-export const useGoogleAnalytics = () => {
-  useEffect(() => {
-    const checkConsent = () => {
-      const consent = localStorage.getItem('cookieConsent');
-      if (consent) {
-        const preferences = JSON.parse(consent);
-        if (preferences.marketing) {
-          loadGoogleAnalytics();
-        } else {
-          removeGoogleAnalytics();
-        }
-      }
-    };
-
-    const loadGoogleAnalytics = () => {
-      // Check if GA is already loaded
-      if (document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}"]`)) {
-        // GA is already loaded, just configure it
-        window.gtag('consent', 'update', {
-          analytics_storage: 'granted'
-        });
-        return;
-      }
-
-      // Create and insert the gtag script
-      const script1 = document.createElement('script');
-      script1.async = true;
-      script1.src = `https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`;
-      document.head.appendChild(script1);
-
-      // Initialize dataLayer and gtag function
-      window.dataLayer = window.dataLayer || [];
-      window.gtag = function gtag() {
-        window.dataLayer.push(arguments);
-      };
-
-      // Configure Google Analytics
-      window.gtag('js', new Date());
-      window.gtag('config', GA_TRACKING_ID, {
-        page_title: document.title,
-        page_location: window.location.href,
-      });
-
-      // Set consent
-      window.gtag('consent', 'default', {
-        analytics_storage: 'granted'
-      });
-    };
-
-    const removeGoogleAnalytics = () => {
-      // Remove GA scripts
-      const gaScripts = document.querySelectorAll('script[src*="googletagmanager.com"]');
-      gaScripts.forEach(script => script.remove());
-
-      // Disable GA if it's loaded
-      if (window.gtag) {
-        window.gtag('consent', 'update', {
-          analytics_storage: 'denied'
-        });
-      }
-
-      // Clear GA cookies
-      const gaCookies = document.cookie.split(';').filter(cookie =>
-        cookie.trim().startsWith('_ga') ||
-        cookie.trim().startsWith('_gid') ||
-        cookie.trim().startsWith('_gat')
-      );
-
-      gaCookies.forEach(cookie => {
-        const eqPos = cookie.indexOf('=');
-        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${window.location.hostname}`;
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-      });
-    };
-
-    // Check initial consent
-    checkConsent();
-
-    // Listen for consent changes
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'cookieConsent') {
-        checkConsent();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Also listen for changes in the same tab
-    const handleConsentChange = () => {
-      setTimeout(checkConsent, 100); // Small delay to ensure localStorage is updated
-    };
-
-    window.addEventListener('cookieConsentChanged', handleConsentChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('cookieConsentChanged', handleConsentChange);
-    };
-  }, []);
-};
-
-// Utility function to track page views
-export const trackPageView = (path: string, title?: string) => {
-  if (window.gtag) {
-    const consent = localStorage.getItem('cookieConsent');
-    if (consent) {
-      const preferences = JSON.parse(consent);
-      if (preferences.marketing) {
-        window.gtag('config', GA_TRACKING_ID, {
-          page_path: path,
-          page_title: title || document.title,
-        });
-      }
-    }
-  }
-};
-
-// Utility function to track events
-export const trackEvent = (action: string, category: string, label?: string, value?: number) => {
-  if (window.gtag) {
-    const consent = localStorage.getItem('cookieConsent');
-    if (consent) {
-      const preferences = JSON.parse(consent);
-      if (preferences.marketing) {
-        window.gtag('event', action, {
-          event_category: category,
-          event_label: label,
-          value: value,
-        });
-      }
-    }
-  }
-};
-
-// Utility function to track errors
-export const trackError = (error: Error | string, category: string, component?: string, additionalData?: any) => {
-  if (window.gtag) {
-    const consent = localStorage.getItem('cookieConsent');
-    if (consent) {
-      const preferences = JSON.parse(consent);
-      if (preferences.marketing) {
-        const errorMessage = typeof error === 'string' ? error : error.message;
-        const errorStack = typeof error === 'object' && error.stack ? error.stack : '';
-
-        // Track as exception event
-        window.gtag('event', 'exception', {
-          description: errorMessage,
-          fatal: false,
-        });
-
-        // Track as custom error event with more details
-        window.gtag('event', 'client_error', {
-          event_category: category,
-          event_label: component || 'unknown',
-          custom_map: {
-            error_message: errorMessage,
-            error_stack: errorStack.substring(0, 500), // Limit stack trace length
-            component: component || 'unknown',
-            additional_data: additionalData ? JSON.stringify(additionalData).substring(0, 500) : undefined,
-            timestamp: new Date().toISOString(),
-            user_agent: navigator.userAgent,
-            url: window.location.href
-          }
-        });
-
-        console.error(`[Error Tracking] ${category}:`, {
-          error: errorMessage,
-          component,
-          additionalData,
-          stack: errorStack
-        });
-      }
-    }
-  }
-};
+export default ErrorBoundary;
