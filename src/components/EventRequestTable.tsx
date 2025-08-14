@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { formatDistanceToNow, format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import {
@@ -23,7 +24,12 @@ import {
     ChevronDown,
     ChevronUp,
     FileText,
-    Clock
+    Clock,
+    CheckCircle2,
+    AlertCircle,
+    Loader2,
+    Save,
+    Phone
 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
@@ -43,11 +49,13 @@ interface EventRequest {
     additional_wishes?: string;
     contact_name: string;
     contact_email: string;
+    contact_phone?: string;
     contact_company?: string;
     contact_street: string;
     contact_house_number: string;
     contact_postal_code: string;
     contact_city: string;
+    status: 'ANGEFRAGT' | 'IN_BEARBEITUNG' | 'ABGESCHLOSSEN';
     created_at: string;
     updated_at: string;
 }
@@ -56,6 +64,7 @@ const EventRequestsTable = () => {
     const [eventRequests, setEventRequests] = useState<EventRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+    const [updatingStatus, setUpdatingStatus] = useState<Set<string>>(new Set());
     const { toast } = useToast();
 
     const fetchEventRequests = async () => {
@@ -95,6 +104,82 @@ const EventRequestsTable = () => {
             newExpanded.add(id);
         }
         setExpandedItems(newExpanded);
+    };
+
+    const updateStatus = async (requestId: string, newStatus: 'ANGEFRAGT' | 'IN_BEARBEITUNG' | 'ABGESCHLOSSEN') => {
+        setUpdatingStatus(prev => new Set(prev).add(requestId));
+
+        try {
+            console.log('Updating status for request:', requestId, 'to:', newStatus);
+
+            const { data, error } = await supabase
+                .from('event_requests')
+                .update({ status: newStatus })
+                .eq('id', requestId)
+                .select()
+                .single();
+
+            if (error) {
+                console.error('Supabase error:', error);
+                throw error;
+            }
+
+            console.log('Status update successful:', data);
+
+            // Update local state
+            setEventRequests(prev =>
+                prev.map(request =>
+                    request.id === requestId
+                        ? { ...request, status: newStatus }
+                        : request
+                )
+            );
+
+            toast({
+                title: 'Status aktualisiert',
+                description: `Der Status wurde erfolgreich auf "${newStatus.replace('_', ' ')}" geändert.`,
+            });
+
+        } catch (error) {
+            console.error('Error updating status:', error);
+            toast({
+                title: 'Fehler beim Status-Update',
+                description: `Der Status konnte nicht aktualisiert werden: ${error?.message || 'Unbekannter Fehler'}`,
+                variant: 'destructive',
+            });
+        } finally {
+            setUpdatingStatus(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(requestId);
+                return newSet;
+            });
+        }
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'ANGEFRAGT':
+                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            case 'IN_BEARBEITUNG':
+                return 'bg-blue-100 text-blue-800 border-blue-200';
+            case 'ABGESCHLOSSEN':
+                return 'bg-green-100 text-green-800 border-green-200';
+            default:
+                return 'bg-gray-100 text-gray-800 border-gray-200';
+        }
+    };
+
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case 'ANGEFRAGT':
+                return <AlertCircle className="w-4 h-4" />;
+            case 'IN_BEARBEITUNG':
+                return <Loader2 className="w-4 h-4" />;
+            case 'ABGESCHLOSSEN':
+                return <CheckCircle2 className="w-4 h-4" />;
+            default:
+                return <AlertCircle className="w-4 h-4" />;
+        }
     };
 
     const getTechIcon = (tech: string) => {
@@ -155,8 +240,12 @@ const EventRequestsTable = () => {
                                             {request.offer_number}
                                         </Badge>
                                         <Badge variant="secondary">
-                                            {request.guest_count} Gäste
+                                            {request.guest_count === 'Noch nicht bekannt' ? request.guest_count : `${request.guest_count} Gäste`}
                                         </Badge>
+                                        <span className={`px-3 py-1 rounded-full text-xs font-medium border flex items-center space-x-1 ${getStatusColor(request.status)}`}>
+                                            {getStatusIcon(request.status)}
+                                            <span>{request.status.replace('_', ' ')}</span>
+                                        </span>
                                     </div>
                                     <CardTitle className="text-lg">{request.event_title}</CardTitle>
                                     <CardDescription className="flex items-center gap-4 mt-2">
@@ -177,15 +266,31 @@ const EventRequestsTable = () => {
                                         </div>
                                     </CardDescription>
                                 </div>
-                                <CollapsibleTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                        {expandedItems.has(request.id) ? (
-                                            <ChevronUp className="h-4 w-4" />
-                                        ) : (
-                                            <ChevronDown className="h-4 w-4" />
-                                        )}
-                                    </Button>
-                                </CollapsibleTrigger>
+                                <div className="flex items-center gap-2">
+                                    <Select
+                                        value={request.status}
+                                        onValueChange={(value: 'ANGEFRAGT' | 'IN_BEARBEITUNG' | 'ABGESCHLOSSEN') => updateStatus(request.id, value)}
+                                        disabled={updatingStatus.has(request.id)}
+                                    >
+                                        <SelectTrigger className="w-40">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="ANGEFRAGT">Angefragt</SelectItem>
+                                            <SelectItem value="IN_BEARBEITUNG">In Bearbeitung</SelectItem>
+                                            <SelectItem value="ABGESCHLOSSEN">Abgeschlossen</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <CollapsibleTrigger asChild>
+                                        <Button variant="ghost" size="sm">
+                                            {expandedItems.has(request.id) ? (
+                                                <ChevronUp className="h-4 w-4" />
+                                            ) : (
+                                                <ChevronDown className="h-4 w-4" />
+                                            )}
+                                        </Button>
+                                    </CollapsibleTrigger>
+                                </div>
                             </div>
                         </CardHeader>
 
@@ -202,6 +307,14 @@ const EventRequestsTable = () => {
                                                     {request.contact_email}
                                                 </a>
                                             </div>
+                                            {request.contact_phone && (
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <Phone className="h-4 w-4 text-muted-foreground" />
+                                                    <a href={`tel:${request.contact_phone}`} className="text-primary hover:underline">
+                                                        {request.contact_phone}
+                                                    </a>
+                                                </div>
+                                            )}
                                             <div className="text-sm">
                                                 <strong>{request.contact_name}</strong>
                                             </div>

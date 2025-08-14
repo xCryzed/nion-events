@@ -67,6 +67,7 @@ export type Database = {
                     contact_email: string
                     contact_house_number: string | null
                     contact_name: string
+                    contact_phone: string | null
                     contact_postal_code: string | null
                     contact_street: string | null
                     created_at: string
@@ -81,8 +82,10 @@ export type Database = {
                     location: string
                     offer_number: string | null
                     photographer: boolean | null
+                    status: Database["public"]["Enums"]["request_status"] | null
                     tech_requirements: string[]
                     updated_at: string
+                    user_id: string | null
                     videographer: boolean | null
                 }
                 Insert: {
@@ -92,6 +95,7 @@ export type Database = {
                     contact_email: string
                     contact_house_number?: string | null
                     contact_name: string
+                    contact_phone?: string | null
                     contact_postal_code?: string | null
                     contact_street?: string | null
                     created_at?: string
@@ -106,8 +110,10 @@ export type Database = {
                     location: string
                     offer_number?: string | null
                     photographer?: boolean | null
+                    status?: Database["public"]["Enums"]["request_status"] | null
                     tech_requirements?: string[]
                     updated_at?: string
+                    user_id?: string | null
                     videographer?: boolean | null
                 }
                 Update: {
@@ -117,6 +123,7 @@ export type Database = {
                     contact_email?: string
                     contact_house_number?: string | null
                     contact_name?: string
+                    contact_phone?: string | null
                     contact_postal_code?: string | null
                     contact_street?: string | null
                     created_at?: string
@@ -131,8 +138,10 @@ export type Database = {
                     location?: string
                     offer_number?: string | null
                     photographer?: boolean | null
+                    status?: Database["public"]["Enums"]["request_status"] | null
                     tech_requirements?: string[]
                     updated_at?: string
+                    user_id?: string | null
                     videographer?: boolean | null
                 }
                 Relationships: []
@@ -211,6 +220,7 @@ export type Database = {
         }
         Enums: {
             app_role: "administrator" | "user"
+            request_status: "ANGEFRAGT" | "IN_BEARBEITUNG" | "ABGESCHLOSSEN"
         }
         CompositeTypes: {
             [_ in never]: never
@@ -339,6 +349,7 @@ export const Constants = {
     public: {
         Enums: {
             app_role: ["administrator", "user"],
+            request_status: ["ANGEFRAGT", "IN_BEARBEITUNG", "ABGESCHLOSSEN"],
         },
     },
 } as const

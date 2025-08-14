@@ -27,7 +27,7 @@ const angebotSchema = z.object({
     enddatum: z.date().optional(),
     location: z.string().optional(),
     locationOption: z.enum(['has_location', 'find_location']).default('has_location'),
-    gasteanzahl: z.string().min(1, 'Bitte wählen Sie die erwartete Gästeanzahl aus'),
+    gasteanzahl: z.string().min(1, 'Erwartete Gästeanzahl ist erforderlich'),
     djGenres: z.array(z.string()).optional(),
     fotograf: z.boolean().default(false),
     videograf: z.boolean().default(false),
@@ -94,7 +94,7 @@ const genreOptionen = [
 ];
 
 const gasteAnzahlOptionen = [
-    '1-50', '51-100', '101-200', '201-500', '501-1000', '1000+'
+    '1-50', '51-100', '101-200', '201-500', '501-1000', '1000+', 'Noch nicht bekannt'
 ];
 
 const steps = [
@@ -594,7 +594,7 @@ const Angebot = () => {
                                                                         <SelectItem key={anzahl} value={anzahl}>
                                                                             <div className="flex items-center">
                                                                                 <Users className="w-4 h-4 mr-2" />
-                                                                                {anzahl} Gäste
+                                                                                {anzahl === 'Noch nicht bekannt' ? anzahl : `${anzahl} Gäste`}
                                                                             </div>
                                                                         </SelectItem>
                                                                     ))}
@@ -645,7 +645,7 @@ const Angebot = () => {
                                             {form.watch('locationOption') === 'find_location' && (
                                                 <div className="p-4 rounded-lg bg-muted/50 border border-border">
                                                     <p className="text-sm text-muted-foreground">
-                                                        Gerne helfen wir Ihnen bei der Suche nach der perfekten Location für Ihr Event. Teilen Sie uns weitere Details in den Zusatzwünschen mit.
+                                                        Gerne helfen wir Ihnen bei der Suche nach der perfekten Location für Ihr Event. Weitere Details können Sie in den Zusatzwünschen im nächsten Schritt angeben.
                                                     </p>
                                                 </div>
                                             )}
