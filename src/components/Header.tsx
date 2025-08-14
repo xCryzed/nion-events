@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { trackEvent } from '@/hooks/use-google-analytics';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { useToast } from '@/components/ui/use-toast';
@@ -193,7 +194,10 @@ const Header = () => {
               {navItems.map((item) => (
                 <button
                   key={item.name}
-                  onClick={() => handleSectionClick(item.href)}
+                  onClick={() => {
+                    trackEvent('click', 'navigation', `header_${item.name.toLowerCase()}`);
+                    handleSectionClick(item.href);
+                  }}
                   className="text-foreground hover:text-primary transition-colors duration-200 font-medium cursor-pointer"
                 >
                   {item.name}
@@ -213,7 +217,11 @@ const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem asChild>
-                      <Link to="/meine-angebote" className="cursor-pointer flex items-center">
+                      <Link
+                        to="/meine-angebote"
+                        className="cursor-pointer flex items-center"
+                        onClick={() => trackEvent('click', 'navigation', 'header_meine_angebote')}
+                      >
                         <Users className="mr-2 h-4 w-4" />
                         Meine Angebote
                       </Link>
@@ -221,21 +229,34 @@ const Header = () => {
                     {isAdmin && (
                       <>
                         <DropdownMenuItem asChild>
-                          <Link to="/administration" className="cursor-pointer flex items-center">
+                          <Link
+                            to="/administration"
+                            className="cursor-pointer flex items-center"
+                            onClick={() => trackEvent('click', 'admin', 'header_administration')}
+                          >
                             <Settings className="mr-2 h-4 w-4" />
                             Administration
                           </Link>
                         </DropdownMenuItem>
                       </>
                     )}
-                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onClick={() => {
+                        trackEvent('click', 'auth', 'header_logout');
+                        handleLogout();
+                      }}
+                      className="cursor-pointer"
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
                       Abmelden
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Link to="/auth">
+                <Link
+                  to="/auth"
+                  onClick={() => trackEvent('click', 'auth', 'header_login')}
+                >
                   <Button className="btn-hero">
                     Anmelden
                   </Button>
