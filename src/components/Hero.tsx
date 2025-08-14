@@ -1,5 +1,6 @@
 import { ArrowRight, Play, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { trackEvent } from '@/hooks/use-google-analytics';
 import heroImage from '@/assets/hero-image.jpg';
 
 const calculateDynamicStats = () => {
@@ -59,8 +60,11 @@ const Hero = () => {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up">
             <Button
-                className="btn-hero group"
-                onClick={() => window.location.href = '/angebot'}
+              className="btn-hero group"
+              onClick={() => {
+                trackEvent('click', 'conversion', 'hero_projekt_starten');
+                window.location.href = '/angebot';
+              }}
             >
               Projekt starten
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -68,7 +72,10 @@ const Hero = () => {
             <Button
               variant="outline"
               className="group bg-transparent border-border/50 hover:bg-card/50 backdrop-blur-sm"
-              onClick={() => window.location.href = '/portfolio'}
+              onClick={() => {
+                trackEvent('click', 'navigation', 'hero_portfolio_ansehen');
+                window.location.href = '/portfolio';
+              }}
             >
               <Play className="mr-2 w-4 h-4 group-hover:scale-110 transition-transform" />
               Portfolio ansehen
@@ -107,6 +114,7 @@ const Hero = () => {
         <div
           className="flex flex-col items-center cursor-pointer group hover:cursor-pointer"
           onClick={() => {
+            trackEvent('click', 'navigation', 'hero_scroll_down');
             const target = document.getElementById('unternehmen');
             if (target) {
               target.scrollIntoView({

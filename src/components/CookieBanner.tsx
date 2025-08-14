@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { trackEvent } from '@/hooks/use-google-analytics';
 import { X, Cookie, Settings } from 'lucide-react';
 
 const CookieBanner = () => {
@@ -29,6 +30,7 @@ const CookieBanner = () => {
   }, []);
 
   const acceptAll = () => {
+    trackEvent('click', 'privacy', 'cookie_accept_all');
     const allPreferences = { essential: true, analytics: true, marketing: true, functional: true };
     localStorage.setItem('cookieConsent', JSON.stringify(allPreferences));
     window.dispatchEvent(new Event('cookieConsentChanged'));
@@ -37,6 +39,7 @@ const CookieBanner = () => {
   };
 
   const acceptEssential = () => {
+    trackEvent('click', 'privacy', 'cookie_accept_essential');
     const essentialOnly = { essential: true, analytics: false, marketing: false, functional: false };
     localStorage.setItem('cookieConsent', JSON.stringify(essentialOnly));
     window.dispatchEvent(new Event('cookieConsentChanged'));
@@ -45,6 +48,7 @@ const CookieBanner = () => {
   };
 
   const rejectAll = () => {
+    trackEvent('click', 'privacy', 'cookie_reject_all');
     const rejected = { essential: true, analytics: false, marketing: false, functional: false };
     localStorage.setItem('cookieConsent', JSON.stringify(rejected));
     window.dispatchEvent(new Event('cookieConsentChanged'));
@@ -53,6 +57,7 @@ const CookieBanner = () => {
   };
 
   const savePreferences = () => {
+    trackEvent('click', 'privacy', 'cookie_save_preferences');
     localStorage.setItem('cookieConsent', JSON.stringify(preferences));
     window.dispatchEvent(new Event('cookieConsentChanged'));
     setShowBanner(false);

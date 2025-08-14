@@ -1,10 +1,11 @@
-import { MessageCircle } from 'lucide-react';
+import { trackEvent } from '@/hooks/use-google-analytics';
 
 const WhatsAppButton = () => {
   const phoneNumber = "+4915752046096";
   const message = encodeURIComponent("Hallo! Ich interessiere mich für Ihre Eventmanagement-Services.");
 
   const handleWhatsAppClick = () => {
+    trackEvent('click', 'communication', 'whatsapp_floating_button');
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');
   };
