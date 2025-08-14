@@ -58,7 +58,10 @@ const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up">
-            <Button className="btn-hero group">
+            <Button
+                className="btn-hero group"
+                onClick={() => window.location.href = '/angebot'}
+            >
               Projekt starten
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>

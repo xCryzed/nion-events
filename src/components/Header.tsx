@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,6 +17,8 @@ const Header = () => {
   const [userProfile, setUserProfile] = useState<{first_name: string | null, last_name: string | null} | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -135,6 +137,28 @@ const Header = () => {
     { name: 'FAQ', href: '#faq' },
   ];
 
+  const handleSectionClick = (href: string) => {
+    const sectionId = href.substring(1); // Remove the '#'
+
+    if (location.pathname === '/') {
+      // Already on homepage, just scroll to section
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      // Navigate to homepage first, then scroll to section
+      navigate('/');
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+    setIsMenuOpen(false);
+  };
+
   return (
       <>
         <header
@@ -167,13 +191,13 @@ const Header = () => {
               {/* Desktop Navigation */}
               <div className="hidden md:flex items-center space-x-8">
                 {navItems.map((item) => (
-                    <a
+                    <button
                         key={item.name}
-                        href={item.href}
-                        className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
+                        onClick={() => handleSectionClick(item.href)}
+                        className="text-foreground hover:text-primary transition-colors duration-200 font-medium cursor-pointer"
                     >
                       {item.name}
-                    </a>
+                    </button>
                 ))}
                 {user ? (
                     <DropdownMenu>
@@ -227,14 +251,13 @@ const Header = () => {
             {isMenuOpen && (
                 <div className="md:hidden mt-4 space-y-4 animate-fade-in glass-card p-4">
                   {navItems.map((item) => (
-                      <a
+                      <button
                           key={item.name}
-                          href={item.href}
-                          className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
-                          onClick={() => setIsMenuOpen(false)}
+                          onClick={() => handleSectionClick(item.href)}
+                          className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2 text-left w-full"
                       >
                         {item.name}
-                      </a>
+                      </button>
                   ))}
                   {isAdmin && (
                       <Link

@@ -12,6 +12,7 @@ import AGB from "./pages/AGB";
 import Presse from "./pages/Presse";
 import Auth from "./pages/Auth";
 import Administration from "./pages/Administration";
+import Angebot from "@/pages/Angebot.tsx";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/presse" element={<Presse />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/administration" element={<Administration />} />
+            <Route path="/angebot" element={<Angebot />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

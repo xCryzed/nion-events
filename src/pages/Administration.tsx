@@ -24,8 +24,10 @@ import {
     BarChart3,
     Settings
 } from 'lucide-react';
+
 import { Session } from '@supabase/supabase-js';
 import AdminDashboard from '@/components/AdminDashboard';
+import EventRequestsTable from "@/components/EventRequestTable";
 
 interface ContactRequest {
     id: string;
@@ -349,10 +351,14 @@ const Administration = () => {
                         </div>
 
                         <Tabs defaultValue="dashboard" className="space-y-6">
-                            <TabsList className="grid w-full grid-cols-3">
+                            <TabsList className="grid w-full grid-cols-4">
                                 <TabsTrigger value="dashboard" className="flex items-center gap-2">
                                     <BarChart3 className="h-4 w-4" />
                                     Dashboard
+                                </TabsTrigger>
+                                <TabsTrigger value="event-requests" className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4" />
+                                    Angebotsanfragen
                                 </TabsTrigger>
                                 <TabsTrigger value="contacts" className="flex items-center gap-2">
                                     <MessageSquare className="h-4 w-4" />
@@ -366,6 +372,10 @@ const Administration = () => {
 
                             <TabsContent value="dashboard" className="space-y-6">
                                 <AdminDashboard />
+                            </TabsContent>
+
+                            <TabsContent value="event-requests" className="space-y-6">
+                                <EventRequestsTable />
                             </TabsContent>
 
                             <TabsContent value="contacts" className="space-y-6">

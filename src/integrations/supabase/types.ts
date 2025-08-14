@@ -7,7 +7,7 @@ export type Json =
     | Json[]
 
 export type Database = {
-    // Allows to automatically instanciate createClient with right options
+    // Allows to automatically instantiate createClient with right options
     // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
     __InternalSupabase: {
         PostgrestVersion: "12.2.12 (cd3cf9e)"
@@ -56,6 +56,84 @@ export type Database = {
                     phone?: string | null
                     updated_at?: string
                     venue?: string | null
+                }
+                Relationships: []
+            }
+            event_requests: {
+                Row: {
+                    additional_wishes: string | null
+                    contact_city: string | null
+                    contact_company: string | null
+                    contact_email: string
+                    contact_house_number: string | null
+                    contact_name: string
+                    contact_postal_code: string | null
+                    contact_street: string | null
+                    created_at: string
+                    dj_genres: string[] | null
+                    end_date: string | null
+                    end_time: string | null
+                    event_date: string
+                    event_title: string
+                    guest_count: string
+                    id: string
+                    light_operator: boolean | null
+                    location: string
+                    offer_number: string | null
+                    photographer: boolean | null
+                    tech_requirements: string[]
+                    updated_at: string
+                    videographer: boolean | null
+                }
+                Insert: {
+                    additional_wishes?: string | null
+                    contact_city?: string | null
+                    contact_company?: string | null
+                    contact_email: string
+                    contact_house_number?: string | null
+                    contact_name: string
+                    contact_postal_code?: string | null
+                    contact_street?: string | null
+                    created_at?: string
+                    dj_genres?: string[] | null
+                    end_date?: string | null
+                    end_time?: string | null
+                    event_date: string
+                    event_title: string
+                    guest_count: string
+                    id?: string
+                    light_operator?: boolean | null
+                    location: string
+                    offer_number?: string | null
+                    photographer?: boolean | null
+                    tech_requirements?: string[]
+                    updated_at?: string
+                    videographer?: boolean | null
+                }
+                Update: {
+                    additional_wishes?: string | null
+                    contact_city?: string | null
+                    contact_company?: string | null
+                    contact_email?: string
+                    contact_house_number?: string | null
+                    contact_name?: string
+                    contact_postal_code?: string | null
+                    contact_street?: string | null
+                    created_at?: string
+                    dj_genres?: string[] | null
+                    end_date?: string | null
+                    end_time?: string | null
+                    event_date?: string
+                    event_title?: string
+                    guest_count?: string
+                    id?: string
+                    light_operator?: boolean | null
+                    location?: string
+                    offer_number?: string | null
+                    photographer?: boolean | null
+                    tech_requirements?: string[]
+                    updated_at?: string
+                    videographer?: boolean | null
                 }
                 Relationships: []
             }
@@ -115,14 +193,18 @@ export type Database = {
             [_ in never]: never
         }
         Functions: {
+            generate_offer_number: {
+                Args: Record<PropertyKey, never>
+                Returns: string
+            }
             get_user_role: {
                 Args: { _user_id: string }
                 Returns: Database["public"]["Enums"]["app_role"]
             }
             has_role: {
                 Args: {
-                    _user_id: string
                     _role: Database["public"]["Enums"]["app_role"]
+                    _user_id: string
                 }
                 Returns: boolean
             }
