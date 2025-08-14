@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { trackEvent } from '@/hooks/use-google-analytics';
 import { Calendar, Users, MapPin, Music } from 'lucide-react';
 
 const Portfolio = () => {
@@ -150,6 +151,7 @@ const Portfolio = () => {
               <a
                 href="#contact"
                 className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
+                onClick={() => trackEvent('click', 'conversion', 'portfolio_contact_cta')}
               >
                 Jetzt Kontakt aufnehmen
               </a>

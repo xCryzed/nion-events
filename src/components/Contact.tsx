@@ -1,8 +1,9 @@
-import { Send, Phone, Mail, Clock, Download, QrCode } from 'lucide-react';
+import { Send, Phone, Mail, Clock, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { trackEvent } from '@/hooks/use-google-analytics';
 import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -71,6 +72,7 @@ const Contact = () => {
 
     const onSubmit = async (values: FormData) => {
         try {
+            trackEvent('submit', 'conversion', 'contact_form', 1);
             const { data, error } = await supabase
               .from('contact_requests')
               .insert([{
@@ -215,8 +217,9 @@ const Contact = () => {
                                   <Button
                                     size="lg"
                                     className="bg-gradient-primary text-white hover:opacity-90 transition-all duration-300 shadow-glow hover:shadow-xl hover:scale-105 px-8 py-4"
+                                    onClick={() => trackEvent('click', 'conversion', 'contact_cta_angebot')}
                                   >
-                                      Jetzt Angebot einholen
+                                      Jetzt Angebot erstellen
                                       <Send className="ml-2 w-5 h-5" />
                                   </Button>
                               </a>
@@ -450,7 +453,16 @@ const Contact = () => {
                               return (
                                 <div key={index}>
                                     {isClickable ? (
-                                      <a href={info.href} target={info.title === 'WhatsApp' ? '_blank' : undefined} rel={info.title === 'WhatsApp' ? 'noopener noreferrer' : undefined} className="block">
+                                      <a
+                                        href={info.href}
+                                        target={info.title === 'WhatsApp' ? '_blank' : undefined}
+                                        rel={info.title === 'WhatsApp' ? 'noopener noreferrer' : undefined}
+                                        className="block"
+                                        onClick={() => {
+                                            const eventLabel = info.title.toLowerCase().replace(' ', '_');
+                                            trackEvent('click', 'communication', `contact_${eventLabel}`);
+                                        }}
+                                      >
                                           <div className="glass-card p-6 hover-lift cursor-pointer transition-all duration-300 hover:shadow-glow">
                                               <CardContent />
                                           </div>
@@ -479,7 +491,7 @@ const Contact = () => {
                           <div className="relative z-10">
                               <h4 className="text-2xl font-bold text-foreground mb-3">Kontakt speichern</h4>
                               <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-                                  Speichern Sie unsere Kontaktdaten direkt oder scannen Sie den QR-Code mit Ihrem Smartphone
+                                  Speichern Sie unsere Kontaktdaten direkt oder nutzen Sie den QR-Code für sofortigen Zugriff
                               </p>
 
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center mb-6">
@@ -488,7 +500,7 @@ const Contact = () => {
                                       <img
                                         src="/nion-events-contact-qr-code.svg"
                                         alt="NION Events Kontakt QR-Code"
-                                        className="w-40 h-40 mb-3 group-hover:scale-105 transition-transform duration-300"
+                                        className="w-28 h-28 mb-3 group-hover:scale-105 transition-transform duration-300"
                                       />
                                       <span className="text-sm text-muted-foreground font-medium">QR-Code scannen</span>
                                   </div>
@@ -512,6 +524,7 @@ const Contact = () => {
                                         href="/nion-events-vcard.vcf"
                                         download="NION-Events-Kontakt.vcf"
                                         className="block mb-3"
+                                        onClick={() => trackEvent('click', 'download', 'contact_vcard')}
                                       >
                                           <Button
                                             size="lg"

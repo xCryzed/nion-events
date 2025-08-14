@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { CalendarIcon, Clock, MapPin, Users, Music, Camera, Video, Mic, Lightbulb, Volume2, ChevronLeft, ChevronRight, CheckCircle, Monitor, Timer } from 'lucide-react';
+import { CalendarIcon, Users, Music, Camera, Video, Mic, Lightbulb, Volume2, ChevronLeft, ChevronRight, CheckCircle, Monitor, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
