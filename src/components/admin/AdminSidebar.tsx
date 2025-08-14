@@ -72,7 +72,7 @@ export function AdminSidebar({
   return (
     <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
       {/* Header mit Logo/Title */}
-      <div className="p-4 border-b">
+      <div className="h-16 flex items-center p-4 border-b">
         {!collapsed && (
           <div className="flex items-center gap-2">
             <Settings className="h-6 w-6 text-primary" />
@@ -97,14 +97,14 @@ export function AdminSidebar({
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     asChild
-                    className={isActive(item.id)
+                    className={`h-16 ${isActive(item.id)
                       ? "bg-primary/10 text-primary font-medium border border-primary/20"
                       : "hover:bg-muted/50"
-                    }
+                    }`}
                   >
                     <button
                       onClick={() => onTabChange(item.id)}
-                      className="w-full justify-start"
+                      className="w-full h-full justify-start"
                     >
                       <item.icon className="mr-2 h-4 w-4" />
                       {!collapsed && (
@@ -133,10 +133,10 @@ export function AdminSidebar({
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild className="h-16">
                   <NavLink
                     to="/"
-                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground h-full"
                   >
                     <Home className="mr-2 h-4 w-4" />
                     {!collapsed && <span>Zur Hauptseite</span>}
