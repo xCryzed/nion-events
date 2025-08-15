@@ -271,7 +271,7 @@ const Header = () => {
                 </DropdownMenu>
               ) : (
                 <Link
-                  to="/auth"
+                  to="/anmelden"
                   onClick={() => trackEvent('click', 'auth', 'header_login')}
                 >
                   <Button className="btn-hero">
