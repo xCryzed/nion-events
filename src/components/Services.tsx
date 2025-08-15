@@ -1,4 +1,4 @@
-import { Headphones, Volume2, Lightbulb, Heart, Briefcase, Star, Package, Camera } from 'lucide-react';
+import { Headphones, Volume2, Lightbulb, Heart, Briefcase, Star, Package, Camera, Bus } from 'lucide-react';
 
 const Services = () => {
   const services = [
@@ -39,17 +39,23 @@ const Services = () => {
       features: ['Silent-Disco (Kopfhörerpartys)', 'Open-Air-Events & Pop-up-Veranstaltungen', 'Hybrid-Events & Streaming-Technik']
     },
     {
-      icon: Package,
-      title: 'Full Service oder individuell buchbar',
-      description: 'Alles aus einer Hand oder einzeln buchbar nach Ihren Bedürfnissen',
-      features: ['Musik, Technik, Planung, Durchführung', 'Einzeln buchbar: DJ, Technik oder Planung', 'Persönlicher Ansprechpartner']
-    },
-    {
       icon: Camera,
       title: 'Foto & Videoproduktion',
       description: 'Hochzeitsfotografie, Aftermovies & Business-Videodreh',
       features: ['Hochzeitsfotografie & -videos in Kino-Qualität', 'Dynamische Aftermovies für Events', 'Imagefilme & Corporate Videos']
     },
+    {
+      icon: Bus,
+      title: 'Shuttle Service & Eventlogistik',
+      description: 'Professionelle Transportlösungen für Events aller Größenordnungen',
+      features: ['Flughafen-, Hotel- & Eventtransfer', 'Limousinen, Vans, Sprinter & Busse verfügbar', 'Koordinatoren vor Ort für reibungslosen Ablauf']
+    },
+    {
+      icon: Package,
+      title: 'Full Service oder individuell buchbar',
+      description: 'Alles aus einer Hand oder einzeln buchbar nach Ihren Bedürfnissen',
+      features: ['Musik, Technik, Planung, Durchführung', 'Einzeln buchbar: DJ, Technik oder Planung', 'Persönlicher Ansprechpartner']
+    }
   ];
 
   return (

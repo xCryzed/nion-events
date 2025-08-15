@@ -99,6 +99,7 @@ const About = () => {
                         "DREAMBEATS LAB 2023 (DAS LIEBIG, Aachen)",
                         "Electrisize 2023 & 2024 (Erkelenz)",
                         "Disco Tropics 2024 (Lloret de Mar)",
+                        "J&J AAM 2025 (Wallmans Salonger, Kopenhagen)",
                         "Hammer Beachparty 2025 (DAS LIEBIG, Aachen)"
                       ].map((item, index) => (
                         <div key={index} className="flex items-center space-x-2">

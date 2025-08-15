@@ -66,7 +66,7 @@ const Hero = () => {
                 window.location.href = '/angebot';
               }}
             >
-              Projekt starten
+              Angebot einholen
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button

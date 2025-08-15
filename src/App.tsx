@@ -20,26 +20,25 @@ import MeineAngebote from "./pages/MeineAngebote";
 
 const queryClient = new QueryClient();
 
-// Component to track page views
 const PageTracker = () => {
   const location = useLocation();
 
   useEffect(() => {
     // Track page view when location changes
     const pageTitles: { [key: string]: string } = {
-      '/': 'Startseite - NION Events',
-      '/portfolio': 'Portfolio - NION Events',
-      '/datenschutz': 'Datenschutz - NION Events',
-      '/impressum': 'Impressum - NION Events',
-      '/agb': 'AGB - NION Events',
-      '/presse': 'Presse - NION Events',
-      '/auth': 'Anmeldung - NION Events',
-      '/administration': 'Administration - NION Events',
-      '/angebot': 'Angebot erstellen - NION Events',
-      '/meine-angebote': 'Meine Angebote - NION Events'
+      '/': 'DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
+      '/angebot': 'Angebot anfordern - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
+      '/portfolio': 'Portfolio - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
+      '/presse': 'Presse - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
+      '/impressum': 'Impressum - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
+      '/datenschutz': 'Datenschutz - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
+      '/agb': 'AGB - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
+      '/anmelden': 'Anmelden - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
+      '/meine-angebote': 'Meine Angebote - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
+      '/administration': 'Administration - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich'
     };
 
-    const title = pageTitles[location.pathname] || `${location.pathname} - NION Events`;
+    const title = pageTitles[location.pathname] || `${location.pathname} | NION Events`;
     trackPageView(location.pathname, title);
   }, [location]);
 
@@ -66,15 +65,15 @@ const AppContent = () => {
           <PageTracker />
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/datenschutz" element={<Datenschutz />} />
-            <Route path="/impressum" element={<Impressum />} />
-            <Route path="/agb" element={<AGB />} />
-            <Route path="/presse" element={<Presse />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/administration" element={<Administration />} />
             <Route path="/angebot" element={<Angebot />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/presse" element={<Presse />} />
+            <Route path="/impressum" element={<Impressum />} />
+            <Route path="/datenschutz" element={<Datenschutz />} />
+            <Route path="/agb" element={<AGB />} />
+            <Route path="/anmelden" element={<Auth />} />
             <Route path="/meine-angebote" element={<MeineAngebote />} />
+            <Route path="/administration" element={<Administration />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

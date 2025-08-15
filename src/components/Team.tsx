@@ -1,14 +1,14 @@
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { Crown, Music, Camera, Wrench, Palette, Headphones } from 'lucide-react';
+import { Crown, Music, Camera, Wrench, Headphones } from 'lucide-react';
 import nino from '@/assets/team/nino.webp';
 import dogan from '@/assets/team/dogan.webp';
 import ben from '@/assets/team/ben.webp';
 import steven from '@/assets/team/steven.webp';
 import devin from '@/assets/team/devin.webp';
 import alex from '@/assets/team/alex.webp';
-import melanie from '@/assets/team/melanie.webp'
-import rene from '@/assets/team/rene.webp'
+import rene from '@/assets/team/rene.webp';
+import robin from '@/assets/team/robin.webp';
 
 interface TeamMember {
   name: string;
@@ -86,13 +86,13 @@ const Team = () => {
       image: devin
     },
     {
-      name: 'Melanie',
-      role: 'Designerin',
-      position: 'Creative Designer',
-      description: 'Erschafft beeindruckende visuelle Konzepte und Designs, die jedes Event zu einem unvergesslichen Erlebnis machen.',
-      badges: ['Visual Artist', 'Content Creator'],
-      icon: <Palette className="w-6 h-6" />,
-      image: melanie
+      name: 'Robin',
+      role: 'Techniker',
+      position: 'Technical Expert',
+      description: 'Von der ersten Verkabelung bis zum letzten Feinschliff – er liefert Technik, die beeindruckt und funktioniert.',
+      badges: ['Lighting Expert', 'Sound Engineer'],
+      icon: <Wrench className="w-6 h-6" />,
+      image: robin
     }
   ];
 

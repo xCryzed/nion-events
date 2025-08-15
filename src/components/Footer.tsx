@@ -15,7 +15,8 @@ import {
   Home,
   Briefcase, Star,
   CheckCircle,
-  Camera
+  Camera,
+  Bus
 } from 'lucide-react';
 import nionLogo from '@/assets/nion-logo-white.svg';
 
@@ -210,6 +211,10 @@ const Footer = () => {
               <li className="flex items-center text-sm text-muted-foreground">
                 <Star className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0"/>
                 Spezialformate
+              </li>
+              <li className="flex items-center text-sm text-muted-foreground">
+                <Bus className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0"/>
+                Shuttle Service
               </li>
               <li className="flex items-center text-sm text-muted-foreground">
                 <CheckCircle className="w-3.5 h-3.5 text-primary mr-2 flex-shrink-0"/>

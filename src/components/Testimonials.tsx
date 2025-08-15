@@ -8,8 +8,11 @@ import nox from '@/assets/logos/nox-logo.svg';
 import apollo from '@/assets/logos/apollo-logo.svg';
 import himmerich from '@/assets/logos/himmerich-logo.svg'
 import dasLiebig from '@/assets/logos/das-liebig-logo.png';
-import joy from '@/assets/logos/joy-logo.svg'
-import rent2night from '@/assets/logos/rent2night-logo.svg'
+import joy from '@/assets/logos/joy-logo.svg';
+import rent2night from '@/assets/logos/rent2night-logo.svg';
+import relay from '@/assets/logos/relay-logo.png';
+import ranek from '@/assets/logos/rane-k-logo.webp';
+import adesso from '@/assets/logos/adesso-logo.svg';
 
 const Testimonials = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -66,7 +69,10 @@ const Testimonials = () => {
     { name: 'Diskothek Himmerich', logo: himmerich, website: 'https://www.himmerich.de' },
     { name: 'DAS LIEBIG', logo: dasLiebig, website: 'https://www.dasliebig.de' },
     { name: 'JOY event & media GmbH & Co. KG', logo: joy, website: 'https://www.joy-event-media.de/' },
-    { name: 'Rent2Night Eventmanagement', logo: rent2night, website: 'https://rent2night.de/' }
+    { name: 'Rent2Night Eventmanagement', logo: rent2night, website: 'https://rent2night.de/' },
+    { name: 'RELAY GmbH', logo: relay, website: 'https://relay-on.de/' },
+    { name: 'RaneK Veranstaltungstechnik', logo: ranek, website: 'https://www.instagram.com/rane_k_veranstaltungstechnik/' },
+    { name: 'adesso SE', logo: adesso, website: 'https://www.adesso.de/' }
   ];
 
   const shuffleArray = (array: typeof partners) => {
@@ -168,7 +174,7 @@ const Testimonials = () => {
             </p>
 
             <Button
-              onClick={() => window.open('https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID', '_blank')}
+              onClick={() => window.open('https://g.page/r/CWnFptITqQNDEAE/review', '_blank')}
               className="btn-hero group"
             >
               <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
