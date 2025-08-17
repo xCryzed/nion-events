@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useRegistrationStatus = () => {
-    const [isRegistrationEnabled, setIsRegistrationEnabled] = useState(true);
+    const [isRegistrationEnabled, setIsRegistrationEnabled] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -19,8 +19,8 @@ export const useRegistrationStatus = () => {
                 }
             } catch (error) {
                 console.error('Error checking registration status:', error);
-                // Default to enabled on error
-                setIsRegistrationEnabled(true);
+                // Default to disabled on error for security
+                setIsRegistrationEnabled(false);
             } finally {
                 setLoading(false);
             }

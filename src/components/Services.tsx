@@ -59,65 +59,67 @@ const Services = () => {
   ];
 
   return (
-    <section id="services" className="section-padding bg-muted/30">
-      <div className="container">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-headline mb-6">
-            Unsere <span className="text-gradient">Leistungen</span>
-          </h2>
-          <div className="w-24 h-1 bg-gradient-primary rounded-full mx-auto mb-8"></div>
-          <p className="text-body-large text-muted-foreground">
-            Von der ersten Idee bis zur perfekten Umsetzung – wir bieten Ihnen 
-            alle Services aus einer Hand für unvergessliche Events.
-          </p>
+      <section id="services" className="section-padding bg-muted/30">
+        <div className="container">
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-headline mb-6">
+              Unsere <span className="text-gradient">Leistungen</span>
+            </h2>
+            <div className="w-24 h-1 bg-gradient-primary rounded-full mx-auto mb-8"></div>
+            <p className="text-body-large text-muted-foreground">
+              Von der ersten Idee bis zur perfekten Umsetzung – wir bieten Ihnen
+              alle Services aus einer Hand für unvergessliche Events.
+            </p>
+          </div>
+
+          {/* Services Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, index) => (
+                <div
+                    key={index}
+                    className="glass-card p-8 hover-lift group"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  {/* Icon */}
+                  <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6 group-hover:shadow-glow transition-all duration-300">
+                    <service.icon className="w-8 h-8 text-white" />
+                  </div>
+
+                  {/* Content */}
+                  <h3 className="text-title mb-4 group-hover:text-primary transition-colors">
+                    {service.title}
+                  </h3>
+                  <p className="text-body text-muted-foreground mb-6">
+                    {service.description}
+                  </p>
+
+                  {/* Features */}
+                  <ul className="space-y-2">
+                    {service.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-center text-sm text-muted-foreground">
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full mr-3" />
+                          {feature}
+                        </li>
+                    ))}
+                  </ul>
+                </div>
+            ))}
+          </div>
+
+          {/* CTA Section */}
+          <div className="text-center mt-16">
+            <p className="text-body-large text-muted-foreground mb-6">
+              Benötigen Sie eine individuelle Lösung?
+            </p>
+            <a href="#contact">
+              <button className="btn-hero">
+                Kostenlose Beratung vereinbaren
+              </button>
+            </a>
+          </div>
         </div>
-
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => (
-            <div 
-              key={index} 
-              className="glass-card p-8 hover-lift group"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              {/* Icon */}
-              <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6 group-hover:shadow-glow transition-all duration-300">
-                <service.icon className="w-8 h-8 text-white" />
-              </div>
-
-              {/* Content */}
-              <h3 className="text-title mb-4 group-hover:text-primary transition-colors">
-                {service.title}
-              </h3>
-              <p className="text-body text-muted-foreground mb-6">
-                {service.description}
-              </p>
-
-              {/* Features */}
-              <ul className="space-y-2">
-                {service.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center text-sm text-muted-foreground">
-                    <div className="w-1.5 h-1.5 bg-primary rounded-full mr-3" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        {/* CTA Section */}
-        <div className="text-center mt-16">
-          <p className="text-body-large text-muted-foreground mb-6">
-            Benötigen Sie eine individuelle Lösung?
-          </p>
-          <button className="btn-hero">
-            Kostenlose Beratung vereinbaren
-          </button>
-        </div>
-      </div>
-    </section>
+      </section>
   );
 };
 
