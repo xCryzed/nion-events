@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, Users, Badge, Timer, AlertCircle, CheckCircle2, Loader2, Info } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, Badge, Timer, AlertCircle, CheckCircle2, Loader2, Info, HelpCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,7 +15,7 @@ interface EventRequest {
   event_date: string;
   location: string;
   guest_count: string;
-  status: 'ANGEFRAGT' | 'IN_BEARBEITUNG' | 'ABGESCHLOSSEN';
+  status: 'ANGEFRAGT' | 'IN_BEARBEITUNG' | 'ABGESCHLOSSEN' | 'RÜCKFRAGEN_OFFEN';
   offer_number: string;
   created_at: string;
   tech_requirements: string[];
@@ -129,6 +129,8 @@ const MeineAngebote = () => {
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'IN_BEARBEITUNG':
         return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'RÜCKFRAGEN_OFFEN':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
       case 'ABGESCHLOSSEN':
         return 'bg-green-100 text-green-800 border-green-200';
       default:
@@ -142,6 +144,8 @@ const MeineAngebote = () => {
         return <Info className="w-4 h-4" />;
       case 'IN_BEARBEITUNG':
         return <Loader2 className="w-4 h-4" />;
+      case 'RÜCKFRAGEN_OFFEN':
+        return <HelpCircle className="w-4 h-4" />;
       case 'ABGESCHLOSSEN':
         return <CheckCircle2 className="w-4 h-4" />;
       default:
@@ -239,7 +243,7 @@ const MeineAngebote = () => {
                                 </div>
                               </div>
 
-                              {(request.status === 'ANGEFRAGT' || request.status === 'IN_BEARBEITUNG') && (() => {
+                              {(request.status === 'ANGEFRAGT' || request.status === 'IN_BEARBEITUNG' || request.status === 'RÜCKFRAGEN_OFFEN') && (() => {
                                 const timeInfo = calculateTimeRemaining(request.created_at);
                                 return (
                                     <div className="flex items-center justify-between bg-muted/30 rounded-lg px-4 py-3 border-l-4 border-primary/20">
