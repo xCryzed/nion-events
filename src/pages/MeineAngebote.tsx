@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, Users, Badge, Timer, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, Badge, Timer, AlertCircle, CheckCircle2, Loader2, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -126,7 +126,7 @@ const MeineAngebote = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ANGEFRAGT':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'IN_BEARBEITUNG':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'ABGESCHLOSSEN':
@@ -139,7 +139,7 @@ const MeineAngebote = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'ANGEFRAGT':
-        return <AlertCircle className="w-4 h-4" />;
+        return <Info className="w-4 h-4" />;
       case 'IN_BEARBEITUNG':
         return <Loader2 className="w-4 h-4" />;
       case 'ABGESCHLOSSEN':
@@ -234,7 +234,7 @@ const MeineAngebote = () => {
                                 <div className="flex-shrink-0">
                             <span className={`px-3 py-1 rounded-full text-xs font-medium border flex items-center space-x-1 ${getStatusColor(request.status)}`}>
                               {getStatusIcon(request.status)}
-                              <span className="hidden sm:inline">{request.status.replace('_', ' ')}</span>
+                              <span>{request.status.replace('_', ' ')}</span>
                             </span>
                                 </div>
                               </div>
