@@ -26,6 +26,7 @@ interface AdminSidebarProps {
   eventRequestsCount: number;
   contactRequestsCount: number;
   usersCount: number;
+  internalEventsCount: number;
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
@@ -34,6 +35,7 @@ export function AdminSidebar({
                                eventRequestsCount,
                                contactRequestsCount,
                                usersCount,
+                               internalEventsCount,
                                activeTab,
                                onTabChange
                              }: AdminSidebarProps) {
@@ -58,6 +60,12 @@ export function AdminSidebar({
       title: 'Kontaktanfragen',
       icon: MessageSquare,
       count: contactRequestsCount
+    },
+    {
+      id: 'events',
+      title: 'Veranstaltungen',
+      icon: Calendar,
+      count: internalEventsCount
     },
     {
       id: 'users',

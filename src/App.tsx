@@ -17,6 +17,7 @@ import Auth from "./pages/Auth";
 import Administration from "./pages/Administration";
 import Angebot from "./pages/Angebot";
 import MeineAngebote from "./pages/MeineAngebote";
+import AnstehendeEvents from "./pages/AnstehendeEvents";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const PageTracker = () => {
       '/agb': 'AGB - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
       '/anmelden': 'Anmelden - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
       '/meine-angebote': 'Meine Angebote - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
+      '/anstehende-events': 'Anstehende Events - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
       '/administration': 'Administration - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich'
     };
 
@@ -47,9 +49,9 @@ const PageTracker = () => {
 
 const App = () => {
   return (
-    <ErrorBoundary>
-      <AppContent />
-    </ErrorBoundary>
+      <ErrorBoundary>
+        <AppContent />
+      </ErrorBoundary>
   );
 };
 
@@ -57,29 +59,30 @@ const AppContent = () => {
   useGoogleAnalytics();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <PageTracker />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/angebot" element={<Angebot />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/presse" element={<Presse />} />
-            <Route path="/impressum" element={<Impressum />} />
-            <Route path="/datenschutz" element={<Datenschutz />} />
-            <Route path="/agb" element={<AGB />} />
-            <Route path="/anmelden" element={<Auth />} />
-            <Route path="/meine-angebote" element={<MeineAngebote />} />
-            <Route path="/administration" element={<Administration />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <PageTracker />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/angebot" element={<Angebot />} />
+              <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/presse" element={<Presse />} />
+              <Route path="/impressum" element={<Impressum />} />
+              <Route path="/datenschutz" element={<Datenschutz />} />
+              <Route path="/agb" element={<AGB />} />
+              <Route path="/anmelden" element={<Auth />} />
+              <Route path="/meine-angebote" element={<MeineAngebote />} />
+              <Route path="/anstehende-events" element={<AnstehendeEvents />} />
+              <Route path="/administration" element={<Administration />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
   );
 };
 

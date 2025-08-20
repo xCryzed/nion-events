@@ -9,6 +9,7 @@ import EventRequestsTable from '@/components/EventRequestsTable';
 import ContactRequestsTab from '@/components/admin/ContactRequestsTab';
 import UsersTab from '@/components/admin/UsersTab';
 import SettingsTab from '@/components/admin/SettingsTab';
+import EventsTab from '@/components/admin/EventsTab';
 import { Session } from '@supabase/supabase-js';
 import AdminDashboard from '@/components/AdminDashboard';
 import { Menu } from 'lucide-react';
@@ -18,6 +19,7 @@ const Administration = () => {
     const [contactRequestsCount, setContactRequestsCount] = useState<number>(0);
     const [eventRequestsCount, setEventRequestsCount] = useState<number>(0);
     const [usersCount, setUsersCount] = useState<number>(0);
+    const [internalEventsCount, setInternalEventsCount] = useState<number>(0);
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -114,6 +116,15 @@ const Administration = () => {
             if (!userError) {
                 setUsersCount(userCount || 0);
             }
+
+            // Fetch internal events count
+            const { count: internalCount, error: internalError } = await supabase
+                .from('internal_events')
+                .select('*', { count: 'exact', head: true });
+
+            if (!internalError) {
+                setInternalEventsCount(internalCount || 0);
+            }
         } catch (error) {
             console.error('Error fetching counts:', error);
         }
@@ -154,6 +165,8 @@ const Administration = () => {
                 return <EventRequestsTable />;
             case 'contacts':
                 return <ContactRequestsTab />;
+            case 'events':
+                return <EventsTab />;
             case 'users':
                 return <UsersTab />;
             case 'settings':
@@ -171,6 +184,8 @@ const Administration = () => {
                 return 'Angebotsanfragen';
             case 'contacts':
                 return 'Kontaktanfragen';
+            case 'events':
+                return 'Veranstaltungen';
             case 'users':
                 return 'Benutzerverwaltung';
             case 'settings':
@@ -188,6 +203,8 @@ const Administration = () => {
                 return 'Verwaltung eingehender Angebotsanfragen';
             case 'contacts':
                 return 'Verwaltung von Kontaktanfragen';
+            case 'events':
+                return 'Verwaltung interner Events, Personal-Planung und Anmeldungen';
             case 'users':
                 return 'Benutzer und Berechtigungen verwalten';
             case 'settings':
@@ -204,6 +221,7 @@ const Administration = () => {
                     eventRequestsCount={eventRequestsCount}
                     contactRequestsCount={contactRequestsCount}
                     usersCount={usersCount}
+                    internalEventsCount={internalEventsCount}
                     activeTab={activeTab}
                     onTabChange={setActiveTab}
                 />
