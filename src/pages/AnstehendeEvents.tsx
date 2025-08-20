@@ -321,9 +321,11 @@ const AnstehendeEvents = () => {
         if (!isEmployee) return;
 
         try {
+            const now = new Date().toISOString();
             const { data, error } = await supabase
                 .from('internal_events')
                 .select('*')
+                .gte('event_date', now)
                 .order('event_date', { ascending: true });
 
             if (error) {

@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, MapPin, Users, Plus, Minus, Trash2, Edit, Eye, UserCheck, UserX, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -64,6 +65,7 @@ const STAFF_CATEGORIES = [
 
 const EventsTab = () => {
     const [events, setEvents] = useState<InternalEvent[]>([]);
+    const [archivedEvents, setArchivedEvents] = useState<InternalEvent[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editingEvent, setEditingEvent] = useState<InternalEvent | null>(null);
@@ -88,14 +90,17 @@ const EventsTab = () => {
 
     useEffect(() => {
         fetchEvents();
+        fetchArchivedEvents();
         fetchAllRegistrations();
     }, []);
 
     const fetchEvents = async () => {
         try {
+            const now = new Date().toISOString();
             const { data, error } = await supabase
                 .from('internal_events')
                 .select('*')
+                .gte('event_date', now)
                 .order('event_date', { ascending: true });
 
             if (error) throw error;
@@ -124,6 +129,42 @@ const EventsTab = () => {
             toast.error('Fehler beim Laden der Events');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchArchivedEvents = async () => {
+        try {
+            const now = new Date().toISOString();
+            const { data, error } = await supabase
+                .from('internal_events')
+                .select('*')
+                .lt('event_date', now)
+                .order('event_date', { ascending: false });
+
+            if (error) throw error;
+            const formattedEvents = data?.map(event => {
+                let staffRequirements = [];
+                if (event.staff_requirements) {
+                    if (typeof event.staff_requirements === 'string') {
+                        try {
+                            staffRequirements = JSON.parse(event.staff_requirements);
+                        } catch (e) {
+                            console.error('Error parsing staff_requirements:', e);
+                            staffRequirements = [];
+                        }
+                    } else if (Array.isArray(event.staff_requirements)) {
+                        staffRequirements = event.staff_requirements;
+                    }
+                }
+                return {
+                    ...event,
+                    staff_requirements: staffRequirements
+                };
+            }) || [];
+            setArchivedEvents(formattedEvents);
+        } catch (error) {
+            console.error('Error fetching archived events:', error);
+            toast.error('Fehler beim Laden der archivierten Events');
         }
     };
 
@@ -264,6 +305,7 @@ const EventsTab = () => {
 
             resetForm();
             fetchEvents();
+            fetchArchivedEvents();
             fetchAllRegistrations();
         } catch (error) {
             console.error('Error saving event:', error);
@@ -283,6 +325,7 @@ const EventsTab = () => {
             if (error) throw error;
             toast.success('Event erfolgreich gelöscht');
             fetchEvents();
+            fetchArchivedEvents();
             fetchAllRegistrations();
         } catch (error) {
             console.error('Error deleting event:', error);
@@ -373,11 +416,182 @@ const EventsTab = () => {
         );
     }
 
+    const renderEventList = (eventList: InternalEvent[], isArchived = false) => (
+        <div className="grid gap-4">
+            {eventList.length === 0 ? (
+                <Card>
+                    <CardContent className="text-center py-12">
+                        <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                        <h3 className="text-lg font-semibold mb-2">
+                            {isArchived ? 'Keine archivierten Events' : 'Keine aktuellen Events vorhanden'}
+                        </h3>
+                        <p className="text-muted-foreground">
+                            {isArchived ? 'Alle vergangenen Events werden hier angezeigt.' : 'Erstellen Sie Ihr erstes Event über den Button oben.'}
+                        </p>
+                    </CardContent>
+                </Card>
+            ) : (
+                eventList.map((event) => (
+                    <Card key={event.id}>
+                        <CardHeader>
+                            <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                    <CardTitle className="flex items-center gap-2">
+                                        {event.title}
+                                        <Badge className={getStatusColor(event.status)}>
+                                            {event.status}
+                                        </Badge>
+                                    </CardTitle>
+                                    <div className="mt-2">
+                                        <div className="flex flex-wrap items-center gap-4 text-sm">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                          {format(new Date(event.event_date), 'dd.MM.yyyy HH:mm', { locale: de })}
+                      </span>
+                                            <span className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                                                {event.location}
+                      </span>
+                                            {event.guest_count && (
+                                                <span className="flex items-center gap-1">
+                          <Users className="w-4 h-4" />
+                                                    {event.guest_count} Gäste
+                        </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <Button
+                                        onClick={() => toggleEventExpansion(event.id)}
+                                        variant="outline"
+                                        size="sm"
+                                    >
+                                        <Eye className="w-4 h-4 mr-1" />
+                                        {expandedEvents.has(event.id) ? 'Weniger anzeigen' : 'Anmeldungen anzeigen'}
+                                    </Button>
+                                    {!isArchived && (
+                                        <>
+                                            <Button onClick={() => startEditing(event)} variant="outline" size="sm">
+                                                <Edit className="w-4 h-4 mr-1" />
+                                                Bearbeiten
+                                            </Button>
+                                            <Button onClick={() => deleteEvent(event.id)} variant="outline" size="sm">
+                                                <Trash2 className="w-4 h-4 mr-1" />
+                                                Löschen
+                                            </Button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        </CardHeader>
+
+                        <CardContent>
+                            {event.description && (
+                                <p className="text-sm text-muted-foreground mb-4">{event.description}</p>
+                            )}
+
+                            {event.staff_requirements && event.staff_requirements.length > 0 && (
+                                <div className="mb-4">
+                                    <h4 className="font-semibold text-sm mb-2">Personal-Anforderungen:</h4>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                                        {event.staff_requirements.map((staff, index) => (
+                                            <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                                                <span className="text-sm font-medium">{staff.category}</span>
+                                                <Badge variant={staff.filled >= staff.count ? "default" : "outline"}>
+                                                    {staff.filled}/{staff.count}
+                                                </Badge>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {event.notes && (
+                                <div className="p-3 bg-muted/30 rounded-lg">
+                                    <h4 className="font-semibold text-sm mb-1">Notizen:</h4>
+                                    <p className="text-sm">{event.notes}</p>
+                                </div>
+                            )}
+
+                            {/* Event Registrations Section */}
+                            {expandedEvents.has(event.id) && (
+                                <div className="mt-6 pt-6 border-t">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h4 className="font-semibold text-lg flex items-center gap-2">
+                                            <Users className="h-5 w-5" />
+                                            Anmeldungen ({eventRegistrations[event.id]?.length || 0})
+                                        </h4>
+                                    </div>
+
+                                    {eventRegistrations[event.id]?.length > 0 ? (
+                                        <div className="space-y-3">
+                                            {eventRegistrations[event.id].map((registration) => (
+                                                <div key={registration.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="flex items-center gap-2">
+                                                            {getRegistrationStatusIcon(registration.status)}
+                                                            <div>
+                                                                <p className="font-medium text-sm">
+                                                                    {registration.profiles?.first_name} {registration.profiles?.last_name}
+                                                                </p>
+                                                                <p className="text-xs text-muted-foreground">
+                                                                    {registration.staff_category}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <Badge className={getRegistrationStatusColor(registration.status)}>
+                                                            {registration.status}
+                                                        </Badge>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-3">
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {format(new Date(registration.created_at), 'dd.MM.yyyy HH:mm', { locale: de })}
+                                                        </p>
+
+                                                        {!isArchived && (
+                                                            <Select
+                                                                value={registration.status}
+                                                                onValueChange={(value) => updateRegistrationStatus(registration.id, value)}
+                                                            >
+                                                                <SelectTrigger className="w-[130px]">
+                                                                    <SelectValue />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="angemeldet">Angemeldet</SelectItem>
+                                                                    <SelectItem value="bestätigt">Bestätigt</SelectItem>
+                                                                    <SelectItem value="abgelehnt">Abgelehnt</SelectItem>
+                                                                    <SelectItem value="zurückgezogen">Zurückgezogen</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-8 text-muted-foreground">
+                                            <UserCheck className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                                            <p className="text-sm">Noch keine Anmeldungen für dieses Event</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                ))
+            )}
+        </div>
+    );
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold">Event Management</h2>
+                    <h2 className="text-2xl font-bold">Veranstaltungen</h2>
                     <p className="text-muted-foreground">Verwalten Sie interne Events und Personal-Anforderungen</p>
                 </div>
                 <Button onClick={() => setShowForm(!showForm)} className="btn-hero">
@@ -586,166 +800,24 @@ const EventsTab = () => {
                 </Card>
             )}
 
-            <div className="grid gap-4">
-                {events.length === 0 ? (
-                    <Card>
-                        <CardContent className="text-center py-12">
-                            <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                            <h3 className="text-lg font-semibold mb-2">Keine Events vorhanden</h3>
-                            <p className="text-muted-foreground">
-                                Erstellen Sie Ihr erstes Event über den Button oben.
-                            </p>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    events.map((event) => (
-                        <Card key={event.id}>
-                            <CardHeader>
-                                <div className="flex items-start justify-between">
-                                    <div className="flex-1">
-                                        <CardTitle className="flex items-center gap-2">
-                                            {event.title}
-                                            <Badge className={getStatusColor(event.status)}>
-                                                {event.status}
-                                            </Badge>
-                                        </CardTitle>
-                                        <div className="mt-2">
-                                            <div className="flex flex-wrap items-center gap-4 text-sm">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                            {format(new Date(event.event_date), 'dd.MM.yyyy HH:mm', { locale: de })}
-                        </span>
-                                                <span className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
-                                                    {event.location}
-                        </span>
-                                                {event.guest_count && (
-                                                    <span className="flex items-center gap-1">
-                            <Users className="w-4 h-4" />
-                                                        {event.guest_count} Gäste
-                          </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
+            <Tabs defaultValue="current" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="current">
+                        Aktuelle Events ({events.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="archived">
+                        Archivierte Events ({archivedEvents.length})
+                    </TabsTrigger>
+                </TabsList>
 
-                                    <div className="flex gap-2">
-                                        <Button
-                                            onClick={() => toggleEventExpansion(event.id)}
-                                            variant="outline"
-                                            size="sm"
-                                        >
-                                            <Eye className="w-4 h-4 mr-1" />
-                                            {expandedEvents.has(event.id) ? 'Weniger anzeigen' : 'Anmeldungen anzeigen'}
-                                        </Button>
-                                        <Button onClick={() => startEditing(event)} variant="outline" size="sm">
-                                            <Edit className="w-4 h-4 mr-1" />
-                                            Bearbeiten
-                                        </Button>
-                                        <Button onClick={() => deleteEvent(event.id)} variant="outline" size="sm">
-                                            <Trash2 className="w-4 h-4 mr-1" />
-                                            Löschen
-                                        </Button>
-                                    </div>
-                                </div>
-                            </CardHeader>
+                <TabsContent value="current" className="mt-6">
+                    {renderEventList(events, false)}
+                </TabsContent>
 
-                            <CardContent>
-                                {event.description && (
-                                    <p className="text-sm text-muted-foreground mb-4">{event.description}</p>
-                                )}
-
-                                {event.staff_requirements && event.staff_requirements.length > 0 && (
-                                    <div className="mb-4">
-                                        <h4 className="font-semibold text-sm mb-2">Personal-Anforderungen:</h4>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                                            {event.staff_requirements.map((staff, index) => (
-                                                <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded">
-                                                    <span className="text-sm font-medium">{staff.category}</span>
-                                                    <Badge variant={staff.filled >= staff.count ? "default" : "outline"}>
-                                                        {staff.filled}/{staff.count}
-                                                    </Badge>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {event.notes && (
-                                    <div className="p-3 bg-muted/30 rounded-lg">
-                                        <h4 className="font-semibold text-sm mb-1">Notizen:</h4>
-                                        <p className="text-sm">{event.notes}</p>
-                                    </div>
-                                )}
-
-                                {/* Event Registrations Section */}
-                                {expandedEvents.has(event.id) && (
-                                    <div className="mt-6 pt-6 border-t">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <h4 className="font-semibold text-lg flex items-center gap-2">
-                                                <Users className="h-5 w-5" />
-                                                Anmeldungen ({eventRegistrations[event.id]?.length || 0})
-                                            </h4>
-                                        </div>
-
-                                        {eventRegistrations[event.id]?.length > 0 ? (
-                                            <div className="space-y-3">
-                                                {eventRegistrations[event.id].map((registration) => (
-                                                    <div key={registration.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="flex items-center gap-2">
-                                                                {getRegistrationStatusIcon(registration.status)}
-                                                                <div>
-                                                                    <p className="font-medium text-sm">
-                                                                        {registration.profiles?.first_name} {registration.profiles?.last_name}
-                                                                    </p>
-                                                                    <p className="text-xs text-muted-foreground">
-                                                                        {registration.staff_category}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-
-                                                            <Badge className={getRegistrationStatusColor(registration.status)}>
-                                                                {registration.status}
-                                                            </Badge>
-                                                        </div>
-
-                                                        <div className="flex items-center gap-3">
-                                                            <p className="text-xs text-muted-foreground">
-                                                                {format(new Date(registration.created_at), 'dd.MM.yyyy HH:mm', { locale: de })}
-                                                            </p>
-
-                                                            <Select
-                                                                value={registration.status}
-                                                                onValueChange={(value) => updateRegistrationStatus(registration.id, value)}
-                                                            >
-                                                                <SelectTrigger className="w-[130px]">
-                                                                    <SelectValue />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="angemeldet">Angemeldet</SelectItem>
-                                                                    <SelectItem value="bestätigt">Bestätigt</SelectItem>
-                                                                    <SelectItem value="abgelehnt">Abgelehnt</SelectItem>
-                                                                    <SelectItem value="zurückgezogen">Zurückgezogen</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <div className="text-center py-8 text-muted-foreground">
-                                                <UserCheck className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                                                <p className="text-sm">Noch keine Anmeldungen für dieses Event</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    ))
-                )}
-            </div>
+                <TabsContent value="archived" className="mt-6">
+                    {renderEventList(archivedEvents, true)}
+                </TabsContent>
+            </Tabs>
         </div>
     );
 };
