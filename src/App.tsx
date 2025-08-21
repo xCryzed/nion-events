@@ -18,6 +18,7 @@ import Administration from "./pages/Administration";
 import Angebot from "./pages/Angebot";
 import MeineAngebote from "./pages/MeineAngebote";
 import AnstehendeEvents from "./pages/AnstehendeEvents";
+import PersonaldatenStepper from "./pages/PersonaldatenStepper";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const PageTracker = () => {
       '/anmelden': 'Anmelden - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
       '/meine-angebote': 'Meine Angebote - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
       '/anstehende-events': 'Anstehende Events - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
+      '/personaldaten': 'Personaldaten - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
       '/administration': 'Administration - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich'
     };
 
@@ -76,6 +78,7 @@ const AppContent = () => {
               <Route path="/anmelden" element={<Auth />} />
               <Route path="/meine-angebote" element={<MeineAngebote />} />
               <Route path="/anstehende-events" element={<AnstehendeEvents />} />
+              <Route path="/personaldaten" element={<PersonaldatenStepper />} />
               <Route path="/administration" element={<Administration />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

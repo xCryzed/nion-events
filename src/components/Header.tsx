@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { trackError } from '@/hooks/use-google-analytics';
-import { Menu, X, LogOut, Settings, Users, Calendar } from 'lucide-react';
+import { Menu, X, LogOut, Settings, Users, Calendar, User as UserIcon, FileText, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -261,35 +261,45 @@ const Header = () => {
                               className="cursor-pointer flex items-center"
                               onClick={() => trackEvent('click', 'navigation', 'header_meine_angebote')}
                           >
-                            <Users className="mr-2 h-4 w-4" />
+                            <FileText className="mr-2 h-4 w-4" />
                             Meine Angebote
                           </Link>
                         </DropdownMenuItem>
                         {(isEmployee || isAdmin) && (
-                            <DropdownMenuItem asChild>
-                              <Link
-                                  to="/anstehende-events"
-                                  className="cursor-pointer flex items-center"
-                                  onClick={() => trackEvent('click', 'navigation', 'header_anstehende_events')}
-                              >
-                                <Calendar className="mr-2 h-4 w-4" />
-                                Anstehende Events
-                              </Link>
-                            </DropdownMenuItem>
-                        )}
-                        {isAdmin && (
                             <>
                               <DropdownMenuItem asChild>
                                 <Link
-                                    to="/administration"
+                                    to="/anstehende-events"
                                     className="cursor-pointer flex items-center"
-                                    onClick={() => trackEvent('click', 'admin', 'header_administration')}
+                                    onClick={() => trackEvent('click', 'navigation', 'header_anstehende_events')}
                                 >
-                                  <Settings className="mr-2 h-4 w-4" />
-                                  Administration
+                                  <Calendar className="mr-2 h-4 w-4" />
+                                  Anstehende Events
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <Link
+                                    to="/personaldaten"
+                                    className="cursor-pointer flex items-center"
+                                    onClick={() => trackEvent('click', 'navigation', 'header_personaldaten')}
+                                >
+                                  <UserIcon className="mr-2 h-4 w-4" />
+                                  Personaldaten
                                 </Link>
                               </DropdownMenuItem>
                             </>
+                        )}
+                        {isAdmin && (
+                            <DropdownMenuItem asChild>
+                              <Link
+                                  to="/administration"
+                                  className="cursor-pointer flex items-center"
+                                  onClick={() => trackEvent('click', 'admin', 'header_administration')}
+                              >
+                                <Shield className="mr-2 h-4 w-4" />
+                                Administration
+                              </Link>
+                            </DropdownMenuItem>
                         )}
                         <DropdownMenuItem
                             onClick={() => {
@@ -345,13 +355,22 @@ const Header = () => {
                     Meine Angebote
                   </Link>
                   {(isEmployee || isAdmin) && (
-                      <Link
-                          to="/anstehende-events"
-                          className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
-                          onClick={() => setIsMenuOpen(false)}
-                      >
-                        Anstehende Events
-                      </Link>
+                      <>
+                        <Link
+                            to="/anstehende-events"
+                            className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                          Anstehende Events
+                        </Link>
+                        <Link
+                            to="/personaldaten"
+                            className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                          Personaldaten
+                        </Link>
+                      </>
                   )}
                   {isAdmin && (
                       <Link
@@ -378,7 +397,7 @@ const Header = () => {
                         </Button>
                       </div>
                   ) : (
-                      <Link to="/auth">
+                      <Link to="/anmelden">
                         <Button className="btn-hero w-full mt-4">
                           Anmelden
                         </Button>

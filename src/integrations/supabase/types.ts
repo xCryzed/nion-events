@@ -86,6 +86,114 @@ export type Database = {
                 }
                 Relationships: []
             }
+            employee_personal_data: {
+                Row: {
+                    bic: string
+                    birth_name: string | null
+                    child_allowances: number | null
+                    city: string
+                    created_at: string
+                    date_of_birth: string
+                    employment_type: string
+                    first_name: string
+                    gender: string
+                    has_other_employment: boolean
+                    health_insurance_company: string | null
+                    highest_professional_qualification: string | null
+                    highest_school_degree: string | null
+                    iban: string
+                    id: string
+                    is_complete: boolean | null
+                    is_marginal_employment: boolean | null
+                    job_title: string
+                    last_name: string
+                    marital_status: string
+                    nationality: string
+                    postal_code: string
+                    previous_employment: Json | null
+                    religious_affiliation: string | null
+                    signature_data_url: string | null
+                    signature_date: string | null
+                    social_insurance_number: string | null
+                    start_date: string
+                    street_address: string
+                    tax_class_factor: string | null
+                    tax_id: string | null
+                    updated_at: string
+                    user_id: string
+                }
+                Insert: {
+                    bic: string
+                    birth_name?: string | null
+                    child_allowances?: number | null
+                    city: string
+                    created_at?: string
+                    date_of_birth: string
+                    employment_type: string
+                    first_name: string
+                    gender: string
+                    has_other_employment?: boolean
+                    health_insurance_company?: string | null
+                    highest_professional_qualification?: string | null
+                    highest_school_degree?: string | null
+                    iban: string
+                    id?: string
+                    is_complete?: boolean | null
+                    is_marginal_employment?: boolean | null
+                    job_title: string
+                    last_name: string
+                    marital_status: string
+                    nationality: string
+                    postal_code: string
+                    previous_employment?: Json | null
+                    religious_affiliation?: string | null
+                    signature_data_url?: string | null
+                    signature_date?: string | null
+                    social_insurance_number?: string | null
+                    start_date: string
+                    street_address: string
+                    tax_class_factor?: string | null
+                    tax_id?: string | null
+                    updated_at?: string
+                    user_id: string
+                }
+                Update: {
+                    bic?: string
+                    birth_name?: string | null
+                    child_allowances?: number | null
+                    city?: string
+                    created_at?: string
+                    date_of_birth?: string
+                    employment_type?: string
+                    first_name?: string
+                    gender?: string
+                    has_other_employment?: boolean
+                    health_insurance_company?: string | null
+                    highest_professional_qualification?: string | null
+                    highest_school_degree?: string | null
+                    iban?: string
+                    id?: string
+                    is_complete?: boolean | null
+                    is_marginal_employment?: boolean | null
+                    job_title?: string
+                    last_name?: string
+                    marital_status?: string
+                    nationality?: string
+                    postal_code?: string
+                    previous_employment?: Json | null
+                    religious_affiliation?: string | null
+                    signature_data_url?: string | null
+                    signature_date?: string | null
+                    social_insurance_number?: string | null
+                    start_date?: string
+                    street_address?: string
+                    tax_class_factor?: string | null
+                    tax_id?: string | null
+                    updated_at?: string
+                    user_id?: string
+                }
+                Relationships: []
+            }
             event_registrations: {
                 Row: {
                     created_at: string
@@ -330,6 +438,12 @@ export type Database = {
                 Args: {
                     _role: Database["public"]["Enums"]["app_role"]
                     _user_id: string
+                }
+                Returns: boolean
+            }
+            is_personal_data_complete: {
+                Args: {
+                    employee_data_row: Database["public"]["Tables"]["employee_personal_data"]["Row"]
                 }
                 Returns: boolean
             }

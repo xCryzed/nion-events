@@ -38,7 +38,7 @@ const MeineAngebote = () => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        window.location.href = '/auth';
+        window.location.href = '/anmelden';
         return;
       }
       setUser(user);
