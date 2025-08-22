@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -146,38 +146,46 @@ const PersonaldatenStepper: React.FC = () => {
     useEffect(() => {
         const updateCanvasWidth = () => {
             if (signatureContainerRef.current) {
-                const containerWidth = signatureContainerRef.current.offsetWidth - 32; // Account for padding
+                // Get full container width without padding reduction
+                const containerWidth = signatureContainerRef.current.clientWidth;
                 setCanvasWidth(containerWidth);
 
                 // Update existing canvas if it exists and force proper dimensions
                 if (signatureRef.current) {
                     const canvas = signatureRef.current.getCanvas();
-                    const ratio = Math.max(window.devicePixelRatio || 1, 1);
 
-                    // Set internal canvas size
-                    canvas.width = containerWidth * ratio;
-                    canvas.height = 200 * ratio;
+                    // Set canvas internal size to match display size exactly (1:1 ratio)
+                    canvas.width = containerWidth;
+                    canvas.height = 200;
 
-                    // Set display size
-                    canvas.style.width = containerWidth + 'px';
+                    // Set display size to match container exactly
+                    canvas.style.width = '100%';
                     canvas.style.height = '200px';
+                    canvas.style.maxWidth = '100%';
 
-                    // Scale context for sharp rendering
+                    // Clear any transforms that might affect coordinate calculation
                     const ctx = canvas.getContext('2d');
                     if (ctx) {
-                        ctx.scale(ratio, ratio);
+                        // Don't scale the context - keep 1:1 ratio for accurate coordinates
+                        ctx.lineCap = 'round';
+                        ctx.lineJoin = 'round';
                     }
                 }
             }
         };
 
-        updateCanvasWidth();
-        window.addEventListener('resize', updateCanvasWidth);
+        // Initial update with slight delay for DOM readiness
+        setTimeout(updateCanvasWidth, 50);
 
-        // Small delay to ensure DOM is ready
-        setTimeout(updateCanvasWidth, 100);
+        // Update on resize
+        const resizeObserver = new ResizeObserver(updateCanvasWidth);
+        if (signatureContainerRef.current) {
+            resizeObserver.observe(signatureContainerRef.current);
+        }
 
-        return () => window.removeEventListener('resize', updateCanvasWidth);
+        return () => {
+            resizeObserver.disconnect();
+        };
     }, []);
 
     useEffect(() => {
@@ -186,44 +194,49 @@ const PersonaldatenStepper: React.FC = () => {
             setUser(user);
 
             if (user) {
-                // Fetch existing data
+                // Fetch existing data only once
                 const { data } = await supabase
-                    .from('employee_personal_data')
-                    .select('*')
-                    .eq('user_id', user.id)
-                    .single();
+                  .from('employee_personal_data')
+                  .select('*')
+                  .eq('user_id', user.id)
+                  .maybeSingle();
 
                 if (data) {
                     setExistingData(data);
 
-                    // Pre-populate form with existing data
-                    form.reset({
-                        first_name: data.first_name || '',
-                        last_name: data.last_name || '',
-                        birth_name: data.birth_name || '',
-                        date_of_birth: data.date_of_birth ? new Date(data.date_of_birth) : undefined,
-                        street_address: data.street_address || '',
-                        postal_code: data.postal_code || '',
-                        city: data.city || '',
-                        marital_status: data.marital_status as any || undefined,
-                        gender: data.gender as any || undefined,
-                        nationality: data.nationality || '',
-                        iban: data.iban || '',
-                        bic: data.bic || '',
-                        start_date: data.start_date ? new Date(data.start_date) : undefined,
-                        job_title: data.job_title || '',
-                        employment_type: data.employment_type as any || undefined,
-                        has_other_employment: data.has_other_employment || false,
-                        is_marginal_employment: data.is_marginal_employment || false,
-                        highest_school_degree: data.highest_school_degree as any || undefined,
-                        highest_professional_qualification: data.highest_professional_qualification as any || undefined,
-                        tax_id: data.tax_id || '',
-                        tax_class_factor: data.tax_class_factor || '',
-                        child_allowances: data.child_allowances || 0,
-                        religious_affiliation: data.religious_affiliation || '',
-                        health_insurance_company: data.health_insurance_company || '',
-                        social_insurance_number: data.social_insurance_number || '',
-                    });
+                    // Pre-populate form with existing data only if not already populated
+                    const currentValues = form.getValues();
+                    const hasCurrentData = currentValues.first_name || currentValues.last_name;
+
+                    if (!hasCurrentData) {
+                        form.reset({
+                            first_name: data.first_name || '',
+                            last_name: data.last_name || '',
+                            birth_name: data.birth_name || '',
+                            date_of_birth: data.date_of_birth ? new Date(data.date_of_birth) : undefined,
+                            street_address: data.street_address || '',
+                            postal_code: data.postal_code || '',
+                            city: data.city || '',
+                            marital_status: data.marital_status as any || undefined,
+                            gender: data.gender as any || undefined,
+                            nationality: data.nationality || '',
+                            iban: data.iban || '',
+                            bic: data.bic || '',
+                            start_date: data.start_date ? new Date(data.start_date) : undefined,
+                            job_title: data.job_title || '',
+                            employment_type: data.employment_type as any || undefined,
+                            has_other_employment: data.has_other_employment || false,
+                            is_marginal_employment: data.is_marginal_employment || false,
+                            highest_school_degree: data.highest_school_degree as any || undefined,
+                            highest_professional_qualification: data.highest_professional_qualification as any || undefined,
+                            tax_id: data.tax_id || '',
+                            tax_class_factor: data.tax_class_factor || '',
+                            child_allowances: data.child_allowances || 0,
+                            religious_affiliation: data.religious_affiliation || '',
+                            health_insurance_company: data.health_insurance_company || '',
+                            social_insurance_number: data.social_insurance_number || '',
+                        });
+                    }
 
                     if (data.signature_data_url) {
                         setSignatureDataUrl(data.signature_data_url);
@@ -236,7 +249,7 @@ const PersonaldatenStepper: React.FC = () => {
         };
 
         getUser();
-    }, [form]);
+    }, []);
 
     const clearSignature = () => {
         if (signatureRef.current) {
@@ -245,18 +258,21 @@ const PersonaldatenStepper: React.FC = () => {
 
             // Force proper canvas dimensions after clearing
             setTimeout(() => {
-                if (signatureRef.current) {
+                if (signatureRef.current && signatureContainerRef.current) {
                     const canvas = signatureRef.current.getCanvas();
-                    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                    const containerWidth = signatureContainerRef.current.clientWidth;
 
-                    canvas.width = canvasWidth * ratio;
-                    canvas.height = 200 * ratio;
-                    canvas.style.width = canvasWidth + 'px';
+                    // Keep 1:1 ratio for accurate coordinate mapping
+                    canvas.width = containerWidth;
+                    canvas.height = 200;
+                    canvas.style.width = '100%';
                     canvas.style.height = '200px';
+                    canvas.style.maxWidth = '100%';
 
                     const ctx = canvas.getContext('2d');
                     if (ctx) {
-                        ctx.scale(ratio, ratio);
+                        ctx.lineCap = 'round';
+                        ctx.lineJoin = 'round';
                     }
                 }
             }, 0);
@@ -311,10 +327,10 @@ const PersonaldatenStepper: React.FC = () => {
             };
 
             const { error } = await supabase
-                .from('employee_personal_data')
-                .upsert(submitData, {
-                    onConflict: 'user_id'
-                });
+              .from('employee_personal_data')
+              .upsert(submitData, {
+                  onConflict: 'user_id'
+              });
 
             if (error) throw error;
 
@@ -338,24 +354,24 @@ const PersonaldatenStepper: React.FC = () => {
         }
     };
 
-    // Validation functions for each step
-    const validateStep = (stepIndex: number): boolean => {
+    // Validation function for each step
+    const validateStep = useCallback((stepIndex: number): boolean => {
         const values = form.getValues();
         const errors = form.formState.errors;
 
         switch (stepIndex) {
             case 0: // Personal Information
                 return !!(values.first_name && values.last_name && values.date_of_birth &&
-                        values.street_address && values.postal_code && values.city &&
-                        values.marital_status && values.gender && values.nationality) &&
-                    !errors.first_name && !errors.last_name && !errors.date_of_birth &&
-                    !errors.street_address && !errors.postal_code && !errors.city &&
-                    !errors.marital_status && !errors.gender && !errors.nationality;
+                    values.street_address && values.postal_code && values.city &&
+                    values.marital_status && values.gender && values.nationality) &&
+                  !errors.first_name && !errors.last_name && !errors.date_of_birth &&
+                  !errors.street_address && !errors.postal_code && !errors.city &&
+                  !errors.marital_status && !errors.gender && !errors.nationality;
             case 1: // Banking Information
                 return !!(values.iban && values.bic) && !errors.iban && !errors.bic;
             case 2: // Employment Information
                 return !!(values.start_date && values.job_title && values.employment_type) &&
-                    !errors.start_date && !errors.job_title && !errors.employment_type;
+                  !errors.start_date && !errors.job_title && !errors.employment_type;
             case 3: // Education (optional fields)
                 return true;
             case 4: // Tax Information (optional fields)
@@ -367,600 +383,607 @@ const PersonaldatenStepper: React.FC = () => {
             default:
                 return true;
         }
-    };
+    }, [signatureDataUrl, signatureDate]);
 
-    const handleNext = () => {
-        if (currentStep < steps.length - 1) {
-            setCurrentStep(currentStep + 1);
+    const handleNext = useCallback(() => {
+        if (currentStep < 6) { // 7 steps total (0-6)
+            setCurrentStep(prev => prev + 1);
         }
-    };
+    }, []);
 
-    const handlePrevious = () => {
+    const handlePrevious = useCallback(() => {
         if (currentStep > 0) {
-            setCurrentStep(currentStep - 1);
+            setCurrentStep(prev => prev - 1);
         }
-    };
+    }, []);
 
-    const handleStepChange = (step: number) => {
+    const handleStepChange = useCallback((step: number) => {
         setCurrentStep(step);
-    };
+    }, []);
 
     const handleComplete = () => {
         form.handleSubmit(onSubmit)();
     };
 
-    // Step components
-    const PersonalInfoStep = () => (
-        <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                    control={form.control}
-                    name="first_name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Vorname *</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Max" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="last_name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Nachname *</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Mustermann" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                    control={form.control}
-                    name="birth_name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Geburtsname (optional)</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Musterfrau" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="date_of_birth"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Geburtsdatum *</FormLabel>
-                            <FormControl>
-                                <Input
-                                    type="date"
-                                    {...field}
-                                    value={field.value ? format(field.value, 'yyyy-MM-dd') : ''}
-                                    onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
-
-            <FormField
+    // Memoized step components to prevent unnecessary re-renders
+    const PersonalInfoStep = useMemo(() => (
+      <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
                 control={form.control}
-                name="street_address"
+                name="first_name"
                 render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Straße und Hausnummer *</FormLabel>
-                        <FormControl>
-                            <Input placeholder="Musterstraße 123" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
+                  <FormItem>
+                      <FormLabel>Vorname *</FormLabel>
+                      <FormControl>
+                          <Input placeholder="Max" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
                 )}
-            />
+              />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                    control={form.control}
-                    name="postal_code"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Postleitzahl *</FormLabel>
-                            <FormControl>
-                                <Input placeholder="12345" maxLength={5} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Ort *</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Musterstadt" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                    control={form.control}
-                    name="marital_status"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Familienstand *</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Familienstand wählen" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {maritalStatusOptions.map((option) => (
-                                        <SelectItem key={option.value} value={option.value}>
-                                            {option.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="gender"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Geschlecht *</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Geschlecht wählen" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {genderOptions.map((option) => (
-                                        <SelectItem key={option.value} value={option.value}>
-                                            {option.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
-
-            <FormField
+              <FormField
                 control={form.control}
-                name="nationality"
+                name="last_name"
                 render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Staatsangehörigkeit *</FormLabel>
-                        <FormControl>
-                            <Input placeholder="Deutsch" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
+                  <FormItem>
+                      <FormLabel>Nachname *</FormLabel>
+                      <FormControl>
+                          <Input placeholder="Mustermann" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
                 )}
-            />
-        </div>
-    );
+              />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="birth_name"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Geburtsname (optional)</FormLabel>
+                      <FormControl>
+                          <Input placeholder="Musterfrau" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="date_of_birth"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Geburtsdatum *</FormLabel>
+                      <FormControl>
+                          <Input
+                            type="date"
+                            {...field}
+                            value={field.value ? format(field.value, 'yyyy-MM-dd') : ''}
+                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
+                          />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="street_address"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>Straße und Hausnummer *</FormLabel>
+                  <FormControl>
+                      <Input placeholder="Musterstraße 123" {...field} />
+                  </FormControl>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="postal_code"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Postleitzahl *</FormLabel>
+                      <FormControl>
+                          <Input placeholder="12345" maxLength={5} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Ort *</FormLabel>
+                      <FormControl>
+                          <Input placeholder="Musterstadt" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="marital_status"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Familienstand *</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Familienstand wählen" />
+                              </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                              {maritalStatusOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                      </Select>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Geschlecht *</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Geschlecht wählen" />
+                              </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                              {genderOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                      </Select>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="nationality"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>Staatsangehörigkeit *</FormLabel>
+                  <FormControl>
+                      <Input placeholder="Deutsch" {...field} />
+                  </FormControl>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
+      </div>
+    ), [form.control]);
 
     const BankingStep = () => (
-        <div className="space-y-6">
-            <FormField
-                control={form.control}
-                name="iban"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>IBAN *</FormLabel>
-                        <FormControl>
-                            <Input
-                                placeholder="DE12 3456 7890 1234 5678 90"
-                                {...field}
-                                onChange={(e) => {
-                                    // Format IBAN with spaces
-                                    let value = e.target.value.replace(/\s/g, '').toUpperCase();
-                                    if (value.startsWith('DE')) {
-                                        value = value.replace(/(.{4})/g, '$1 ').trim();
-                                    }
-                                    field.onChange(value);
-                                }}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
+      <div className="space-y-6">
+          <FormField
+            control={form.control}
+            name="iban"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>IBAN *</FormLabel>
+                  <FormControl>
+                      <Input
+                        placeholder="DE12 3456 7890 1234 5678 90"
+                        {...field}
+                        onChange={(e) => {
+                            // Format IBAN with spaces
+                            let value = e.target.value.replace(/\s/g, '').toUpperCase();
+                            if (value.startsWith('DE')) {
+                                value = value.replace(/(.{4})/g, '$1 ').trim();
+                            }
+                            field.onChange(value);
+                        }}
+                      />
+                  </FormControl>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-                control={form.control}
-                name="bic"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>BIC *</FormLabel>
-                        <FormControl>
-                            <Input
-                                placeholder="ABCDDE2AXXX"
-                                {...field}
-                                onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-        </div>
+          <FormField
+            control={form.control}
+            name="bic"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>BIC *</FormLabel>
+                  <FormControl>
+                      <Input
+                        placeholder="ABCDDE2AXXX"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                      />
+                  </FormControl>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
+      </div>
     );
 
     const EmploymentStep = () => (
-        <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                    control={form.control}
-                    name="start_date"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Eintrittsdatum *</FormLabel>
-                            <FormControl>
-                                <Input
-                                    type="date"
-                                    {...field}
-                                    value={field.value ? format(field.value, 'yyyy-MM-dd') : ''}
-                                    onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="job_title"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Berufsbezeichnung *</FormLabel>
-                            <FormControl>
-                                <Input placeholder="DJ/Techniker" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
-
-            <FormField
+      <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
                 control={form.control}
-                name="employment_type"
+                name="start_date"
                 render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Art der Beschäftigung *</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Art der Beschäftigung wählen" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {employmentTypeOptions.map((option) => (
-                                    <SelectItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                    </FormItem>
+                  <FormItem>
+                      <FormLabel>Eintrittsdatum *</FormLabel>
+                      <FormControl>
+                          <Input
+                            type="date"
+                            {...field}
+                            value={field.value ? format(field.value, 'yyyy-MM-dd') : ''}
+                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
+                          />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
                 )}
-            />
+              />
 
-            <FormField
+              <FormField
                 control={form.control}
-                name="has_other_employment"
+                name="job_title"
                 render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                        <FormControl>
-                            <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                            />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                            <FormLabel>
-                                Ich habe noch eine andere Beschäftigung
-                            </FormLabel>
-                        </div>
-                    </FormItem>
+                  <FormItem>
+                      <FormLabel>Berufsbezeichnung *</FormLabel>
+                      <FormControl>
+                          <Input placeholder="DJ/Techniker" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
                 )}
-            />
+              />
+          </div>
 
-            {form.watch('has_other_employment') && (
-                <FormField
-                    control={form.control}
-                    name="is_marginal_employment"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                                <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                                <FormLabel>
-                                    Handelt es sich hierbei um eine geringfügige Beschäftigung?
-                                </FormLabel>
-                            </div>
-                        </FormItem>
-                    )}
-                />
+          <FormField
+            control={form.control}
+            name="employment_type"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>Art der Beschäftigung *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                          <SelectTrigger>
+                              <SelectValue placeholder="Art der Beschäftigung wählen" />
+                          </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                          {employmentTypeOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                  </Select>
+                  <FormMessage />
+              </FormItem>
             )}
-        </div>
+          />
+
+          <FormField
+            control={form.control}
+            name="has_other_employment"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                      <FormLabel>
+                          Ich habe noch eine andere Beschäftigung
+                      </FormLabel>
+                  </div>
+              </FormItem>
+            )}
+          />
+
+          {form.watch('has_other_employment') && (
+            <FormField
+              control={form.control}
+              name="is_marginal_employment"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                        <FormLabel>
+                            Handelt es sich hierbei um eine geringfügige Beschäftigung?
+                        </FormLabel>
+                    </div>
+                </FormItem>
+              )}
+            />
+          )}
+      </div>
     );
 
     const EducationStep = () => (
-        <div className="space-y-6">
-            <FormField
-                control={form.control}
-                name="highest_school_degree"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Höchster Schulabschluss</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Schulabschluss wählen" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {schoolDegreeOptions.map((option) => (
-                                    <SelectItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
+      <div className="space-y-6">
+          <FormField
+            control={form.control}
+            name="highest_school_degree"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>Höchster Schulabschluss</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                          <SelectTrigger>
+                              <SelectValue placeholder="Schulabschluss wählen" />
+                          </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                          {schoolDegreeOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                  </Select>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-                control={form.control}
-                name="highest_professional_qualification"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Höchste Berufsausbildung</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Berufsausbildung wählen" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {professionalQualificationOptions.map((option) => (
-                                    <SelectItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-        </div>
+          <FormField
+            control={form.control}
+            name="highest_professional_qualification"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>Höchste Berufsausbildung</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                          <SelectTrigger>
+                              <SelectValue placeholder="Berufsausbildung wählen" />
+                          </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                          {professionalQualificationOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                  </Select>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
+      </div>
     );
 
     const TaxStep = () => (
-        <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                    control={form.control}
-                    name="tax_id"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Steuer-Identifikationsnummer</FormLabel>
-                            <FormControl>
-                                <Input
-                                    placeholder="12345678901"
-                                    maxLength={11}
-                                    {...field}
-                                    onChange={(e) => {
-                                        // Only allow numbers
-                                        const value = e.target.value.replace(/\D/g, '');
-                                        field.onChange(value);
-                                    }}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+      <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="tax_id"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Steuer-Identifikationsnummer</FormLabel>
+                      <FormControl>
+                          <Input
+                            placeholder="12345678901"
+                            maxLength={11}
+                            {...field}
+                            onChange={(e) => {
+                                // Only allow numbers
+                                const value = e.target.value.replace(/\D/g, '');
+                                field.onChange(value);
+                            }}
+                          />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                    control={form.control}
-                    name="tax_class_factor"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Steuerklasse/Faktor</FormLabel>
-                            <FormControl>
-                                <Input placeholder="1" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
+              <FormField
+                control={form.control}
+                name="tax_class_factor"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Steuerklasse/Faktor</FormLabel>
+                      <FormControl>
+                          <Input placeholder="1" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                    control={form.control}
-                    name="child_allowances"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Kinderfreibeträge</FormLabel>
-                            <FormControl>
-                                <Input
-                                    type="number"
-                                    min="0"
-                                    placeholder="0"
-                                    {...field}
-                                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="child_allowances"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Kinderfreibeträge</FormLabel>
+                      <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                          />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                    control={form.control}
-                    name="religious_affiliation"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Konfession</FormLabel>
-                            <FormControl>
-                                <Input placeholder="evangelisch" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
-        </div>
+              <FormField
+                control={form.control}
+                name="religious_affiliation"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Konfession</FormLabel>
+                      <FormControl>
+                          <Input placeholder="evangelisch" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
+          </div>
+      </div>
     );
 
     const SocialInsuranceStep = () => (
-        <div className="space-y-6">
-            <FormField
-                control={form.control}
-                name="health_insurance_company"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Gesetzliche Krankenkasse</FormLabel>
-                        <FormControl>
-                            <Input placeholder="AOK" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
+      <div className="space-y-6">
+          <FormField
+            control={form.control}
+            name="health_insurance_company"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>Gesetzliche Krankenkasse</FormLabel>
+                  <FormControl>
+                      <Input placeholder="AOK" {...field} />
+                  </FormControl>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-                control={form.control}
-                name="social_insurance_number"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Versicherungsnummer gem. Sozialversicherungsausweis</FormLabel>
-                        <FormControl>
-                            <Input
-                                placeholder="12 345678 A 123"
-                                {...field}
-                                onChange={(e) => {
-                                    // Format social insurance number
-                                    let value = e.target.value.replace(/[^\dA-Z]/g, '');
-                                    if (value.length > 2) {
-                                        value = value.replace(/(\d{2})(\d{6})([A-Z])(\d{3})/, '$1 $2 $3 $4');
-                                    }
-                                    field.onChange(value);
-                                }}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-        </div>
+          <FormField
+            control={form.control}
+            name="social_insurance_number"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>Versicherungsnummer gem. Sozialversicherungsausweis</FormLabel>
+                  <FormControl>
+                      <Input
+                        placeholder="12 345678 A 123"
+                        {...field}
+                        onChange={(e) => {
+                            // Format social insurance number
+                            let value = e.target.value.replace(/[^\dA-Z]/g, '');
+                            if (value.length > 2) {
+                                value = value.replace(/(\d{2})(\d{6})([A-Z])(\d{3})/, '$1 $2 $3 $4');
+                            }
+                            field.onChange(value);
+                        }}
+                      />
+                  </FormControl>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
+      </div>
     );
 
     const SignatureStep = () => (
-        <div className="space-y-6" ref={signatureContainerRef}>
-            <div className="border border-border rounded-lg p-4 bg-background">
-                <div className="w-full">
-                    <SignatureCanvas
-                        ref={signatureRef}
-                        canvasProps={{
-                            width: canvasWidth,
-                            height: 200,
-                            className: 'signature-canvas border border-border rounded bg-white',
-                            style: {
-                                width: canvasWidth + 'px',
-                                height: '200px',
-                                display: 'block',
-                                touchAction: 'none'
-                            }
-                        }}
-                        backgroundColor="white"
-                        onEnd={() => {
-                            if (signatureRef.current) {
-                                const dataUrl = signatureRef.current.toDataURL();
-                                setSignatureDataUrl(dataUrl);
-                            }
-                        }}
-                    />
-                </div>
-            </div>
+      <div className="space-y-6">
+          <div className="w-full" ref={signatureContainerRef}>
+              <div className="border border-border rounded-lg p-0 bg-background overflow-hidden">
+                  <SignatureCanvas
+                    ref={signatureRef}
+                    canvasProps={{
+                        width: canvasWidth,
+                        height: 200,
+                        className: 'signature-canvas bg-white block',
+                        style: {
+                            width: '100%',
+                            height: '200px',
+                            maxWidth: '100%',
+                            display: 'block',
+                            touchAction: 'none',
+                            cursor: 'crosshair'
+                        }
+                    }}
+                    backgroundColor="white"
+                    penColor="black"
+                    dotSize={2}
+                    minWidth={1}
+                    maxWidth={3}
+                    velocityFilterWeight={0.7}
+                    onEnd={() => {
+                        if (signatureRef.current) {
+                            const dataUrl = signatureRef.current.toDataURL();
+                            setSignatureDataUrl(dataUrl);
+                        }
+                    }}
+                  />
+              </div>
+          </div>
 
-            <div className="flex flex-col sm:flex-row gap-2">
-                <Button type="button" variant="outline" onClick={clearSignature} className="flex-1">
-                    Unterschrift löschen
-                </Button>
-                <Button type="button" onClick={saveSignature} className="flex-1">
-                    Unterschrift speichern
-                </Button>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+              <Button type="button" variant="outline" onClick={clearSignature} className="flex-1">
+                  Unterschrift löschen
+              </Button>
+              <Button type="button" onClick={saveSignature} className="flex-1">
+                  Unterschrift speichern
+              </Button>
+          </div>
 
-            {signatureDataUrl && (
-                <div className="mt-4 p-4 bg-muted rounded-lg">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm font-medium">Unterschrift gespeichert</p>
-                            <p className="text-sm text-muted-foreground">Datum: {signatureDate}</p>
-                        </div>
+          {signatureDataUrl && (
+            <div className="mt-4 p-4 bg-muted rounded-lg">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <p className="text-sm font-medium">Unterschrift gespeichert</p>
+                        <p className="text-sm text-muted-foreground">Datum: {signatureDate}</p>
                     </div>
                 </div>
-            )}
-
-            <div className="text-sm text-muted-foreground">
-                <p>
-                    Mit meiner Unterschrift bestätige ich die Richtigkeit und Vollständigkeit der gemachten Angaben.
-                    Diese Angaben sind für die Anmeldung beim Finanzamt und bei der Sozialversicherung erforderlich.
-                </p>
             </div>
-        </div>
+          )}
+
+          <div className="text-sm text-muted-foreground">
+              <p>
+                  Mit meiner Unterschrift bestätige ich die Richtigkeit und Vollständigkeit der gemachten Angaben.
+                  Diese Angaben sind für die Anmeldung beim Finanzamt und bei der Sozialversicherung erforderlich.
+              </p>
+          </div>
+      </div>
     );
 
-    const steps = [
+    const steps = useMemo(() => [
         {
             id: 'personal',
             title: 'Persönliche Angaben',
             description: 'Grundlegende persönliche Informationen',
-            component: <PersonalInfoStep />
+            component: PersonalInfoStep
         },
         {
             id: 'banking',
@@ -998,46 +1021,46 @@ const PersonaldatenStepper: React.FC = () => {
             description: 'Bestätigung der Angaben',
             component: <SignatureStep />
         }
-    ];
+    ], []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-            <Header />
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+          <Header />
 
-            <main className="container mx-auto px-4 py-8 pt-24">
-                <div className="max-w-4xl mx-auto">
-                    <div className="flex items-center gap-4 mb-8">
-                        <Button
-                            variant="ghost"
-                            onClick={() => navigate(-1)}
-                            className="flex items-center gap-2"
-                        >
-                            <ArrowLeft className="w-4 h-4" />
-                            Zurück
-                        </Button>
-                        <div className="flex items-center gap-3">
-                            <User className="w-6 h-6 text-primary" />
-                            <h1 className="text-3xl font-bold text-foreground">Personaldaten</h1>
-                        </div>
-                    </div>
+          <main className="container mx-auto px-4 py-8 pt-24">
+              <div className="max-w-4xl mx-auto">
+                  <div className="flex items-center gap-4 mb-8">
+                      <Button
+                        variant="ghost"
+                        onClick={() => navigate(-1)}
+                        className="flex items-center gap-2"
+                      >
+                          <ArrowLeft className="w-4 h-4" />
+                          Zurück
+                      </Button>
+                      <div className="flex items-center gap-3">
+                          <User className="w-6 h-6 text-primary" />
+                          <h1 className="text-3xl font-bold text-foreground">Personaldaten</h1>
+                      </div>
+                  </div>
 
-                    <Form {...form}>
-                        <form>
-                            <PersonalDataStepper
-                                steps={steps}
-                                currentStep={currentStep}
-                                onStepChange={handleStepChange}
-                                onNext={handleNext}
-                                onPrevious={handlePrevious}
-                                onComplete={handleComplete}
-                                isNextDisabled={!validateStep(currentStep)}
-                                isCompleting={loading}
-                            />
-                        </form>
-                    </Form>
-                </div>
-            </main>
-        </div>
+                  <Form {...form}>
+                      <form>
+                          <PersonalDataStepper
+                            steps={steps}
+                            currentStep={currentStep}
+                            onStepChange={handleStepChange}
+                            onNext={handleNext}
+                            onPrevious={handlePrevious}
+                            onComplete={handleComplete}
+                            isNextDisabled={!validateStep(currentStep)}
+                            isCompleting={loading}
+                          />
+                      </form>
+                  </Form>
+              </div>
+          </main>
+      </div>
     );
 };
 

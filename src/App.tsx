@@ -19,6 +19,7 @@ import Angebot from "./pages/Angebot";
 import MeineAngebote from "./pages/MeineAngebote";
 import AnstehendeEvents from "./pages/AnstehendeEvents";
 import PersonaldatenStepper from "./pages/PersonaldatenStepper";
+import { PersonalDataGuard } from "./components/PersonalDataGuard";
 
 const queryClient = new QueryClient();
 
@@ -51,9 +52,9 @@ const PageTracker = () => {
 
 const App = () => {
   return (
-      <ErrorBoundary>
-        <AppContent />
-      </ErrorBoundary>
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
   );
 };
 
@@ -61,31 +62,31 @@ const AppContent = () => {
   useGoogleAnalytics();
 
   return (
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <PageTracker />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/angebot" element={<Angebot />} />
-              <Route path="/portfolio" element={<Portfolio />} />
-              <Route path="/presse" element={<Presse />} />
-              <Route path="/impressum" element={<Impressum />} />
-              <Route path="/datenschutz" element={<Datenschutz />} />
-              <Route path="/agb" element={<AGB />} />
-              <Route path="/anmelden" element={<Auth />} />
-              <Route path="/meine-angebote" element={<MeineAngebote />} />
-              <Route path="/anstehende-events" element={<AnstehendeEvents />} />
-              <Route path="/personaldaten" element={<PersonaldatenStepper />} />
-              <Route path="/administration" element={<Administration />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <PageTracker />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/angebot" element={<Angebot />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/presse" element={<Presse />} />
+            <Route path="/impressum" element={<Impressum />} />
+            <Route path="/datenschutz" element={<Datenschutz />} />
+            <Route path="/agb" element={<AGB />} />
+            <Route path="/anmelden" element={<Auth />} />
+            <Route path="/personaldaten" element={<PersonaldatenStepper />} />
+            <Route path="/meine-angebote" element={<PersonalDataGuard><MeineAngebote /></PersonalDataGuard>} />
+            <Route path="/anstehende-events" element={<PersonalDataGuard><AnstehendeEvents /></PersonalDataGuard>} />
+            <Route path="/administration" element={<PersonalDataGuard><Administration /></PersonalDataGuard>} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 };
 
