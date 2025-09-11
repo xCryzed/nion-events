@@ -7,7 +7,7 @@ import { useGoogleAnalytics, trackPageView } from "@/hooks/use-google-analytics"
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { useEffect } from "react";
 import Index from "./pages/Index";
-import Portfolio from "./pages/Portfolio";
+
 import NotFound from "./pages/NotFound";
 import Datenschutz from "./pages/Datenschutz";
 import Impressum from "./pages/Impressum";
@@ -31,7 +31,6 @@ const PageTracker = () => {
     const pageTitles: { [key: string]: string } = {
       '/': 'DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
       '/angebot': 'Angebot anfordern - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
-      '/portfolio': 'Portfolio - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
       '/presse': 'Presse - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
       '/impressum': 'Impressum - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
       '/datenschutz': 'Datenschutz - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
@@ -71,7 +70,7 @@ const AppContent = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/angebot" element={<Angebot />} />
-            <Route path="/portfolio" element={<Portfolio />} />
+
             <Route path="/presse" element={<Presse />} />
             <Route path="/impressum" element={<Impressum />} />
             <Route path="/datenschutz" element={<Datenschutz />} />

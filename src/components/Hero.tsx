@@ -74,7 +74,10 @@ const Hero = () => {
               className="group bg-transparent border-border/50 hover:bg-card/50 backdrop-blur-sm"
               onClick={() => {
                 trackEvent('click', 'navigation', 'hero_portfolio_ansehen');
-                window.location.href = '/portfolio';
+                const portfolioElement = document.getElementById('testimonials');
+                if (portfolioElement) {
+                  portfolioElement.scrollIntoView({ behavior: 'smooth' });
+                }
               }}
             >
               <Play className="mr-2 w-4 h-4 group-hover:scale-110 transition-transform" />
