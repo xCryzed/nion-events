@@ -16,6 +16,7 @@ import adesso from '@/assets/logos/adesso-logo.svg';
 
 const Testimonials = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [portfolioVisible, setPortfolioVisible] = useState(false);
   const [shuffledPartners, setShuffledPartners] = useState<typeof partners>([]);
 
   // Events data
@@ -89,15 +90,48 @@ const Testimonials = () => {
           setIsVisible(true);
         }
       },
-      { threshold: 0.1 }
+      {
+        threshold: 0.1,
+        rootMargin: '50px'
+      }
     );
 
-    const section = document.getElementById('testimonials');
-    if (section) {
-      observer.observe(section);
+    const portfolioObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setPortfolioVisible(true);
+        }
+      },
+      {
+        threshold: 0.05,
+        rootMargin: '100px'
+      }
+    );
+
+    const testimonialsSection = document.getElementById('testimonials');
+    const portfolioSection = document.getElementById('event-portfolio');
+
+    if (testimonialsSection) {
+      observer.observe(testimonialsSection);
     }
 
-    return () => observer.disconnect();
+    if (portfolioSection) {
+      portfolioObserver.observe(portfolioSection);
+    }
+
+    // Mobile fallback: Set visible after a short delay if intersection observer fails
+    const mobileTimeout = setTimeout(() => {
+      if (window.innerWidth <= 768) {
+        setIsVisible(true);
+        setPortfolioVisible(true);
+      }
+    }, 1000);
+
+    return () => {
+      observer.disconnect();
+      portfolioObserver.disconnect();
+      clearTimeout(mobileTimeout);
+    };
   }, []);
 
   const testimonials = [
@@ -152,6 +186,7 @@ const Testimonials = () => {
     setShuffledPartners(shuffleArray(partners));
   }, []);
 
+  const partnersToShow = shuffledPartners.length > 0 ? shuffledPartners : partners;
 
   return (
     <section id="testimonials" className="section-padding">
@@ -268,7 +303,7 @@ const Testimonials = () => {
           <div className="relative overflow-hidden py-12">
             <div className="flex animate-scroll-smooth" style={{ width: 'max-content' }}>
               {/* Sextuple the array for truly seamless infinite scroll */}
-              {[...shuffledPartners, ...shuffledPartners, ...shuffledPartners, ...shuffledPartners, ...shuffledPartners, ...shuffledPartners].map((partner, index) => (
+              {[...partnersToShow, ...partnersToShow, ...partnersToShow, ...partnersToShow, ...partnersToShow, ...partnersToShow].map((partner, index) => (
                 <div
                   key={`${partner.name}-${index}`}
                   className="flex-shrink-0 mx-6 group"
@@ -328,7 +363,7 @@ const Testimonials = () => {
             {events.map((event, index) => (
               <div
                 key={event.id}
-                className={`group relative glass-card p-4 sm:p-8 rounded-2xl sm:rounded-3xl hover-lift border border-border/50 hover:border-primary/50 transition-all duration-500 ${isVisible ? 'animate-fade-in' : 'opacity-0'}`}
+                className={`group relative glass-card p-4 sm:p-8 rounded-2xl sm:rounded-3xl hover-lift border border-border/50 hover:border-primary/50 transition-all duration-500 ${portfolioVisible ? 'animate-fade-in' : 'opacity-0'}`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {/* Animated background glow */}
