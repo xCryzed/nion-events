@@ -18,6 +18,7 @@ const Testimonials = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [shuffledPartners, setShuffledPartners] = useState<typeof partners>([]);
 
+  // Events data
   const events = [
     {
       id: 1,
@@ -168,7 +169,7 @@ const Testimonials = () => {
         </div>
 
         {/* Testimonials */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-20">
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
@@ -300,7 +301,7 @@ const Testimonials = () => {
       </div>
 
       {/* Portfolio Section - Full Width */}
-      <div className="relative py-24 mt-20 w-full">
+      <div id="event-portfolio" className="relative py-16 sm:py-24 mt-20 w-full">
         {/* Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5"></div>
         <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-primary rounded-full blur-3xl opacity-20"></div>
@@ -323,11 +324,11 @@ const Testimonials = () => {
           </div>
 
           {/* Portfolio Grid */}
-          <div className="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 max-w-7xl mx-auto px-4">
             {events.map((event, index) => (
               <div
                 key={event.id}
-                className={`group relative glass-card p-8 rounded-3xl hover-lift border border-border/50 hover:border-primary/50 transition-all duration-500 ${isVisible ? 'animate-fade-in' : 'opacity-0'}`}
+                className={`group relative glass-card p-4 sm:p-8 rounded-2xl sm:rounded-3xl hover-lift border border-border/50 hover:border-primary/50 transition-all duration-500 ${isVisible ? 'animate-fade-in' : 'opacity-0'}`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {/* Animated background glow */}
@@ -336,65 +337,66 @@ const Testimonials = () => {
                 {/* Content */}
                 <div className="relative z-10">
                   {/* Video */}
-                  <div className="aspect-video mb-6 rounded-2xl overflow-hidden bg-muted/30 ring-1 ring-border/50 group-hover:ring-primary/50 transition-all duration-500">
+                  <div className="aspect-video mb-4 sm:mb-6 rounded-xl sm:rounded-2xl overflow-hidden bg-muted/30 ring-1 ring-border/50 group-hover:ring-primary/50 transition-all duration-500">
                     <iframe
-                      src={`https://www.youtube.com/embed/${event.videoId}`}
+                      src={`https://www.youtube.com/embed/${event.videoId}?enablejsapi=1&origin=${window.location.origin}`}
                       title={event.title}
                       className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
+                      loading="lazy"
                     />
                   </div>
 
                   {/* Event Info */}
-                  <div className="space-y-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <h4 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                      <h4 className="text-lg sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300 leading-tight">
                         {event.title}
                       </h4>
-                      <span className="px-4 py-2 bg-gradient-primary/20 text-primary rounded-full text-sm font-semibold border border-primary/20 flex-shrink-0">
+                      <span className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-primary/20 text-primary rounded-full text-xs sm:text-sm font-semibold border border-primary/20 flex-shrink-0 self-start">
                         {event.category}
                       </span>
                     </div>
 
-                    <p className="text-muted-foreground leading-relaxed group-hover:text-muted-foreground/80 transition-colors duration-300">
+                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed group-hover:text-muted-foreground/80 transition-colors duration-300">
                       {event.description}
                     </p>
 
                     {/* Event Details */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-border/50 group-hover:border-primary/50 transition-colors duration-300">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-border/50 group-hover:border-primary/50 transition-colors duration-300">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300 flex-shrink-0">
                           <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <div className="text-xs text-muted-foreground font-medium">Datum</div>
-                          <div className="text-sm font-semibold text-foreground">{event.date}</div>
+                          <div className="text-xs sm:text-sm font-semibold text-foreground break-words">{event.date}</div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300 flex-shrink-0">
                           <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                           </svg>
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <div className="text-xs text-muted-foreground font-medium">Gäste</div>
-                          <div className="text-sm font-semibold text-foreground">{event.attendees}</div>
+                          <div className="text-xs sm:text-sm font-semibold text-foreground break-words">{event.attendees}</div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 sm:col-span-2">
-                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
+                      <div className="flex items-center gap-2 sm:gap-3 sm:col-span-2">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300 flex-shrink-0">
                           <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <div className="text-xs text-muted-foreground font-medium">Location</div>
-                          <div className="text-sm font-semibold text-foreground">{event.location}</div>
+                          <div className="text-xs sm:text-sm font-semibold text-foreground break-words">{event.location}</div>
                         </div>
                       </div>
                     </div>

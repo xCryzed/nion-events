@@ -74,7 +74,7 @@ const Hero = () => {
               className="group bg-transparent border-border/50 hover:bg-card/50 backdrop-blur-sm"
               onClick={() => {
                 trackEvent('click', 'navigation', 'hero_portfolio_ansehen');
-                const portfolioElement = document.getElementById('testimonials');
+                const portfolioElement = document.getElementById('event-portfolio');
                 if (portfolioElement) {
                   portfolioElement.scrollIntoView({ behavior: 'smooth' });
                 }
