@@ -303,6 +303,52 @@ const Angebot = () => {
             const angebotsnummer = insertedData?.offer_number;
             console.log('Event request saved successfully with offer number:', angebotsnummer);
 
+            // Send notification emails
+            try {
+                const emailData = {
+                    id: insertedData.id,
+                    offer_number: angebotsnummer,
+                    event_title: data.veranstaltungstitel,
+                    event_date: data.datum.toISOString(),
+                    end_date: data.istMehrtaegig && data.enddatum ? data.enddatum.toISOString() : null,
+                    location: data.locationOption === 'has_location' ? data.location || '' : 'Location wird gesucht',
+                    guest_count: data.gasteanzahl,
+                    tech_requirements: data.veranstaltungstechnik,
+                    dj_genres: data.djGenres || [],
+                    photographer: data.fotograf,
+                    videographer: data.videograf,
+                    light_operator: data.lichtoperator,
+                    additional_wishes: data.zusatzwunsche || '',
+                    contact_name: data.kontakt.name,
+                    contact_email: data.kontakt.email,
+                    contact_phone: data.kontakt.telefon,
+                    contact_company: data.kontakt.unternehmen || '',
+                    contact_street: data.kontakt.strasse,
+                    contact_house_number: data.kontakt.hausnummer,
+                    contact_postal_code: data.kontakt.postleitzahl,
+                    contact_city: data.kontakt.ort,
+                    created_at: new Date().toISOString()
+                };
+
+                // Send both emails in parallel
+                const [notificationResult, confirmationResult] = await Promise.allSettled([
+                    supabase.functions.invoke('send-offer-notification', { body: emailData }),
+                    supabase.functions.invoke('send-offer-confirmation', { body: emailData })
+                ]);
+
+                if (notificationResult.status === 'rejected') {
+                    console.error('Failed to send notification email:', notificationResult.reason);
+                }
+                if (confirmationResult.status === 'rejected') {
+                    console.error('Failed to send confirmation email:', confirmationResult.reason);
+                }
+
+                console.log('Email notifications sent');
+            } catch (emailError) {
+                console.error('Error sending email notifications:', emailError);
+                // Don't fail the entire process if emails fail
+            }
+
             // Clear localStorage and show success
             clearStorage();
             setIsSuccess(true);

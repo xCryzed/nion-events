@@ -16,24 +16,151 @@ import adesso from '@/assets/logos/adesso-logo.svg';
 
 const Testimonials = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [portfolioVisible, setPortfolioVisible] = useState(false);
   const [shuffledPartners, setShuffledPartners] = useState<typeof partners>([]);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
+  // Events data
+  const events = [
+    {
+      id: 1,
+      title: "Abiomed AAM 2025",
+      description: "Bei der Abiomed AAM Veranstaltung in Kopenhagen, ausgerichtet in der renommierten Location Wallmans Salonger, übernahmen wir die musikalische Betreuung sowie die Aftershow-Party und sorgten für ein unvergessliches Finale. Im Mittelpunkt des Abends stand der Zusammenschluss von Abiomed und Johnson & Johnson, begleitet von eindrucksvollen Showelementen und der Würdigung zahlreicher Mitarbeiterbeförderungen. Gemeinsam mit internationalen Gästen und Mitarbeiter:innen entstand so ein Event von außergewöhnlicher Strahlkraft.",
+      date: "Februar 2025",
+      attendees: "500+",
+      location: "Wallmans Salonger, Kopenhagen",
+      videoId: "Stc0eMLuQQg",
+      category: "Corporate Event"
+    },
+    {
+      id: 2,
+      title: "Abiomed Neujahrsparty 2025",
+      description: "Die Neujahrsparty 2025 von Abiomed | Johnson & Johnson fand erneut im DAS LIEBIG in Aachen statt und stand unter dem Motto Around The World. Unser Team stellte abwechslungsreiche Spielstationen bereit – inspiriert von Formaten wie Das Duell um die Welt – bei denen die Mitarbeiter:innen in 4er-Teams gegeneinander antraten. Für zusätzliche Motivation sorgten attraktive Preise für die Gewinnerteams sowie eine Echtzeit-Punkteanzeige auf der großen LED-Wand im Hauptraum. Neben der Betreuung der Spiele übernahmen wir auch die musikalische Gestaltung des Abends und trugen so maßgeblich zu einem energiegeladenen Start ins neue Jahr bei. Inzwischen sind wir ein fester Bestandteil des Abiomed | Johnson & Johnson Feier-Inventars geworden.",
+      date: "Juni 2024",
+      attendees: "600+",
+      location: "DAS LIEBIG, Aachen",
+      videoId: "4FIk2StHQdk",
+      category: "Corporate Event"
+    },
+    {
+      id: 3,
+      title: "Abiomed Sommerfest 2024",
+      description: "Bei diesem außergewöhnlichen Sommerfest verwandelte unser Team die Halle 60 in eine eindrucksvolle Festival-Location. Unter dem Motto Von Aachen aus in die ganze Welt feierten Mitarbeiter:innen und Gäste die internationale Bedeutung der innovativen Herzpumpen. Wir verantworteten die komplette technische Betreuung, die DJ-Planung, die Gestaltung einer Geländeübersicht sowie den professionellen Auf- und Abbau und stellten so einen reibungslosen Ablauf sicher. Dieses Recap-Video zeigt die Highlights eines unvergesslichen Tages.",
+      date: "August 2024",
+      attendees: "600+",
+      location: "Halle 60, Aachen",
+      videoId: "68U6T7jaPZI",
+      category: "Corporate Event"
+    },
+    {
+      id: 4,
+      title: "NION DJ Set Tropics",
+      description: "Im renommierten Tropics Club in Spanien, ausgezeichnet als einer der besten Clubs weltweit auf Platz 48, sorgte ich mit meiner DJ-Performance für eine mitreißende Party-Atmosphäre. Die Gäste von RUF Jugendreisen erlebten eine energiegeladene Nacht voller Begeisterung, perfekt abgestimmter Beats und elektrisierender Stimmung. Das Event verwandelte den Club in eine pulsierende Feierzone, in der ausgelassene Stimmung und gemeinsame Partyerlebnisse im Mittelpunkt standen.",
+      date: "April 2024",
+      attendees: "3000+",
+      location: "Disco Tropics, Lloret de Mar",
+      videoId: "Vuh19HL6sqI",
+      category: "Privatfeier"
+    },
+    {
+      id: 5,
+      title: "Abiomed Neujahrsfeier 2024",
+      description: "Zum Jahresauftakt 2024 wurde das DAS LIEBIG in Aachen (ehemals Starfish) in eine faszinierende Retro-Spiele-Arena verwandelt. Unter dem Motto klassischer Arcade-Games entstand eine außergewöhnliche Event-Atmosphäre, die die Gäste in eine andere Welt eintauchen ließ. Unser Team verantwortete die musikalische Gestaltung des Abends und schuf damit den perfekten Rahmen für ausgelassene Feierlichkeiten. Die Mitarbeiter:innen genossen eine unvergessliche Stimmung und starteten gemeinsam voller Energie in das neue Jahr.",
+      date: "Januar 2024",
+      attendees: "600+",
+      location: "DAS LIEBIG, Aachen",
+      videoId: "jWPe7QO38gc",
+      category: "Corporate Event"
+    },
+    {
+      id: 6,
+      title: "Halloween 2023: DREAMBEATS LAB",
+      description: "Das DREAMBEATS LAB 2023 im DAS LIEBIG in Aachen (ehemals Starfish) setzte neue Maßstäbe für Halloween-Partys in der Region. Mit über 1.300 Gästen avancierte die Veranstaltung zur größten Halloween-Party Aachens und zog Publikum aus der gesamten Umgebung an. Highlight des Abends war meine eigene DJ-Performance, die für eine mitreißende Stimmung sorgte, unterstützt von spektakulären Lichteffekten und thematisch inszenierten Dekorationen. Das Event vereinte beste Unterhaltung, ausgefeilte Showelemente und ein außergewöhnliches Partyerlebnis, das in Aachen seinesgleichen sucht.",
+      date: "Oktober 2023",
+      attendees: "1300+",
+      location: "DAS LIEBIG, Aachen",
+      videoId: "T55uDdFXt4k",
+      category: "Club Event"
+    }
+  ];
 
-    const section = document.getElementById('testimonials');
-    if (section) {
-      observer.observe(section);
+  useEffect(() => {
+    const supportsIO = typeof window !== 'undefined' && 'IntersectionObserver' in window;
+
+    const testimonialsSection = document.getElementById('testimonials');
+    const portfolioSection = document.getElementById('event-portfolio');
+
+    let observer: IntersectionObserver | null = null;
+    let portfolioObserver: IntersectionObserver | null = null;
+
+    const markTestimonialsVisible = () => setIsVisible(true);
+    const markPortfolioVisible = () => setPortfolioVisible(true);
+
+    if (supportsIO) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            markTestimonialsVisible();
+            observer?.disconnect();
+          }
+        },
+        {
+          threshold: 0,
+          rootMargin: '100px',
+        }
+      );
+
+      portfolioObserver = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            markPortfolioVisible();
+            portfolioObserver?.disconnect();
+          }
+        },
+        {
+          threshold: 0,
+          rootMargin: '150px',
+        }
+      );
+
+      if (testimonialsSection) observer.observe(testimonialsSection);
+      if (portfolioSection) portfolioObserver.observe(portfolioSection);
+    } else {
+      // Fallback if IntersectionObserver is not supported
+      markTestimonialsVisible();
+      markPortfolioVisible();
     }
 
-    return () => observer.disconnect();
+    // Immediate in-viewport check (covers cases where IO doesn't fire on initial load)
+    const immediateCheck = () => {
+      if (testimonialsSection) {
+        const rect = testimonialsSection.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) markTestimonialsVisible();
+      }
+      if (portfolioSection) {
+        const rect = portfolioSection.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) markPortfolioVisible();
+      }
+    };
+    immediateCheck();
+
+    // Lightweight scroll/resize safety check
+    const handleScroll = () => immediateCheck();
+    window.addEventListener('scroll', handleScroll, { passive: true } as any);
+    window.addEventListener('resize', handleScroll);
+
+    // Final safety: force visible after short delay (all devices)
+    const safetyTimeout = setTimeout(() => {
+      markTestimonialsVisible();
+      markPortfolioVisible();
+    }, 1500);
+
+    return () => {
+      observer?.disconnect();
+      portfolioObserver?.disconnect();
+      clearTimeout(safetyTimeout);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   const testimonials = [
@@ -88,6 +215,7 @@ const Testimonials = () => {
     setShuffledPartners(shuffleArray(partners));
   }, []);
 
+  const partnersToShow = shuffledPartners.length > 0 ? shuffledPartners : partners;
 
   return (
     <section id="testimonials" className="section-padding">
@@ -105,7 +233,7 @@ const Testimonials = () => {
         </div>
 
         {/* Testimonials */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-20">
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
@@ -142,8 +270,8 @@ const Testimonials = () => {
 
                 {/* Content with quote styling */}
                 <div className="relative">
-                  <Quote className="w-5 h-5 text-primary/30 absolute -top-2 -left-2" />
-                  <p className="text-body text-muted-foreground italic group-hover:text-foreground transition-colors duration-300 pl-4">
+                  <Quote className="w-5 h-5 text-primary/40 absolute -top-2 -left-2" />
+                  <p className="text-body text-foreground/90 italic group-hover:text-foreground transition-colors duration-300 pl-4 leading-relaxed">
                     {testimonial.content}
                   </p>
                 </div>
@@ -204,7 +332,7 @@ const Testimonials = () => {
           <div className="relative overflow-hidden py-12">
             <div className="flex animate-scroll-smooth" style={{ width: 'max-content' }}>
               {/* Sextuple the array for truly seamless infinite scroll */}
-              {[...shuffledPartners, ...shuffledPartners, ...shuffledPartners, ...shuffledPartners, ...shuffledPartners, ...shuffledPartners].map((partner, index) => (
+              {[...partnersToShow, ...partnersToShow, ...partnersToShow, ...partnersToShow, ...partnersToShow, ...partnersToShow].map((partner, index) => (
                 <div
                   key={`${partner.name}-${index}`}
                   className="flex-shrink-0 mx-6 group"
@@ -233,6 +361,115 @@ const Testimonials = () => {
           </div>
         </div>
 
+
+      </div>
+
+      {/* Portfolio Section - Full Width */}
+      <div id="event-portfolio" className="relative py-16 sm:py-24 mt-20 w-full">
+        {/* Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5"></div>
+        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-primary rounded-full blur-3xl opacity-20"></div>
+        <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-accent rounded-full blur-3xl opacity-15"></div>
+
+        <div className="relative z-10 container">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center space-x-2 bg-card/50 backdrop-blur-sm px-6 py-3 rounded-full border border-border mb-6">
+              <span className="w-2 h-2 bg-gradient-primary rounded-full animate-pulse"></span>
+              <span className="text-sm text-muted-foreground font-medium tracking-wide">UNSERE ERFOLGREICHSTEN EVENTS</span>
+            </div>
+            <h3 className="text-5xl font-bold mb-6 text-foreground">
+              Event <span className="text-gradient">Portfolio</span>
+            </h3>
+            <div className="w-24 h-1 bg-gradient-primary rounded-full mx-auto mb-8"></div>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Erleben Sie unsere erfolgreichsten Events und lassen Sie sich von der Qualität unserer Arbeit überzeugen.
+              Jedes Event ist einzigartig und perfekt auf unsere Kunden abgestimmt.
+            </p>
+          </div>
+
+          {/* Portfolio Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 max-w-7xl mx-auto px-4">
+            {events.map((event, index) => (
+              <div
+                key={event.id}
+                className={`group relative glass-card p-4 sm:p-8 rounded-2xl sm:rounded-3xl hover-lift border border-border/50 hover:border-primary/50 transition-all duration-500 ${portfolioVisible ? 'animate-fade-in' : 'opacity-0'}`}
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                {/* Animated background glow */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
+
+                {/* Content */}
+                <div className="relative z-10">
+                  {/* Video */}
+                  <div className="aspect-video mb-4 sm:mb-6 rounded-xl sm:rounded-2xl overflow-hidden bg-muted/30 ring-1 ring-border/50 group-hover:ring-primary/50 transition-all duration-500">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${event.videoId}?enablejsapi=1&origin=${window.location.origin}`}
+                      title={event.title}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      loading="lazy"
+                    />
+                  </div>
+
+                  {/* Event Info */}
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                      <h4 className="text-lg sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300 leading-tight">
+                        {event.title}
+                      </h4>
+                      <span className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-primary/20 text-primary rounded-full text-xs sm:text-sm font-semibold border border-primary/20 flex-shrink-0 self-start">
+                        {event.category}
+                      </span>
+                    </div>
+
+                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed group-hover:text-muted-foreground/80 transition-colors duration-300">
+                      {event.description}
+                    </p>
+
+                    {/* Event Details */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-border/50 group-hover:border-primary/50 transition-colors duration-300">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300 flex-shrink-0">
+                          <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs text-muted-foreground font-medium">Datum</div>
+                          <div className="text-xs sm:text-sm font-semibold text-foreground break-words">{event.date}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300 flex-shrink-0">
+                          <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs text-muted-foreground font-medium">Gäste</div>
+                          <div className="text-xs sm:text-sm font-semibold text-foreground break-words">{event.attendees}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 sm:gap-3 sm:col-span-2">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300 flex-shrink-0">
+                          <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs text-muted-foreground font-medium">Location</div>
+                          <div className="text-xs sm:text-sm font-semibold text-foreground break-words">{event.location}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

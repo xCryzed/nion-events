@@ -20,13 +20,17 @@ export const usePersonalDataCompletion = (userId?: string) => {
             return;
         }
 
+        let mounted = true;
+
         const checkCompletion = async () => {
             try {
                 const { data, error } = await supabase
-                    .from('employee_personal_data')
-                    .select('is_complete')
-                    .eq('user_id', userId)
-                    .single();
+                  .from('employee_personal_data')
+                  .select('is_complete')
+                  .eq('user_id', userId)
+                  .single();
+
+                if (!mounted) return;
 
                 if (error && error.code !== 'PGRST116') {
                     console.error('Error checking personal data completion:', error);
@@ -40,12 +44,17 @@ export const usePersonalDataCompletion = (userId?: string) => {
                     loading: false,
                 });
             } catch (error) {
+                if (!mounted) return;
                 console.error('Error checking personal data completion:', error);
                 setCompletion({ isComplete: false, hasData: false, loading: false });
             }
         };
 
         checkCompletion();
+
+        return () => {
+            mounted = false;
+        };
     }, [userId]);
 
     return completion;

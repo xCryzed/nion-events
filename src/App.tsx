@@ -7,7 +7,7 @@ import { useGoogleAnalytics, trackPageView } from "@/hooks/use-google-analytics"
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { useEffect } from "react";
 import Index from "./pages/Index";
-import Portfolio from "./pages/Portfolio";
+
 import NotFound from "./pages/NotFound";
 import Datenschutz from "./pages/Datenschutz";
 import Impressum from "./pages/Impressum";
@@ -17,8 +17,10 @@ import Auth from "./pages/Auth";
 import Administration from "./pages/Administration";
 import Angebot from "./pages/Angebot";
 import MeineAngebote from "./pages/MeineAngebote";
+import MeineAnfragen from "./pages/MeineAnfragen";
 import AnstehendeEvents from "./pages/AnstehendeEvents";
-import PersonaldatenStepper from "./pages/PersonaldatenStepper";
+import Personaldaten from "./pages/Personaldaten";
+import { PersonalDataGuard } from "./components/PersonalDataGuard";
 
 const queryClient = new QueryClient();
 
@@ -30,13 +32,13 @@ const PageTracker = () => {
     const pageTitles: { [key: string]: string } = {
       '/': 'DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
       '/angebot': 'Angebot anfordern - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
-      '/portfolio': 'Portfolio - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
       '/presse': 'Presse - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
       '/impressum': 'Impressum - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
       '/datenschutz': 'Datenschutz - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
       '/agb': 'AGB - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
       '/anmelden': 'Anmelden - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
       '/meine-angebote': 'Meine Angebote - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
+      '/meine-anfragen': 'Meine Anfragen - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
       '/anstehende-events': 'Anstehende Events - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
       '/personaldaten': 'Personaldaten - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
       '/administration': 'Administration - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich'
@@ -51,9 +53,9 @@ const PageTracker = () => {
 
 const App = () => {
   return (
-      <ErrorBoundary>
-        <AppContent />
-      </ErrorBoundary>
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
   );
 };
 
@@ -61,31 +63,32 @@ const AppContent = () => {
   useGoogleAnalytics();
 
   return (
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <PageTracker />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/angebot" element={<Angebot />} />
-              <Route path="/portfolio" element={<Portfolio />} />
-              <Route path="/presse" element={<Presse />} />
-              <Route path="/impressum" element={<Impressum />} />
-              <Route path="/datenschutz" element={<Datenschutz />} />
-              <Route path="/agb" element={<AGB />} />
-              <Route path="/anmelden" element={<Auth />} />
-              <Route path="/meine-angebote" element={<MeineAngebote />} />
-              <Route path="/anstehende-events" element={<AnstehendeEvents />} />
-              <Route path="/personaldaten" element={<PersonaldatenStepper />} />
-              <Route path="/administration" element={<Administration />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <PageTracker />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/angebot" element={<Angebot />} />
+
+            <Route path="/presse" element={<Presse />} />
+            <Route path="/impressum" element={<Impressum />} />
+            <Route path="/datenschutz" element={<Datenschutz />} />
+            <Route path="/agb" element={<AGB />} />
+            <Route path="/anmelden" element={<Auth />} />
+            <Route path="/personaldaten" element={<Personaldaten />} />
+            <Route path="/meine-angebote" element={<PersonalDataGuard><MeineAngebote /></PersonalDataGuard>} />
+            <Route path="/meine-anfragen" element={<PersonalDataGuard><MeineAnfragen /></PersonalDataGuard>} />
+            <Route path="/anstehende-events" element={<PersonalDataGuard><AnstehendeEvents /></PersonalDataGuard>} />
+            <Route path="/administration" element={<PersonalDataGuard><Administration /></PersonalDataGuard>} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 };
 

@@ -1,8 +1,9 @@
-import { Send, Phone, Mail, Clock, Download } from 'lucide-react';
+import { Send, Phone, Mail, Clock, Download, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 import { trackEvent, trackError } from '@/hooks/use-google-analytics';
 import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
@@ -56,6 +57,7 @@ type FormData = z.infer<typeof formSchema>;
 
 const Contact = () => {
     const { toast } = useToast();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -75,6 +77,9 @@ const Contact = () => {
     const { clearStorage } = useFormPersistence(form, 'contact-form-data');
 
     const onSubmit = async (values: FormData) => {
+        if (isSubmitting) return; // Prevent double submission
+        
+        setIsSubmitting(true);
         try {
             trackEvent('submit', 'conversion', 'contact_form', 1);
             const { data, error } = await supabase
@@ -111,9 +116,10 @@ const Contact = () => {
                 return;
             }
 
-            // Send email notification
+            // Send email notifications
             try {
                 const emailData = {
+                    id: data.id,
                     name: values.name,
                     email: values.email,
                     phone: values.phone,
@@ -126,13 +132,22 @@ const Contact = () => {
                     created_at: data.created_at
                 };
 
-                await supabase.functions.invoke('send-contact-notification', {
+                // Send internal notification email
+                const internalEmailPromise = supabase.functions.invoke('send-contact-notification', {
                     body: emailData
                 });
 
-                console.log('Email notification sent successfully');
+                // Send customer confirmation email
+                const customerEmailPromise = supabase.functions.invoke('send-customer-confirmation', {
+                    body: emailData
+                });
+
+                // Wait for both emails to be sent
+                await Promise.all([internalEmailPromise, customerEmailPromise]);
+
+                console.log('Both email notifications sent successfully');
             } catch (emailError) {
-                console.error('Error sending email notification:', emailError);
+                console.error('Error sending email notifications:', emailError);
                 trackError(emailError instanceof Error ? emailError : 'Email notification failed', 'email_service', 'contact_form', {
                     form_data: { name: values.name, email: values.email }
                 });
@@ -146,7 +161,17 @@ const Contact = () => {
 
             // Clear localStorage and reset form
             clearStorage();
-            form.reset();
+            form.reset({
+                name: "",
+                email: "",
+                phone: "",
+                mobile: "",
+                company: "",
+                eventType: "",
+                callbackTime: "",
+                venue: "",
+                message: "",
+            });
         } catch (error) {
             console.error('Error submitting contact request:', error);
             trackError(error instanceof Error ? error : 'Contact form submission failed', 'form_submission', 'contact_form', {
@@ -161,6 +186,8 @@ const Contact = () => {
                 description: "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
                 variant: "destructive"
             });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -277,11 +304,12 @@ const Contact = () => {
                                       <FormItem>
                                           <FormLabel>Name *</FormLabel>
                                           <FormControl>
-                                              <Input
-                                                placeholder="Ihr Name"
-                                                className="bg-card border-border/50 focus:border-primary"
-                                                {...field}
-                                              />
+                                               <Input
+                                                 placeholder="Ihr Name"
+                                                 className="bg-card border-border/50 focus:border-primary"
+                                                 disabled={isSubmitting}
+                                                 {...field}
+                                               />
                                           </FormControl>
                                           <FormMessage />
                                       </FormItem>
@@ -294,12 +322,13 @@ const Contact = () => {
                                       <FormItem>
                                           <FormLabel>E-Mail *</FormLabel>
                                           <FormControl>
-                                              <Input
-                                                type="email"
-                                                placeholder="ihre@email.de"
-                                                className="bg-card border-border/50 focus:border-primary"
-                                                {...field}
-                                              />
+                                               <Input
+                                                 type="email"
+                                                 placeholder="ihre@email.de"
+                                                 className="bg-card border-border/50 focus:border-primary"
+                                                 disabled={isSubmitting}
+                                                 {...field}
+                                               />
                                           </FormControl>
                                           <FormMessage />
                                       </FormItem>
@@ -315,12 +344,13 @@ const Contact = () => {
                                       <FormItem>
                                           <FormLabel>Telefonnummer</FormLabel>
                                           <FormControl>
-                                              <Input
-                                                type="tel"
-                                                placeholder="+49 123 456789"
-                                                className="bg-card border-border/50 focus:border-primary"
-                                                {...field}
-                                              />
+                                               <Input
+                                                 type="tel"
+                                                 placeholder="+49 123 456789"
+                                                 className="bg-card border-border/50 focus:border-primary"
+                                                 disabled={isSubmitting}
+                                                 {...field}
+                                               />
                                           </FormControl>
                                           <FormMessage />
                                       </FormItem>
@@ -333,11 +363,12 @@ const Contact = () => {
                                       <FormItem>
                                           <FormLabel>Unternehmen</FormLabel>
                                           <FormControl>
-                                              <Input
-                                                placeholder="Ihr Unternehmen"
-                                                className="bg-card border-border/50 focus:border-primary"
-                                                {...field}
-                                              />
+                                               <Input
+                                                 placeholder="Ihr Unternehmen"
+                                                 className="bg-card border-border/50 focus:border-primary"
+                                                 disabled={isSubmitting}
+                                                 {...field}
+                                               />
                                           </FormControl>
                                           <FormMessage />
                                       </FormItem>
@@ -352,7 +383,11 @@ const Contact = () => {
                                     render={({ field }) => (
                                       <FormItem>
                                           <FormLabel>Veranstaltungsvorhaben</FormLabel>
-                                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                           <Select 
+                                             onValueChange={field.onChange} 
+                                             value={field.value || ""} 
+                                             disabled={isSubmitting}
+                                           >
                                               <FormControl>
                                                   <SelectTrigger className="bg-card border-border/50 focus:border-primary">
                                                       <SelectValue placeholder="Bitte wählen" />
@@ -381,7 +416,11 @@ const Contact = () => {
                                     render={({ field }) => (
                                       <FormItem>
                                           <FormLabel>Gewünschte Rückrufzeit</FormLabel>
-                                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                           <Select 
+                                             onValueChange={field.onChange} 
+                                             value={field.value || ""} 
+                                             disabled={isSubmitting}
+                                           >
                                               <FormControl>
                                                   <SelectTrigger className="bg-card border-border/50 focus:border-primary">
                                                       <SelectValue placeholder="Bitte wählen" />
@@ -409,11 +448,12 @@ const Contact = () => {
                                   <FormItem>
                                       <FormLabel>Veranstaltungsort (falls bereits bekannt)</FormLabel>
                                       <FormControl>
-                                          <Input
-                                            placeholder="z.B. DAS LIEBIG..."
-                                            className="bg-card border-border/50 focus:border-primary"
-                                            {...field}
-                                          />
+                                           <Input
+                                             placeholder="z.B. DAS LIEBIG..."
+                                             className="bg-card border-border/50 focus:border-primary"
+                                             disabled={isSubmitting}
+                                             {...field}
+                                           />
                                       </FormControl>
                                       <FormMessage />
                                   </FormItem>
@@ -427,22 +467,36 @@ const Contact = () => {
                                   <FormItem>
                                       <FormLabel>Nachricht *</FormLabel>
                                       <FormControl>
-                                          <Textarea
-                                            rows={5}
-                                            placeholder="Beschreiben Sie Ihr Vorhaben..."
-                                            className="bg-card border-border/50 focus:border-primary"
-                                            {...field}
-                                          />
+                                           <Textarea
+                                             rows={5}
+                                             placeholder="Beschreiben Sie Ihr Vorhaben..."
+                                             className="bg-card border-border/50 focus:border-primary"
+                                             disabled={isSubmitting}
+                                             {...field}
+                                           />
                                       </FormControl>
                                       <FormMessage />
                                   </FormItem>
                                 )}
                               />
 
-                              <Button type="submit" className="btn-hero w-full group">
-                                  Nachricht senden
-                                  <Send className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                              </Button>
+                               <Button 
+                                 type="submit" 
+                                 className="btn-hero w-full group" 
+                                 disabled={isSubmitting}
+                               >
+                                   {isSubmitting ? (
+                                       <>
+                                           <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                                           Nachricht wird gesendet...
+                                       </>
+                                   ) : (
+                                       <>
+                                           Nachricht senden
+                                           <Send className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                       </>
+                                   )}
+                               </Button>
                           </form>
                       </Form>
                   </div>

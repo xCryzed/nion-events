@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 import { trackError } from '@/hooks/use-google-analytics';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { Mail, Phone, Building, Calendar, MapPin, MessageSquare } from 'lucide-react';
+import { Mail, Phone, Building, Calendar, MapPin, MessageSquare, Reply, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -20,10 +23,18 @@ interface ContactRequest {
   venue?: string;
   message: string;
   created_at: string;
+  status?: string;
+  response_message?: string;
+  responded_at?: string;
+  responded_by?: string;
 }
 
 const ContactRequestsTab = () => {
   const [contactRequests, setContactRequests] = useState<ContactRequest[]>([]);
+  const [selectedRequest, setSelectedRequest] = useState<ContactRequest | null>(null);
+  const [responseMessage, setResponseMessage] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -85,6 +96,78 @@ const ContactRequestsTab = () => {
     return callbackTimes[callbackTime] || callbackTime;
   };
 
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'eingegangen':
+        return 'default';
+      case 'geantwortet':
+        return 'secondary';
+      default:
+        return 'outline';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'eingegangen':
+        return 'Eingegangen';
+      case 'geantwortet':
+        return 'Beantwortet';
+      default:
+        return status;
+    }
+  };
+
+  const handleOpenResponse = (request: ContactRequest) => {
+    setSelectedRequest(request);
+    setResponseMessage('');
+    setIsDialogOpen(true);
+  };
+
+  const handleSendResponse = async () => {
+    if (!selectedRequest || !responseMessage.trim()) {
+      toast({
+        title: "Fehler",
+        description: "Bitte geben Sie eine Antwort ein.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-contact-response', {
+        body: {
+          requestId: selectedRequest.id,
+          responseMessage: responseMessage.trim(),
+          customerName: selectedRequest.name,
+          customerEmail: selectedRequest.email
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Antwort gesendet",
+        description: "Die Antwort wurde erfolgreich an den Kunden gesendet.",
+      });
+
+      setIsDialogOpen(false);
+      fetchContactRequests(); // Refresh the list
+    } catch (error) {
+      console.error('Error sending response:', error);
+      toast({
+        title: "Fehler beim Senden",
+        description: "Die Antwort konnte nicht gesendet werden.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {contactRequests.length === 0 ? (
@@ -101,17 +184,27 @@ const ContactRequestsTab = () => {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-lg">{request.name}</CardTitle>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      {request.name}
+                      <Badge variant="outline" className="text-xs font-mono" title={request.id}>
+                        ID: {request.id}
+                      </Badge>
+                    </CardTitle>
                     <CardDescription className="flex items-center gap-2 mt-1">
                       <Calendar className="h-4 w-4" />
                       {formatDistanceToNow(new Date(request.created_at), { addSuffix: true, locale: de })}
                     </CardDescription>
                   </div>
-                  {request.event_type && (
-                    <Badge variant="secondary">
-                      {getEventTypeLabel(request.event_type)}
+                  <div className="flex items-center gap-2">
+                    <Badge variant={getStatusBadgeVariant(request.status || 'eingegangen')}>
+                      {getStatusLabel(request.status || 'eingegangen')}
                     </Badge>
-                  )}
+                    {request.event_type && (
+                      <Badge variant="secondary">
+                        {getEventTypeLabel(request.event_type)}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -167,11 +260,93 @@ const ContactRequestsTab = () => {
                     {request.message}
                   </p>
                 </div>
+                
+                {request.response_message && (
+                  <div className="pt-4 border-t bg-muted/30 p-4 rounded-lg">
+                    <h4 className="font-medium text-sm mb-2">Antwort gesendet:</h4>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap mb-2">
+                      {request.response_message}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {request.responded_at && `Gesendet am: ${formatDistanceToNow(new Date(request.responded_at), { addSuffix: true, locale: de })}`}
+                    </p>
+                  </div>
+                )}
+                
+                <div className="pt-4 border-t flex justify-end">
+                  <Button 
+                    variant={request.status === 'geantwortet' ? 'outline' : 'default'}
+                    size="sm"
+                    onClick={() => handleOpenResponse(request)}
+                    className="flex items-center gap-2"
+                  >
+                    <Reply className="h-4 w-4" />
+                    {request.status === 'geantwortet' ? 'Erneut antworten' : 'Antworten'}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
       )}
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Antwort auf Kontaktanfrage</DialogTitle>
+            <DialogDescription>
+              {selectedRequest && (
+                <>
+                  Antwort an {selectedRequest.name} ({selectedRequest.email})
+                  <br />
+                  <span className="font-mono text-xs">ID: {selectedRequest.id}</span>
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedRequest && (
+            <div className="space-y-4">
+              <div className="bg-muted p-4 rounded-lg">
+                <h4 className="font-medium text-sm mb-2">Ursprüngliche Nachricht:</h4>
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                  {selectedRequest.message}
+                </p>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">Ihre Antwort:</label>
+                <Textarea
+                  value={responseMessage}
+                  onChange={(e) => setResponseMessage(e.target.value)}
+                  placeholder="Geben Sie hier Ihre Antwort ein..."
+                  rows={6}
+                  className="w-full"
+                />
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Abbrechen
+            </Button>
+            <Button onClick={handleSendResponse} disabled={isSending || !responseMessage.trim()}>
+              {isSending ? (
+                <>
+                  <Send className="h-4 w-4 mr-2 animate-spin" />
+                  Senden...
+                </>
+              ) : (
+                <>
+                  <Send className="h-4 w-4 mr-2" />
+                  Antwort senden
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { trackError } from '@/hooks/use-google-analytics';
-import { Menu, X, LogOut, Settings, Users, Calendar, User as UserIcon, FileText, Shield } from 'lucide-react';
+import { Menu, X, LogOut, Settings, Users, Calendar, User as UserIcon, FileText, Shield, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -257,6 +257,16 @@ const Header = () => {
                       <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuItem asChild>
                           <Link
+                              to="/meine-anfragen"
+                              className="cursor-pointer flex items-center"
+                              onClick={() => trackEvent('click', 'navigation', 'header_meine_anfragen')}
+                          >
+                            <MessageSquare className="mr-2 h-4 w-4" />
+                            Meine Anfragen
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link
                               to="/meine-angebote"
                               className="cursor-pointer flex items-center"
                               onClick={() => trackEvent('click', 'navigation', 'header_meine_angebote')}
@@ -347,6 +357,13 @@ const Header = () => {
                         {item.name}
                       </button>
                   ))}
+                  <Link
+                      to="/meine-anfragen"
+                      className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                      onClick={() => setIsMenuOpen(false)}
+                  >
+                    Meine Anfragen
+                  </Link>
                   <Link
                       to="/meine-angebote"
                       className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"

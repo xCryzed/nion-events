@@ -7,64 +7,64 @@ const Portfolio = () => {
   const events = [
     {
       id: 1,
-      title: "Beachparty DAS LIEBIG",
-      description: "Die größte Beachparty Aachens mit über 800 Gästen. Eine unvergessliche Nacht mit perfekter Atmosphäre und erstklassiger Musik.",
-      date: "August 2025",
-      attendees: "800+",
-      location: "DAS LIEBIG, Aachen",
-      videoId: "dQw4w9WgXcQ", // Placeholder YouTube ID
-      category: "Großveranstaltung"
+      title: "Abiomed AAM 2025",
+      description: "Bei der Abiomed AAM Veranstaltung in Kopenhagen, ausgerichtet in der renommierten Location Wallmans Salonger, übernahmen wir die musikalische Betreuung sowie die Aftershow-Party und sorgten für ein unvergessliches Finale. Im Mittelpunkt des Abends stand der Zusammenschluss von Abiomed und Johnson & Johnson, begleitet von eindrucksvollen Showelementen und der Würdigung zahlreicher Mitarbeiterbeförderungen. Gemeinsam mit internationalen Gästen und Mitarbeiter:innen entstand so ein Event von außergewöhnlicher Strahlkraft.",
+      date: "Februar 2025",
+      attendees: "500+",
+      location: "Wallmans Salonger, Kopenhagen",
+      videoId: "Stc0eMLuQQg",
+      category: "Corporate Event"
     },
     {
       id: 2,
-      title: "Corporate Event Köln",
-      description: "Firmenevent mit über 600 Mitarbeitern. Professionelle Organisation und Entertainment für einen erfolgreichen Unternehmensabend.",
-      date: "September 2024",
+      title: "Abiomed Neujahrsparty 2025",
+      description: "Die Neujahrsparty 2025 von Abiomed | Johnson & Johnson fand erneut im DAS LIEBIG in Aachen statt und stand unter dem Motto „Around The World“. Unser Team stellte abwechslungsreiche Spielstationen bereit – inspiriert von Formaten wie „Das Duell um die Welt“ – bei denen die Mitarbeiter:innen in 4er-Teams gegeneinander antraten. Für zusätzliche Motivation sorgten attraktive Preise für die Gewinnerteams sowie eine Echtzeit-Punkteanzeige auf der großen LED-Wand im Hauptraum. Neben der Betreuung der Spiele übernahmen wir auch die musikalische Gestaltung des Abends und trugen so maßgeblich zu einem energiegeladenen Start ins neue Jahr bei. Inzwischen sind wir ein fester Bestandteil des Abiomed | Johnson & Johnson Feier-Inventars geworden.",
+      date: "Juni 2024",
       attendees: "600+",
-      location: "Köln",
-      videoId: "dQw4w9WgXcQ", // Placeholder YouTube ID
+      location: "DAS LIEBIG, Aachen",
+      videoId: "4FIk2StHQdk",
       category: "Corporate Event"
     },
     {
       id: 3,
-      title: "Hochzeit Aachen",
-      description: "Eine romantische Hochzeitsfeier mit perfekt abgestimmter Musik für jeden Moment des besonderen Tages.",
-      date: "Juli 2024",
-      attendees: "120",
-      location: "Aachen Region",
-      videoId: "dQw4w9WgXcQ", // Placeholder YouTube ID
-      category: "Hochzeit"
+      title: "Abiomed Sommerfest 2024",
+      description: "Bei diesem außergewöhnlichen Sommerfest verwandelte unser Team die Halle 60 in eine eindrucksvolle Festival-Location. Unter dem Motto „Von Aachen aus in die ganze Welt“ feierten Mitarbeiter:innen und Gäste die internationale Bedeutung der innovativen Herzpumpen. Wir verantworteten die komplette technische Betreuung, die DJ-Planung, die Gestaltung einer Geländeübersicht sowie den professionellen Auf- und Abbau und stellten so einen reibungslosen Ablauf sicher. Dieses Recap-Video zeigt die Highlights eines unvergesslichen Tages.",
+      date: "August 2024",
+      attendees: "600+",
+      location: "Halle 60, Aachen",
+      videoId: "68U6T7jaPZI",
+      category: "Corporate Event"
     },
     {
       id: 4,
-      title: "Abiball 2024",
-      description: "Unvergesslicher Abiball mit energiegeladener Musik und perfekter Stimmung für die Absolventen.",
-      date: "Juni 2024",
-      attendees: "200",
-      location: "Aachen",
-      videoId: "dQw4w9WgXcQ", // Placeholder YouTube ID
-      category: "Abiball"
+      title: "NION DJ Set Tropics",
+      description: "Im renommierten Tropics Club in Spanien, ausgezeichnet als einer der besten Clubs weltweit auf Platz 48, sorgte ich mit meiner DJ-Performance für eine mitreißende Party-Atmosphäre. Die Gäste von RUF Jugendreisen erlebten eine energiegeladene Nacht voller Begeisterung, perfekt abgestimmter Beats und elektrisierender Stimmung. Das Event verwandelte den Club in eine pulsierende Feierzone, in der ausgelassene Stimmung und gemeinsame Partyerlebnisse im Mittelpunkt standen.",
+      date: "April 2024",
+      attendees: "3000+",
+      location: "Disco Tropics, Lloret de Mar",
+      videoId: "Vuh19HL6sqI",
+      category: "Privatfeier"
     },
     {
       id: 5,
-      title: "Club Night Spanien",
-      description: "Internationaler Auftritt in Spanien mit begeistertem Publikum und unvergesslicher Partystimmung.",
-      date: "Mai 2024",
-      attendees: "300+",
-      location: "Spanien",
-      videoId: "dQw4w9WgXcQ", // Placeholder YouTube ID
-      category: "Club Event"
+      title: "Abiomed Neujahrsfeier 2024",
+      description: "Zum Jahresauftakt 2024 wurde das DAS LIEBIG in Aachen (ehemals Starfish) in eine faszinierende Retro-Spiele-Arena verwandelt. Unter dem Motto klassischer Arcade-Games entstand eine außergewöhnliche Event-Atmosphäre, die die Gäste in eine andere Welt eintauchen ließ. Unser Team verantwortete die musikalische Gestaltung des Abends und schuf damit den perfekten Rahmen für ausgelassene Feierlichkeiten. Die Mitarbeiter:innen genossen eine unvergessliche Stimmung und starteten gemeinsam voller Energie in das neue Jahr.",
+      date: "Januar 2024",
+      attendees: "600+",
+      location: "DAS LIEBIG, Aachen",
+      videoId: "jWPe7QO38gc",
+      category: "Corporate Event"
     },
     {
       id: 6,
-      title: "Geburtagsfeier Deluxe",
-      description: "Exklusive Geburtstagsfeier mit individuell zusammengestellter Playlist und perfekter Atmosphäre.",
-      date: "April 2024",
-      attendees: "80",
-      location: "Aachen Region",
-      videoId: "dQw4w9WgXcQ", // Placeholder YouTube ID
-      category: "Privatfeier"
-    }
+      title: "Halloween 2023: DREAMBEATS LAB",
+      description: "Das DREAMBEATS LAB 2023 im DAS LIEBIG in Aachen (ehemals Starfish) setzte neue Maßstäbe für Halloween-Partys in der Region. Mit über 1.300 Gästen avancierte die Veranstaltung zur größten Halloween-Party Aachens und zog Publikum aus der gesamten Umgebung an. Highlight des Abends war meine eigene DJ-Performance, die für eine mitreißende Stimmung sorgte, unterstützt von spektakulären Lichteffekten und thematisch inszenierten Dekorationen. Das Event vereinte beste Unterhaltung, ausgefeilte Showelemente und ein außergewöhnliches Partyerlebnis, das in Aachen seinesgleichen sucht.",
+      date: "Oktober 2023",
+      attendees: "1300+",
+      location: "DAS LIEBIG, Aachen",
+      videoId: "T55uDdFXt4k",
+      category: "Club Event"
+    },
   ];
 
   return (

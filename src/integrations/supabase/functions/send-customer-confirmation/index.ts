@@ -12,7 +12,7 @@ const corsHeaders = {
         "authorization, x-client-info, apikey, content-type",
 };
 
-interface ContactRequest {
+interface CustomerConfirmationRequest {
     id: string;
     name: string;
     email: string;
@@ -33,9 +33,9 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     try {
-        const contactRequest: ContactRequest = await req.json();
+        const customerRequest: CustomerConfirmationRequest = await req.json();
 
-        console.log("Processing contact request:", contactRequest);
+        console.log("Processing customer confirmation for:", customerRequest.email);
 
         // Helper function to get readable labels
         const getEventTypeLabel = (eventType: string) => {
@@ -79,14 +79,14 @@ const handler = async (req: Request): Promise<Response> => {
             });
         };
 
-        // Create HTML email template
+        // Create HTML email template for customer confirmation
         const htmlContent = `
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neue Kontaktanfrage - NION Events</title>
+    <title>Vielen Dank für Ihre Anfrage - NION Events</title>
     <style>
         * {
             margin: 0;
@@ -137,11 +137,26 @@ const handler = async (req: Request): Promise<Response> => {
         }
         
         .title {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: #1a1a1a;
             margin-bottom: 20px;
             text-align: center;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+        
+        .greeting {
+            font-size: 16px;
+            color: #1a1a1a;
+            margin-bottom: 25px;
+            line-height: 1.8;
         }
         
         .section {
@@ -162,10 +177,11 @@ const handler = async (req: Request): Promise<Response> => {
         }
         
         .section-title::before {
-            content: "●";
+            content: "✓";
             color: #667eea;
             margin-right: 10px;
-            font-size: 20px;
+            font-size: 18px;
+            font-weight: bold;
         }
         
         .info-grid {
@@ -212,6 +228,81 @@ const handler = async (req: Request): Promise<Response> => {
             white-space: pre-wrap;
         }
         
+        .next-steps {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .next-steps h3 {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .next-steps ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .next-steps li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #1a1a1a;
+            font-size: 16px;
+        }
+        
+        .next-steps li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .contact-info {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .contact-info h3 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .contact-details {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .contact-item {
+            text-align: center;
+        }
+        
+        .contact-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .contact-value {
+            font-size: 16px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        
         .footer {
             background: #f8f9ff;
             padding: 30px;
@@ -245,6 +336,11 @@ const handler = async (req: Request): Promise<Response> => {
                 grid-template-columns: 1fr;
             }
             
+            .contact-details {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
             .container {
                 margin: 10px;
                 border-radius: 15px;
@@ -264,99 +360,129 @@ const handler = async (req: Request): Promise<Response> => {
         </div>
         
         <div class="content">
-            <h1 class="title">🎉 Neue Kontaktanfrage eingegangen!</h1>
+            <h1 class="title">Vielen Dank für Ihre Anfrage! 🎉</h1>
+            <p class="subtitle">Wir haben Ihre Nachricht erhalten und werden uns schnellstmöglich bei Ihnen melden.</p>
             
             <div style="text-align: center; margin-bottom: 30px;">
-                <span class="timestamp">📅 ${formatDate(contactRequest.created_at)}</span>
+                <span class="timestamp">📅 Eingegangen am ${formatDate(customerRequest.created_at)}</span>
+            </div>
+            
+            <div class="greeting">
+                <p>Hallo ${customerRequest.name},</p>
+                <br>
+                <p>vielen Dank für Ihr Interesse an NION Events! Wir freuen uns sehr über Ihre Anfrage und möchten Ihnen versichern, dass wir uns innerhalb der nächsten <strong>24 Stunden</strong> bei Ihnen melden werden.</p>
             </div>
             
             <div class="section">
-                <h2 class="section-title">Kontaktdaten</h2>
+                <h2 class="section-title">Ihre Anfrage im Überblick</h2>
                 <div class="info-grid">
                     <div class="info-item">
                         <div class="info-label">Name</div>
-                        <div class="info-value">${contactRequest.name}</div>
+                        <div class="info-value">${customerRequest.name}</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">E-Mail</div>
-                        <div class="info-value">${contactRequest.email}</div>
+                        <div class="info-value">${customerRequest.email}</div>
                     </div>
-                    ${contactRequest.phone ? `
+                    ${customerRequest.phone ? `
                     <div class="info-item">
                         <div class="info-label">Telefon</div>
-                        <div class="info-value">${contactRequest.phone}</div>
+                        <div class="info-value">${customerRequest.phone}</div>
                     </div>
                     ` : ''}
-                    ${contactRequest.mobile ? `
-                    <div class="info-item">
-                        <div class="info-label">Mobil</div>
-                        <div class="info-value">${contactRequest.mobile}</div>
-                    </div>
-                    ` : ''}
-                    ${contactRequest.company ? `
+                    ${customerRequest.company ? `
                     <div class="info-item">
                         <div class="info-label">Unternehmen</div>
-                        <div class="info-value">${contactRequest.company}</div>
+                        <div class="info-value">${customerRequest.company}</div>
                     </div>
                     ` : ''}
-                </div>
-            </div>
-            
-            ${contactRequest.event_type || contactRequest.callback_time || contactRequest.venue ? `
-            <div class="section">
-                <h2 class="section-title">Event-Details</h2>
-                <div class="info-grid">
-                    ${contactRequest.event_type ? `
+                    ${customerRequest.event_type ? `
                     <div class="info-item">
                         <div class="info-label">Veranstaltungsart</div>
-                        <div class="info-value">${getEventTypeLabel(contactRequest.event_type)}</div>
+                        <div class="info-value">${getEventTypeLabel(customerRequest.event_type)}</div>
                     </div>
                     ` : ''}
-                    ${contactRequest.callback_time ? `
+                    ${customerRequest.callback_time ? `
                     <div class="info-item">
                         <div class="info-label">Gewünschte Rückrufzeit</div>
-                        <div class="info-value">${getCallbackTimeLabel(contactRequest.callback_time)}</div>
+                        <div class="info-value">${getCallbackTimeLabel(customerRequest.callback_time)}</div>
                     </div>
                     ` : ''}
-                    ${contactRequest.venue ? `
-                    <div class="info-item" style="grid-column: 1 / -1;">
-                        <div class="info-label">Veranstaltungsort</div>
-                        <div class="info-value">${contactRequest.venue}</div>
-                    </div>
-                    ` : ''}
+                </div>
+                
+                ${customerRequest.venue ? `
+                <div class="info-item" style="margin-bottom: 15px;">
+                    <div class="info-label">Veranstaltungsort</div>
+                    <div class="info-value">${customerRequest.venue}</div>
+                </div>
+                ` : ''}
+                
+                <div class="message-box">
+                    <div class="info-label">Ihre Nachricht</div>
+                    <div class="message-text">${customerRequest.message}</div>
                 </div>
             </div>
-            ` : ''}
             
-            <div class="section">
-                <h2 class="section-title">Nachricht</h2>
-                <div class="message-box">
-                    <div class="message-text">${contactRequest.message}</div>
+            <div class="next-steps">
+                <h3>Was passiert als nächstes? 🚀</h3>
+                <ul>
+                    <li>Wir prüfen Ihre Anfrage im Detail</li>
+                    <li>Ein Eventplaner meldet sich innerhalb von 24 Stunden bei Ihnen</li>
+                    <li>Wir besprechen Ihre Wünsche und erstellen ein individuelles Angebot</li>
+                    <li>Bei Bedarf vereinbaren wir einen Termin für ein persönliches Gespräch</li>
+                </ul>
+            </div>
+            
+            <div class="contact-info">
+                <h3>Sie haben noch Fragen? Wir sind für Sie da!</h3>
+                <div class="contact-details">
+                    <div class="contact-item">
+                        <div class="contact-label">Telefon</div>
+                        <div class="contact-value">+49 1575 2046096</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-label">E-Mail</div>
+                        <div class="contact-value">info@nion-events.de</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-label">Website</div>
+                        <div class="contact-value">nion-events.de</div>
+                    </div>
                 </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px; padding: 20px; background: rgba(102, 126, 234, 0.05); border-radius: 12px;">
+                <p style="font-size: 16px; color: #1a1a1a; margin-bottom: 10px;">
+                    <strong>Folgen Sie uns für Inspiration und Updates:</strong>
+                </p>
+                <p style="font-size: 14px; color: #667eea;">
+                    Entdecken Sie unsere neuesten Events und bekommen Sie Einblicke hinter die Kulissen auf unserer Website und in den sozialen Medien.
+                </p>
             </div>
         </div>
         
         <div class="footer">
             <div class="footer-text">
-                Diese E-Mail wurde automatisch über das Kontaktformular auf nion-events.de gesendet.
+                Diese Bestätigung wurde automatisch gesendet. Bitte antworten Sie nicht auf diese E-Mail.
             </div>
             <div class="footer-contact">
-                NION Events • info@nion-events.de • +49 1575 2046096
+                NION Events • Event Management & Production<br>
+                info@nion-events.de • +49 1575 2046096 • nion-events.de
             </div>
         </div>
     </div>
 </body>
 </html>`;
 
-        // Send email notification
+        // Send customer confirmation email
         const emailResponse = await resend.emails.send({
             from: "NION Events <info@nion-events.de>",
-            to: ["info@nion-events.de"],
-            subject: `🎉 Neue Kontaktanfrage von ${contactRequest.name} (ID: ${contactRequest.id})`,
+            to: [customerRequest.email],
+            subject: `Vielen Dank für Ihre Anfrage, ${customerRequest.name}! 🎉 (Referenz: ${customerRequest.id})`,
             html: htmlContent,
         });
 
-        console.log("Email sent successfully:", emailResponse);
+        console.log("Customer confirmation email sent successfully:", emailResponse);
 
         return new Response(JSON.stringify({ success: true, emailResponse }), {
             status: 200,
@@ -366,7 +492,7 @@ const handler = async (req: Request): Promise<Response> => {
             },
         });
     } catch (error: any) {
-        console.error("Error in send-contact-notification function:", error);
+        console.error("Error in send-customer-confirmation function:", error);
         return new Response(
             JSON.stringify({ error: error.message }),
             {

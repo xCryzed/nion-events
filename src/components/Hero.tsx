@@ -28,7 +28,7 @@ const Hero = () => {
       <div className="absolute inset-0">
         <img
           src={heroImage}
-          alt="NION Eventmanagement - Professionelle Events"
+          alt="NION Events - Professionelle Events"
           className="w-full h-full object-cover opacity-30"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/40" />
@@ -74,7 +74,10 @@ const Hero = () => {
               className="group bg-transparent border-border/50 hover:bg-card/50 backdrop-blur-sm"
               onClick={() => {
                 trackEvent('click', 'navigation', 'hero_portfolio_ansehen');
-                window.location.href = '/portfolio';
+                const portfolioElement = document.getElementById('event-portfolio');
+                if (portfolioElement) {
+                  portfolioElement.scrollIntoView({ behavior: 'smooth' });
+                }
               }}
             >
               <Play className="mr-2 w-4 h-4 group-hover:scale-110 transition-transform" />
