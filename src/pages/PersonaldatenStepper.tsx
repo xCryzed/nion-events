@@ -993,73 +993,121 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
 
             <FormField
                 control={form.control}
-                name="date_of_birth"
+                name="street_address"
                 render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Geburtsdatum *</FormLabel>
-                      <FormControl>
-                          <Input
-                            type="date"
-                            {...field}
-                            value={field.value ? format(field.value, 'yyyy-MM-dd') : ''}
-                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
-                          />
-                      </FormControl>
-                      <FormMessage />
-                  </FormItem>
+                    <FormItem>
+                        <FormLabel>Straße und Hausnummer *</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Musterstraße 123" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
                 )}
-              />
-          </div>
+            />
 
-          <FormField
-            control={form.control}
-            name="street_address"
-            render={({ field }) => (
-              <FormItem>
-                  <FormLabel>Straße und Hausnummer *</FormLabel>
-                  <FormControl>
-                      <Input placeholder="Musterstraße 123" {...field} />
-                  </FormControl>
-                  <FormMessage />
-              </FormItem>
-            )}
-          />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                    control={form.control}
+                    name="postal_code"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Postleitzahl *</FormLabel>
+                            <FormControl>
+                                <Input placeholder="12345" maxLength={5} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
+                <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Ort *</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Musterstadt" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                    control={form.control}
+                    name="marital_status"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Familienstand *</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Familienstand wählen" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {maritalStatusOptions.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="gender"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Geschlecht *</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Geschlecht wählen" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {genderOptions.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </div>
+
+            <FormField
                 control={form.control}
-                name="postal_code"
+                name="nationality"
                 render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Postleitzahl *</FormLabel>
-                      <FormControl>
-                          <Input placeholder="12345" maxLength={5} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="city"
-                render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Ort *</FormLabel>
-                      <FormControl>
-                          <Input placeholder="Musterstadt" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                  </FormItem>
+                    <FormItem>
+                        <FormLabel>Staatsangehörigkeit *</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Deutsch" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
                 )}
             />
         </div>
     ), [form.control]);
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
+    const BankingStep = () => (
+        <div className="space-y-6">
+            <FormField
                 control={form.control}
-                name="marital_status"
+                name="iban"
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>IBAN *</FormLabel>
