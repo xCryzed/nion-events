@@ -1127,95 +1127,26 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                         <FormMessage />
                     </FormItem>
                 )}
-              />
+            />
 
-              <FormField
+            <FormField
                 control={form.control}
-                name="gender"
+                name="bic"
                 render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Geschlecht *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                              <SelectTrigger>
-                                  <SelectValue placeholder="Geschlecht wählen" />
-                              </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                              {genderOptions.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </SelectItem>
-                              ))}
-                          </SelectContent>
-                      </Select>
-                      <FormMessage />
-                  </FormItem>
+                    <FormItem>
+                        <FormLabel>BIC *</FormLabel>
+                        <FormControl>
+                            <Input
+                                placeholder="ABCDDE2AXXX"
+                                {...field}
+                                onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
                 )}
-              />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="nationality"
-            render={({ field }) => (
-              <FormItem>
-                  <FormLabel>Staatsangehörigkeit *</FormLabel>
-                  <FormControl>
-                      <Input placeholder="Deutsch" {...field} />
-                  </FormControl>
-                  <FormMessage />
-              </FormItem>
-            )}
-          />
-      </div>
-    ), [form.control]);
-
-    const BankingStep = () => (
-      <div className="space-y-6">
-          <FormField
-            control={form.control}
-            name="iban"
-            render={({ field }) => (
-              <FormItem>
-                  <FormLabel>IBAN *</FormLabel>
-                  <FormControl>
-                      <Input
-                        placeholder="DE12 3456 7890 1234 5678 90"
-                        {...field}
-                        onChange={(e) => {
-                            // Format IBAN with spaces
-                            let value = e.target.value.replace(/\s/g, '').toUpperCase();
-                            if (value.startsWith('DE')) {
-                                value = value.replace(/(.{4})/g, '$1 ').trim();
-                            }
-                            field.onChange(value);
-                        }}
-                      />
-                  </FormControl>
-                  <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="bic"
-            render={({ field }) => (
-              <FormItem>
-                  <FormLabel>BIC *</FormLabel>
-                  <FormControl>
-                      <Input
-                        placeholder="ABCDDE2AXXX"
-                        {...field}
-                        onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                      />
-                  </FormControl>
-                  <FormMessage />
-              </FormItem>
-            )}
-          />
-      </div>
+            />
+        </div>
     );
 
     const EducationStep = () => (
