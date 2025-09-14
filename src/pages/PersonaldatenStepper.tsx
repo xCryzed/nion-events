@@ -886,35 +886,35 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                     )}
                 />
 
-                <FormField
-                    control={form.control}
-                    name="last_name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Nachname *</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Mustermann" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
+              <FormField
+                control={form.control}
+                name="last_name"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Nachname *</FormLabel>
+                      <FormControl>
+                          <Input placeholder="Mustermann" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                    control={form.control}
-                    name="birth_name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Geburtsname (optional)</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Musterfrau" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="birth_name"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Geburtsname (optional)</FormLabel>
+                      <FormControl>
+                          <Input placeholder="Musterfrau" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
 
                 <FormField
                     control={form.control}
@@ -993,121 +993,73 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
 
             <FormField
                 control={form.control}
-                name="street_address"
+                name="date_of_birth"
                 render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Straße und Hausnummer *</FormLabel>
-                        <FormControl>
-                            <Input placeholder="Musterstraße 123" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
+                  <FormItem>
+                      <FormLabel>Geburtsdatum *</FormLabel>
+                      <FormControl>
+                          <Input
+                            type="date"
+                            {...field}
+                            value={field.value ? format(field.value, 'yyyy-MM-dd') : ''}
+                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
+                          />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
                 )}
-            />
+              />
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                    control={form.control}
-                    name="postal_code"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Postleitzahl *</FormLabel>
-                            <FormControl>
-                                <Input placeholder="12345" maxLength={5} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+          <FormField
+            control={form.control}
+            name="street_address"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>Straße und Hausnummer *</FormLabel>
+                  <FormControl>
+                      <Input placeholder="Musterstraße 123" {...field} />
+                  </FormControl>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
 
-                <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Ort *</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Musterstadt" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                    control={form.control}
-                    name="marital_status"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Familienstand *</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Familienstand wählen" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {maritalStatusOptions.map((option) => (
-                                        <SelectItem key={option.value} value={option.value}>
-                                            {option.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="gender"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Geschlecht *</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Geschlecht wählen" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {genderOptions.map((option) => (
-                                        <SelectItem key={option.value} value={option.value}>
-                                            {option.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
-
-            <FormField
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
                 control={form.control}
-                name="nationality"
+                name="postal_code"
                 render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Staatsangehörigkeit *</FormLabel>
-                        <FormControl>
-                            <Input placeholder="Deutsch" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
+                  <FormItem>
+                      <FormLabel>Postleitzahl *</FormLabel>
+                      <FormControl>
+                          <Input placeholder="12345" maxLength={5} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Ort *</FormLabel>
+                      <FormControl>
+                          <Input placeholder="Musterstadt" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
                 )}
             />
         </div>
     ), [form.control]);
 
-    const BankingStep = () => (
-        <div className="space-y-6">
-            <FormField
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
                 control={form.control}
-                name="iban"
+                name="marital_status"
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>IBAN *</FormLabel>
@@ -1127,26 +1079,95 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                         <FormMessage />
                     </FormItem>
                 )}
-            />
+              />
 
-            <FormField
+              <FormField
                 control={form.control}
-                name="bic"
+                name="gender"
                 render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>BIC *</FormLabel>
-                        <FormControl>
-                            <Input
-                                placeholder="ABCDDE2AXXX"
-                                {...field}
-                                onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
+                  <FormItem>
+                      <FormLabel>Geschlecht *</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Geschlecht wählen" />
+                              </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                              {genderOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                      </Select>
+                      <FormMessage />
+                  </FormItem>
                 )}
-            />
-        </div>
+              />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="nationality"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>Staatsangehörigkeit *</FormLabel>
+                  <FormControl>
+                      <Input placeholder="Deutsch" {...field} />
+                  </FormControl>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
+      </div>
+    ), [form.control]);
+
+    const BankingStep = () => (
+      <div className="space-y-6">
+          <FormField
+            control={form.control}
+            name="iban"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>IBAN *</FormLabel>
+                  <FormControl>
+                      <Input
+                        placeholder="DE12 3456 7890 1234 5678 90"
+                        {...field}
+                        onChange={(e) => {
+                            // Format IBAN with spaces
+                            let value = e.target.value.replace(/\s/g, '').toUpperCase();
+                            if (value.startsWith('DE')) {
+                                value = value.replace(/(.{4})/g, '$1 ').trim();
+                            }
+                            field.onChange(value);
+                        }}
+                      />
+                  </FormControl>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="bic"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>BIC *</FormLabel>
+                  <FormControl>
+                      <Input
+                        placeholder="ABCDDE2AXXX"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                      />
+                  </FormControl>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
+      </div>
     );
 
     const EducationStep = () => (
@@ -1174,9 +1195,9 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                         <FormMessage />
                     </FormItem>
                 )}
-            />
+              />
 
-            <FormField
+              <FormField
                 control={form.control}
                 name="highest_professional_qualification"
                 render={({ field }) => (
@@ -1199,6 +1220,73 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                         <FormMessage />
                     </FormItem>
                 )}
+              />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="employment_type"
+            render={({ field }) => (
+              <FormItem>
+                  <FormLabel>Art der Beschäftigung *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                          <SelectTrigger>
+                              <SelectValue placeholder="Art der Beschäftigung wählen" />
+                          </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                          {employmentTypeOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                  </Select>
+                  <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="has_other_employment"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                      <FormLabel>
+                          Ich habe noch eine andere Beschäftigung
+                      </FormLabel>
+                  </div>
+              </FormItem>
+            )}
+          />
+
+          {form.watch('has_other_employment') && (
+            <FormField
+              control={form.control}
+              name="is_marginal_employment"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                        <FormLabel>
+                            Handelt es sich hierbei um eine geringfügige Beschäftigung?
+                        </FormLabel>
+                    </div>
+                </FormItem>
+              )}
             />
         </div>
     );
@@ -1399,7 +1487,7 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                         </div>
                     </FormItem>
                 )}
-            />
+              />
 
             {form.watch('has_additional_employment') && (
                 <FormField
