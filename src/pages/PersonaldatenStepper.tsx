@@ -886,35 +886,35 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                     )}
                 />
 
-              <FormField
-                control={form.control}
-                name="last_name"
-                render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Nachname *</FormLabel>
-                      <FormControl>
-                          <Input placeholder="Mustermann" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                  </FormItem>
-                )}
-              />
-          </div>
+                <FormField
+                    control={form.control}
+                    name="last_name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Nachname *</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Mustermann" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="birth_name"
-                render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Geburtsname (optional)</FormLabel>
-                      <FormControl>
-                          <Input placeholder="Musterfrau" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                    control={form.control}
+                    name="birth_name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Geburtsname (optional)</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Musterfrau" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
                 <FormField
                     control={form.control}
@@ -1195,9 +1195,9 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                         <FormMessage />
                     </FormItem>
                 )}
-              />
+            />
 
-              <FormField
+            <FormField
                 control={form.control}
                 name="highest_professional_qualification"
                 render={({ field }) => (
@@ -1487,7 +1487,7 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                         </div>
                     </FormItem>
                 )}
-              />
+            />
 
             {form.watch('has_additional_employment') && (
                 <FormField
