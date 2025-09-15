@@ -336,9 +336,21 @@ const Angebot = () => {
                     supabase.functions.invoke('send-offer-confirmation', { body: emailData })
                 ]);
 
+                // Check for rate limiting specifically
                 if (notificationResult.status === 'rejected') {
-                    console.error('Failed to send notification email:', notificationResult.reason);
+                    const error = notificationResult.reason;
+                    if (error?.message?.includes('Rate limit exceeded') || error?.status === 429) {
+                        console.warn('Rate limit reached for offer notifications');
+                        toast({
+                            title: "Zu viele Angebotsanfragen",
+                            description: "Sie haben zu viele Angebotsanfragen in kurzer Zeit gesendet. Bitte versuchen Sie es in einer Stunde erneut.",
+                            variant: "destructive"
+                        });
+                        return;
+                    }
+                    console.error('Failed to send notification email:', error);
                 }
+                
                 if (confirmationResult.status === 'rejected') {
                     console.error('Failed to send confirmation email:', confirmationResult.reason);
                 }
@@ -346,6 +358,18 @@ const Angebot = () => {
                 console.log('Email notifications sent');
             } catch (emailError) {
                 console.error('Error sending email notifications:', emailError);
+                
+                // Check if it's a rate limiting error
+                if (emailError?.message?.includes('Rate limit exceeded') || 
+                    emailError?.status === 429) {
+                    toast({
+                        title: "Zu viele Angebotsanfragen",
+                        description: "Sie haben zu viele Angebotsanfragen in kurzer Zeit gesendet. Bitte versuchen Sie es in einer Stunde erneut.",
+                        variant: "destructive"
+                    });
+                    return;
+                }
+                
                 // Don't fail the entire process if emails fail
             }
 

@@ -1,4 +1,7 @@
 project_id = "xqgtwzpmuxkeqpykrxmd"
 
+[functions.send-employee-invitation]
+verify_jwt = false
+
 [functions.send-contact-notification]
 verify_jwt = false

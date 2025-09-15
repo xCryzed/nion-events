@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import { PersonalDataCard } from '@/components/PersonalDataCard';
+import { PersonalDataSkeleton } from '@/components/PersonalDataSkeleton';
 import { usePersonalDataCompletion } from '@/hooks/use-personal-data-completion';
 
 
@@ -13,27 +14,34 @@ const Personaldaten: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [personalData, setPersonalData] = useState<any>(null);
   const [showStepper, setShowStepper] = useState(false);
+  const [loading, setLoading] = useState(true);
   
   const completion = usePersonalDataCompletion(user?.id);
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/anmelden');
-        return;
-      }
-      setUser(user);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          navigate('/anmelden');
+          return;
+        }
+        setUser(user);
 
-      // Load existing personal data
-      const { data: personalData } = await supabase
-        .from('employee_personal_data')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+        // Load existing personal data
+        const { data: personalData } = await supabase
+          .from('employee_personal_data')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-      if (personalData) {
-        setPersonalData(personalData);
+        if (personalData) {
+          setPersonalData(personalData);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -63,8 +71,8 @@ const Personaldaten: React.FC = () => {
     refreshData();
   };
 
-  // Show loading state while checking completion status
-  if (completion.loading) {
+  // Show skeleton while loading
+  if (loading || completion.loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
         <Header />
@@ -80,9 +88,7 @@ const Personaldaten: React.FC = () => {
                 Zurück
               </Button>
             </div>
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">Lade Personaldaten...</p>
-            </div>
+            <PersonalDataSkeleton />
           </div>
         </main>
       </div>

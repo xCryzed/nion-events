@@ -375,5 +375,13 @@
     }
   }
 
-  /* Remove calendar dropdown custom styling - back to default shadcn */
+  /* react-day-picker: hide visually-hidden labels */
+  .rdp-vhidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  .rdp-caption_label { display: none; }
+
+  /* Calendar selected day styling - use primary color instead of pink */
+  .rdp-day_selected, .rdp-day_selected:focus-visible, .rdp-day_selected:hover {
+    background-color: hsl(var(--primary)) !important;
+    color: hsl(var(--primary-foreground)) !important;
+  }
 }

@@ -22,7 +22,9 @@ import { toast } from '@/hooks/use-toast';
 import { PersonalDataStepper } from '@/components/PersonalDataStepper';
 import { cn } from '@/lib/utils';
 import SignatureCanvas from 'react-signature-canvas';
+import jsPDF from 'jspdf';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { generatePersonalDataPDFBlob, generatePersonalDataPDFFileName } from '@/utils/pdfGenerator';
 import { Info } from 'lucide-react';
 
 // Validation schemas and constants
@@ -471,6 +473,31 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
         });
     };
 
+    const hasFormChanges = (before: any | null, after: any): boolean => {
+        if (!before) return true;
+        const sortKeys = (obj: any): any => {
+            if (Array.isArray(obj)) return obj.map(sortKeys);
+            if (obj && typeof obj === 'object') {
+                const out: any = {};
+                Object.keys(obj)
+                  .filter((k) => obj[k] !== undefined)
+                  .sort()
+                  .forEach((k) => (out[k] = sortKeys(obj[k])));
+                return out;
+            }
+            return obj;
+        };
+        const sanitize = (o: any) => sortKeys({
+            ...o,
+            // Normalize date types to ISO strings for stable compare
+            date_of_birth: o.date_of_birth ? new Date(o.date_of_birth as any).toISOString().slice(0,10) : null,
+            start_date: o.start_date ? new Date(o.start_date as any).toISOString().slice(0,10) : null,
+        });
+        const a = JSON.stringify(sanitize(before));
+        const b = JSON.stringify(sanitize(after));
+        return a !== b;
+    };
+
     const onSubmit = async (data: PersonalDataFormData) => {
         setLoading(true);
 
@@ -519,13 +546,48 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
 
             if (error) throw error;
 
+            // PDF generieren und in Personalakte hochladen (nur bei Änderungen)
+            try {
+                const hasChanges = hasFormChanges(existingData, submitData);
+                
+                if (hasChanges) {
+                    const pdfBlob = generatePersonalDataPDFBlob(submitData);
+                    const fileName = generatePersonalDataPDFFileName(submitData);
+                    const filePath = `${user?.id}/${fileName}`;
+
+                    const { error: uploadError } = await supabase.storage
+                        .from('personalakten')
+                        .upload(filePath, pdfBlob, {
+                            cacheControl: '3600',
+                            upsert: true
+                        });
+
+                    if (uploadError) {
+                        console.warn('PDF upload failed:', uploadError);
+                        toast({
+                            title: 'Erfolg',
+                            description: 'Ihre Personaldaten wurden gespeichert, aber das PDF konnte nicht hochgeladen werden.',
+                        });
+                    } else {
+                        toast({
+                            title: 'Erfolg',
+                            description: 'Ihre Personaldaten wurden erfolgreich gespeichert und in die Personalakte hochgeladen.',
+                        });
+                    }
+                } else {
+                    toast({
+                        title: 'Gespeichert',
+                        description: 'Keine Änderungen erkannt. Ihre Daten sind auf dem neuesten Stand.',
+                    });
+                }
+            } catch (pdfError) {
+                console.warn('PDF generation failed:', pdfError);
+                toast({
+                    title: 'Erfolg',
+                    description: 'Ihre Personaldaten wurden gespeichert.',
+                });
+            }
             clearStorage();
-
-            toast({
-                title: 'Erfolg',
-                description: 'Ihre Personaldaten wurden erfolgreich gespeichert.',
-            });
-
             if (onComplete) {
                 onComplete();
             } else {
@@ -571,7 +633,7 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                   // Check if there are incomplete additional employments (partially filled forms that weren't submitted)
                   // We can't directly access the AdditionalEmploymentManager's internal state,
                   // so we assume if has_additional_employment is true, the employments array should have entries
-                  if (values.has_additional_employment && values.other_employment_details.length === 0) {
+                  if (values.has_additional_employment && (!values.other_employment_details || values.other_employment_details.length === 0)) {
                     // User indicated they have additional employment but haven't added any - this might be incomplete
                     // However, we'll allow it for now as additional employment is optional
                   }
@@ -698,10 +760,11 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                             type="button"
                             onClick={() => setShowAddForm(true)}
                             variant="outline"
-                            className="w-full"
+                            className="w-full px-3 py-2"
+                            size="sm"
                         >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Weitere Beschäftigung hinzufügen
+                            <Plus className="w-4 h-4 mr-2 flex-shrink-0" />
+                            <span className="truncate">Weitere Beschäftigung hinzufügen</span>
                         </Button>
                     </div>
                 )}
@@ -789,6 +852,9 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                                                 });
                                             }}
                                             locale={dayPickerLocale}
+                                            captionLayout="dropdown-buttons"
+                                            fromYear={1900}
+                                            toYear={new Date().getFullYear() + 10}
                                             initialFocus
                                             className={cn("p-3 pointer-events-auto")}
                                         />
@@ -823,6 +889,9 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                                                 });
                                             }}
                                             locale={dayPickerLocale}
+                                            captionLayout="dropdown-buttons"
+                                            fromYear={1900}
+                                            toYear={new Date().getFullYear() + 10}
                                             initialFocus
                                             className={cn("p-3 pointer-events-auto")}
                                         />
@@ -950,8 +1019,12 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                                             date > new Date() || date < new Date("1900-01-01")
                                         }
                                         locale={dayPickerLocale}
+                                        captionLayout="dropdown-buttons"
+                                        fromYear={1900}
+                                        toYear={new Date().getFullYear()}
+                                        defaultMonth={field.value || new Date(1990, 0)}
                                         initialFocus
-                                        className="pointer-events-auto"
+                                        showOutsideDays={false}
                                     />
                                 </PopoverContent>
                             </Popover>
@@ -1239,6 +1312,10 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                                             onSelect={field.onChange}
                                             disabled={(date) => date < new Date("1900-01-01")}
                                             locale={dayPickerLocale}
+                                            captionLayout="dropdown-buttons"
+                                            fromYear={1900}
+                                            toYear={new Date().getFullYear() + 10}
+                                            defaultMonth={field.value || new Date()}
                                             initialFocus
                                             className="pointer-events-auto"
                                         />
@@ -1281,7 +1358,7 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                                 <FormLabel>Status bei Beginn der Beschäftigung *</FormLabel>
                                 <FormControl>
                                     <div className="space-y-4">
-                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                        <div className="grid grid-cols-1 gap-3">
                                             {employmentCategories.map((category) => (
                                                 <div key={category} className="flex items-center space-x-2">
                                                     <Checkbox
@@ -1426,7 +1503,7 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                     name="tax_id"
                     render={({ field }) => (
                     <FormItem>
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 min-h-[1.25rem]">
                             <FormLabel>Steuer-ID *</FormLabel>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -1459,7 +1536,9 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                     name="tax_class_factor"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Steuerklasse *</FormLabel>
+                            <div className="flex items-center gap-2 min-h-[1.25rem]">
+                                <FormLabel>Steuerklasse *</FormLabel>
+                            </div>
                             <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
@@ -1486,7 +1565,7 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                     name="child_allowances"
                     render={({ field }) => (
                         <FormItem>
-                            <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center gap-2 min-h-[1.25rem]">
                                 <FormLabel>Kinderfreibeträge</FormLabel>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -1516,7 +1595,9 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                     name="religious_affiliation"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Konfession *</FormLabel>
+                            <div className="flex items-center gap-2 min-h-[1.25rem]">
+                                <FormLabel>Konfession *</FormLabel>
+                            </div>
                             <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
@@ -1543,7 +1624,9 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                     name="health_insurance_company"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Krankenkasse *</FormLabel>
+                            <div className="flex items-center gap-2 min-h-[1.25rem]">
+                                <FormLabel>Krankenkasse *</FormLabel>
+                            </div>
                             <FormControl>
                                 <Input placeholder="AOK, Barmer, etc." {...field} />
                             </FormControl>
@@ -1557,7 +1640,7 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
                     name="social_insurance_number"
                     render={({ field }) => (
                     <FormItem>
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 min-h-[1.25rem]">
                             <FormLabel>Sozialversicherungsnummer *</FormLabel>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -1700,34 +1783,36 @@ const signatureContainerRef = useRef<HTMLDivElement>(null);
             <Form {...form}>
                 <div className="min-h-screen bg-background">
                     <div className="container mx-auto px-4 py-8">
-                        <div className="flex items-center gap-4 mb-8">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onCancel ? onCancel() : navigate('/personaldaten')}
-                                className="flex items-center gap-2"
-                            >
-                                <ArrowLeft className="w-4 h-4" />
-                                Zurück
-                            </Button>
-                            <div className="flex items-center gap-2">
-                                <User className="w-6 h-6 text-primary" />
-                                <h1 className="text-2xl font-bold">
-                                    {hasExistingData ? 'Personaldaten bearbeiten' : 'Personaldaten erfassen'}
-                                </h1>
+                        <div className="max-w-4xl mx-auto">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-3">
+                                    <User className="w-6 h-6 text-primary" />
+                                    <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                                        {hasExistingData ? 'Personaldaten bearbeiten' : 'Personaldaten erfassen'}
+                                    </h1>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => onCancel ? onCancel() : navigate('/personaldaten')}
+                                    className="flex items-center gap-2 hover:bg-destructive hover:text-destructive-foreground"
+                                >
+                                    <X className="w-4 h-4" />
+                                    Abbrechen
+                                </Button>
                             </div>
-                        </div>
 
-                        <PersonalDataStepper
-                            steps={steps}
-                            currentStep={currentStep}
-                            onStepChange={handleStepChange}
-                            onNext={handleNext}
-                            onPrevious={handlePrevious}
-                            onComplete={handleComplete}
-                            isNextDisabled={!validateStep(currentStep)}
-                            isCompleting={loading}
-                        />
+                            <PersonalDataStepper
+                                steps={steps}
+                                currentStep={currentStep}
+                                onStepChange={handleStepChange}
+                                onNext={handleNext}
+                                onPrevious={handlePrevious}
+                                onComplete={handleComplete}
+                                isNextDisabled={!validateStep(currentStep)}
+                                isCompleting={loading}
+                            />
+                        </div>
                     </div>
                 </div>
             </Form>

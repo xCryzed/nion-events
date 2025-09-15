@@ -18,6 +18,7 @@ import {
   Calendar,
   MessageSquare,
   Users,
+  UserCheck,
   Settings,
   Home
 } from 'lucide-react';
@@ -27,6 +28,7 @@ interface AdminSidebarProps {
   contactRequestsCount: number;
   usersCount: number;
   internalEventsCount: number;
+  personnelCount: number;
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
@@ -36,6 +38,7 @@ export function AdminSidebar({
                                contactRequestsCount,
                                usersCount,
                                internalEventsCount,
+                               personnelCount,
                                activeTab,
                                onTabChange
                              }: AdminSidebarProps) {
@@ -72,6 +75,18 @@ export function AdminSidebar({
       title: 'Benutzer',
       icon: Users,
       count: usersCount
+    },
+    {
+      id: 'invitations',
+      title: 'Einladungen',
+      icon: Users,
+      count: null
+    },
+    {
+      id: 'personnel',
+      title: 'Personal',
+      icon: UserCheck,
+      count: personnelCount
     },
     {
       id: 'settings',

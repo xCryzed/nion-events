@@ -38,7 +38,7 @@ export const PersonalDataStepper: React.FC<PersonalDataStepperProps> = ({
   const isLastStep = currentStep === steps.length - 1;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       {/* Progress Bar */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-muted-foreground">
@@ -107,7 +107,7 @@ export const PersonalDataStepper: React.FC<PersonalDataStepperProps> = ({
             disabled={isNextDisabled || isCompleting}
             className="flex items-center gap-2"
           >
-            {isCompleting ? 'Speichere...' : 'Abschließen'}
+            {isCompleting ? 'Lade in Personalakte...' : 'In Personalakte hochladen'}
             <Check className="w-4 h-4" />
           </Button>
         ) : (

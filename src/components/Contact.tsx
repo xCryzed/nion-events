@@ -133,21 +133,42 @@ const Contact = () => {
                 };
 
                 // Send internal notification email
-                const internalEmailPromise = supabase.functions.invoke('send-contact-notification', {
+                const internalEmailResult = await supabase.functions.invoke('send-contact-notification', {
                     body: emailData
                 });
+
+                // Check for rate limiting on internal notification
+                if (internalEmailResult.error?.message?.includes('Rate limit exceeded') || 
+                    internalEmailResult.error?.status === 429) {
+                    console.warn('Rate limit reached for contact notifications');
+                    toast({
+                        title: "Anfrage gespeichert",
+                        description: "Ihre Anfrage wurde gespeichert, aber zu viele Anfragen wurden kürzlich gesendet. Wir melden uns trotzdem bei Ihnen.",
+                        variant: "default"
+                    });
+                    return;
+                }
 
                 // Send customer confirmation email
-                const customerEmailPromise = supabase.functions.invoke('send-customer-confirmation', {
+                const customerEmailPromise = await supabase.functions.invoke('send-customer-confirmation', {
                     body: emailData
                 });
-
-                // Wait for both emails to be sent
-                await Promise.all([internalEmailPromise, customerEmailPromise]);
 
                 console.log('Both email notifications sent successfully');
             } catch (emailError) {
                 console.error('Error sending email notifications:', emailError);
+                
+                // Check if it's a rate limiting error
+                if (emailError?.message?.includes('Rate limit exceeded') || 
+                    emailError?.status === 429) {
+                    toast({
+                        title: "Zu viele Anfragen",
+                        description: "Sie haben zu viele Anfragen in kurzer Zeit gesendet. Bitte versuchen Sie es in einer Stunde erneut.",
+                        variant: "destructive"
+                    });
+                    return;
+                }
+                
                 trackError(emailError instanceof Error ? emailError : 'Email notification failed', 'email_service', 'contact_form', {
                     form_data: { name: values.name, email: values.email }
                 });

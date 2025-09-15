@@ -131,6 +131,45 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invitation_token: string
+          invited_by: string
+          role: Database["public"]["Enums"]["app_role"]
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invitation_token?: string
+          invited_by: string
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invitation_token?: string
+          invited_by?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       employee_personal_data: {
         Row: {
           bic: string
@@ -454,6 +493,36 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limit_requests: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: unknown
+          request_count: number
+          request_type: string
+          updated_at: string
+          window_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address: unknown
+          request_count?: number
+          request_type: string
+          updated_at?: string
+          window_start?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          request_count?: number
+          request_type?: string
+          updated_at?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -487,9 +556,17 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      cleanup_expired_invitations: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       cleanup_old_personal_data: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      cleanup_rate_limit_records: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       generate_offer_number: {
         Args: Record<PropertyKey, never>

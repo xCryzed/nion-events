@@ -2,9 +2,16 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 // @ts-expect-error - npm imports are valid in Deno runtime
 import { Resend } from "npm:resend@2.0.0";
+// @ts-expect-error - Supabase imports are valid in Deno runtime
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // @ts-expect-error - Deno global is available in Deno runtime
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+// @ts-expect-error - Deno global is available in Deno runtime
+const supabaseUrl = Deno.env.get('SUPABASE_URL');
+// @ts-expect-error - Deno global is available in Deno runtime
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
@@ -33,6 +40,86 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     try {
+        // Get client IP address
+        const clientIP = req.headers.get('x-forwarded-for') || 
+                        req.headers.get('x-real-ip') || 
+                        '127.0.0.1';
+
+        console.log("Processing contact request from IP:", clientIP);
+
+        // Check rate limiting - max 3 requests per hour for contact form
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        
+        // Get existing rate limit record
+        const { data: existingRecords, error: selectError } = await supabase
+            .from('rate_limit_requests')
+            .select('*')
+            .eq('ip_address', clientIP)
+            .eq('request_type', 'contact')
+            .gte('window_start', oneHourAgo)
+            .order('window_start', { ascending: false })
+            .limit(1);
+
+        if (selectError) {
+            console.error("Error checking rate limit:", selectError);
+        }
+
+        let currentCount = 0;
+        let recordId: string | null = null;
+
+        if (existingRecords && existingRecords.length > 0) {
+            const record = existingRecords[0];
+            currentCount = record.request_count;
+            recordId = record.id;
+            
+            // Check if rate limit exceeded
+            if (currentCount >= 3) {
+                console.log(`Rate limit exceeded for IP ${clientIP}: ${currentCount} requests in the last hour`);
+                return new Response(
+                    JSON.stringify({ 
+                        error: "Rate limit exceeded", 
+                        message: "Zu viele Anfragen. Bitte versuchen Sie es in einer Stunde erneut.",
+                        nextAllowedTime: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+                    }), 
+                    {
+                        status: 429,
+                        headers: { 
+                            "Content-Type": "application/json", 
+                            "Retry-After": "3600",
+                            ...corsHeaders 
+                        },
+                    }
+                );
+            }
+        }
+
+        // Update or create rate limit record
+        if (recordId) {
+            // Update existing record
+            const { error: updateError } = await supabase
+                .from('rate_limit_requests')
+                .update({ request_count: currentCount + 1, updated_at: new Date().toISOString() })
+                .eq('id', recordId);
+                
+            if (updateError) {
+                console.error("Error updating rate limit:", updateError);
+            }
+        } else {
+            // Create new record
+            const { error: insertError } = await supabase
+                .from('rate_limit_requests')
+                .insert({
+                    ip_address: clientIP,
+                    request_type: 'contact',
+                    request_count: 1,
+                    window_start: new Date().toISOString()
+                });
+                
+            if (insertError) {
+                console.error("Error creating rate limit record:", insertError);
+            }
+        }
+
         const contactRequest: ContactRequest = await req.json();
 
         console.log("Processing contact request:", contactRequest);

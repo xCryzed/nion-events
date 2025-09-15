@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { trackError } from '@/hooks/use-google-analytics';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { formatDistanceToNow, format } from 'date-fns';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { format, formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import {
     Mail,
@@ -32,7 +35,9 @@ import {
     Save,
     Phone,
     Info,
-    HelpCircle
+    HelpCircle,
+    Search,
+    Filter
 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
@@ -65,9 +70,13 @@ interface EventRequest {
 
 const EventRequestsTable = () => {
     const [eventRequests, setEventRequests] = useState<EventRequest[]>([]);
+    const [filteredRequests, setFilteredRequests] = useState<EventRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
     const [updatingStatus, setUpdatingStatus] = useState<Set<string>>(new Set());
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState<string>('all');
+    const isMobile = useIsMobile();
     const { toast } = useToast();
 
     const fetchEventRequests = async () => {
@@ -102,6 +111,22 @@ const EventRequestsTable = () => {
     useEffect(() => {
         fetchEventRequests();
     }, []);
+
+    useEffect(() => {
+        let filtered = eventRequests;
+        if (searchTerm) {
+            filtered = filtered.filter((req) =>
+                req.event_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                req.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                req.contact_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                req.offer_number.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+        if (statusFilter !== 'all') {
+            filtered = filtered.filter((req) => req.status === statusFilter);
+        }
+        setFilteredRequests(filtered);
+    }, [eventRequests, searchTerm, statusFilter]);
 
     const toggleExpanded = (id: string) => {
         const newExpanded = new Set(expandedItems);
@@ -225,215 +250,219 @@ const EventRequestsTable = () => {
         return labels[tech] || tech;
     };
 
+    const formatDate = (dateString: string) => {
+        try {
+            return format(new Date(dateString), 'dd.MM.yyyy', { locale: de });
+        } catch {
+            return '-';
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center p-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <Loader2 className="h-8 w-8 animate-spin" />
             </div>
         );
     }
 
-    if (eventRequests.length === 0) {
-        return (
+    return (
+        <div className="space-y-6">
             <Card>
-                <CardContent className="p-8 text-center">
-                    <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Noch keine Angebotsanfragen vorhanden.</p>
+                <CardContent className="p-6">
+                    <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                        <div className="flex-1">
+                            <div className="relative">
+                                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Angebotsanfragen durchsuchen..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-8"
+                                />
+                            </div>
+                        </div>
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                            <SelectTrigger className="w-full sm:w-[200px]">
+                                <Filter className="h-4 w-4 mr-2" />
+                                <SelectValue placeholder="Status filtern" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-popover border shadow-lg z-50">
+                                <SelectItem value="all">Alle Status</SelectItem>
+                                <SelectItem value="ANGEFRAGT">Angefragt</SelectItem>
+                                <SelectItem value="IN_BEARBEITUNG">In Bearbeitung</SelectItem>
+                                <SelectItem value="RÜCKFRAGEN_OFFEN">Rückfragen offen</SelectItem>
+                                <SelectItem value="ABGESCHLOSSEN">Abgeschlossen</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {isMobile ? (
+                        <div className="space-y-4">
+                            {filteredRequests.length === 0 && (
+                                <div className="text-center py-8 text-muted-foreground">
+                                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                                    <p>Keine Angebotsanfragen gefunden.</p>
+                                </div>
+                            )}
+                            {filteredRequests.map((request) => (
+                                <Card key={request.id} className="hover:shadow-lg transition-shadow">
+                                    <Collapsible
+                                        open={expandedItems.has(request.id)}
+                                        onOpenChange={() => toggleExpanded(request.id)}
+                                    >
+                                        <CardContent className="p-4 space-y-3">
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <Badge variant="outline" className="font-mono">{request.offer_number}</Badge>
+                                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium border flex items-center gap-1 ${getStatusColor(request.status)}`}>
+                                                            {getStatusIcon(request.status)}
+                                                            <span>{request.status.replace('_', ' ')}</span>
+                                                        </span>
+                                                    </div>
+                                                    <div className="font-medium truncate">{request.event_title}</div>
+                                                    <div className="text-xs text-muted-foreground flex flex-wrap gap-3 mt-1">
+                                                        <span className="flex items-center gap-1">
+                                                            <Calendar className="h-3 w-3" />
+                                                            {formatDate(request.event_date)}
+                                                            {request.end_date && ` - ${formatDate(request.end_date)}`}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                            <MapPin className="h-3 w-3" />
+                                                            {request.location}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                            <Clock className="h-3 w-3" />
+                                                            {formatDistanceToNow(new Date(request.created_at), { addSuffix: true, locale: de })}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-col items-end gap-2">
+                                                    <Select
+                                                        value={request.status}
+                                                        onValueChange={(value: 'ANGEFRAGT' | 'IN_BEARBEITUNG' | 'ABGESCHLOSSEN' | 'RÜCKFRAGEN_OFFEN') => updateStatus(request.id, value)}
+                                                        disabled={updatingStatus.has(request.id)}
+                                                    >
+                                                        <SelectTrigger className="w-40">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="bg-popover border shadow-lg z-50">
+                                                            <SelectItem value="ANGEFRAGT">Angefragt</SelectItem>
+                                                            <SelectItem value="IN_BEARBEITUNG">In Bearbeitung</SelectItem>
+                                                            <SelectItem value="RÜCKFRAGEN_OFFEN">Rückfragen offen</SelectItem>
+                                                            <SelectItem value="ABGESCHLOSSEN">Abgeschlossen</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <CollapsibleTrigger asChild>
+                                                        <Button variant="ghost" size="sm">
+                                                            {expandedItems.has(request.id) ? (
+                                                                <>
+                                                                    <ChevronUp className="h-4 w-4 mr-2" />
+                                                                    Weniger
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <ChevronDown className="h-4 w-4 mr-2" />
+                                                                    Details
+                                                                </>
+                                                            )}
+                                                        </Button>
+                                                    </CollapsibleTrigger>
+                                                </div>
+                                            </div>
+
+                                            <CollapsibleContent>
+                                                <div className="pt-3 border-t mt-3">
+                                                    <div className="text-xs text-muted-foreground">
+                                                        Kontakt: {request.contact_name} · {request.contact_email}
+                                                    </div>
+                                                </div>
+                                            </CollapsibleContent>
+                                        </CardContent>
+                                    </Collapsible>
+                                </Card>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="rounded-md border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Vorgang</TableHead>
+                                        <TableHead>Titel</TableHead>
+                                        <TableHead>Datum</TableHead>
+                                        <TableHead>Ort</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Kontakt</TableHead>
+                                        <TableHead className="text-right">Aktion</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {filteredRequests.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                                <div className="flex flex-col items-center">
+                                                    <FileText className="h-12 w-12 mb-2 opacity-50" />
+                                                    Keine Angebotsanfragen gefunden.
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        filteredRequests.map((request) => (
+                                            <TableRow key={request.id} className="hover:bg-muted/50">
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant="outline" className="font-mono">{request.offer_number}</Badge>
+                                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium border flex items-center gap-1 ${getStatusColor(request.status)}`}>
+                                                            {getStatusIcon(request.status)}
+                                                            <span>{request.status.replace('_', ' ')}</span>
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="max-w-[320px] truncate">{request.event_title}</TableCell>
+                                                <TableCell>
+                                                    {formatDate(request.event_date)}
+                                                    {request.end_date && ` - ${formatDate(request.end_date)}`}
+                                                </TableCell>
+                                                <TableCell>{request.location}</TableCell>
+                                                <TableCell>
+                                                    <Select
+                                                        value={request.status}
+                                                        onValueChange={(value: 'ANGEFRAGT' | 'IN_BEARBEITUNG' | 'ABGESCHLOSSEN' | 'RÜCKFRAGEN_OFFEN') => updateStatus(request.id, value)}
+                                                        disabled={updatingStatus.has(request.id)}
+                                                    >
+                                                        <SelectTrigger className="w-44">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="bg-popover border shadow-lg z-50">
+                                                            <SelectItem value="ANGEFRAGT">Angefragt</SelectItem>
+                                                            <SelectItem value="IN_BEARBEITUNG">In Bearbeitung</SelectItem>
+                                                            <SelectItem value="RÜCKFRAGEN_OFFEN">Rückfragen offen</SelectItem>
+                                                            <SelectItem value="ABGESCHLOSSEN">Abgeschlossen</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="text-sm">
+                                                        <div className="font-medium">{request.contact_name}</div>
+                                                        <div className="text-xs text-muted-foreground">{request.contact_email}</div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {formatDistanceToNow(new Date(request.created_at), { addSuffix: true, locale: de })}
+                                                    </span>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
-        );
-    }
-
-    return (
-        <div className="grid gap-6">
-            {eventRequests.map((request) => (
-                <Card key={request.id} className="hover:shadow-lg transition-shadow">
-                    <Collapsible
-                        open={expandedItems.has(request.id)}
-                        onOpenChange={() => toggleExpanded(request.id)}
-                    >
-                        <CardHeader>
-                            <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <Badge variant="outline" className="font-mono">
-                                            {request.offer_number}
-                                        </Badge>
-                                        <Badge variant="secondary">
-                                            {request.guest_count === 'Noch nicht bekannt' ? request.guest_count : `${request.guest_count} Gäste`}
-                                        </Badge>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium border flex items-center space-x-1 ${getStatusColor(request.status)}`}>
-                                            {getStatusIcon(request.status)}
-                                            <span>{request.status.replace('_', ' ')}</span>
-                                        </span>
-                                    </div>
-                                    <CardTitle className="text-lg">{request.event_title}</CardTitle>
-                                    <CardDescription className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2">
-                                        <div className="flex items-center gap-1">
-                                            <Calendar className="h-4 w-4" />
-                                            <span className="text-sm">
-                                                {format(new Date(request.event_date), 'dd.MM.yyyy', { locale: de })}
-                                                {request.end_date && (
-                                                    <span> - {format(new Date(request.end_date), 'dd.MM.yyyy', { locale: de })}</span>
-                                                )}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <MapPin className="h-4 w-4" />
-                                            <span className="text-sm truncate">{request.location}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <Clock className="h-4 w-4" />
-                                            <span className="text-sm">{formatDistanceToNow(new Date(request.created_at), { addSuffix: true, locale: de })}</span>
-                                        </div>
-                                    </CardDescription>
-                                </div>
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                                    <Select
-                                        value={request.status}
-                                        onValueChange={(value: 'ANGEFRAGT' | 'IN_BEARBEITUNG' | 'ABGESCHLOSSEN' | 'RÜCKFRAGEN_OFFEN') => updateStatus(request.id, value)}
-                                        disabled={updatingStatus.has(request.id)}
-                                    >
-                                        <SelectTrigger className="w-full sm:w-40">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="ANGEFRAGT">Angefragt</SelectItem>
-                                            <SelectItem value="IN_BEARBEITUNG">In Bearbeitung</SelectItem>
-                                            <SelectItem value="RÜCKFRAGEN_OFFEN">Rückfragen offen</SelectItem>
-                                            <SelectItem value="ABGESCHLOSSEN">Abgeschlossen</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <CollapsibleTrigger asChild>
-                                        <Button variant="ghost" size="sm" className="w-full sm:w-auto">
-                                            {expandedItems.has(request.id) ? (
-                                                <>
-                                                    <ChevronUp className="h-4 w-4 mr-2" />
-                                                    <span className="sm:hidden">Weniger anzeigen</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <ChevronDown className="h-4 w-4 mr-2" />
-                                                    <span className="sm:hidden">Details anzeigen</span>
-                                                </>
-                                            )}
-                                        </Button>
-                                    </CollapsibleTrigger>
-                                </div>
-                            </div>
-                        </CardHeader>
-
-                        <CollapsibleContent>
-                            <CardContent className="pt-0 space-y-6">
-                                {/* Kontaktinformationen */}
-                                <div>
-                                    <h4 className="font-semibold mb-3">Kontaktinformationen</h4>
-                                    <div className="grid md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <div className="flex items-center gap-2 text-sm">
-                                                <Mail className="h-4 w-4 text-muted-foreground" />
-                                                <a href={`mailto:${request.contact_email}`} className="text-primary hover:underline">
-                                                    {request.contact_email}
-                                                </a>
-                                            </div>
-                                            {request.contact_phone && (
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <Phone className="h-4 w-4 text-muted-foreground" />
-                                                    <a href={`tel:${request.contact_phone}`} className="text-primary hover:underline">
-                                                        {request.contact_phone}
-                                                    </a>
-                                                </div>
-                                            )}
-                                            <div className="text-sm">
-                                                <strong>{request.contact_name}</strong>
-                                            </div>
-                                            {request.contact_company && (
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <Building className="h-4 w-4 text-muted-foreground" />
-                                                    {request.contact_company}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="text-sm text-muted-foreground">
-                                            <div>{request.contact_street} {request.contact_house_number}</div>
-                                            <div>{request.contact_postal_code} {request.contact_city}</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Veranstaltungstechnik */}
-                                <div>
-                                    <h4 className="font-semibold mb-3">Gewünschte Technik</h4>
-                                    <div className="flex flex-wrap gap-2">
-                                        {request.tech_requirements.map((tech) => (
-                                            <Badge key={tech} variant="outline" className="flex items-center gap-1">
-                                                {getTechIcon(tech)}
-                                                {getTechLabel(tech)}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* DJ & Service */}
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    {request.dj_genres.length > 0 && (
-                                        <div>
-                                            <h4 className="font-semibold mb-3 flex items-center gap-2">
-                                                <Music className="h-4 w-4" />
-                                                DJ Genres
-                                            </h4>
-                                            <div className="flex flex-wrap gap-1">
-                                                {request.dj_genres.map((genre) => (
-                                                    <Badge key={genre} variant="secondary" className="text-xs">
-                                                        {genre}
-                                                    </Badge>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <div>
-                                        <h4 className="font-semibold mb-3">Zusätzliche Services</h4>
-                                        <div className="space-y-2">
-                                            {request.photographer && (
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <Camera className="h-4 w-4 text-primary" />
-                                                    Fotograf
-                                                </div>
-                                            )}
-                                            {request.videographer && (
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <Video className="h-4 w-4 text-primary" />
-                                                    Videograf
-                                                </div>
-                                            )}
-                                            {request.light_operator && (
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <Lightbulb className="h-4 w-4 text-primary" />
-                                                    Lichtoperator
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Zusatzwünsche */}
-                                {request.additional_wishes && (
-                                    <div>
-                                        <h4 className="font-semibold mb-3 flex items-center gap-2">
-                                            <MessageSquare className="h-4 w-4" />
-                                            Zusatzwünsche
-                                        </h4>
-                                        <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-md">
-                                            {request.additional_wishes}
-                                        </p>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </CollapsibleContent>
-                    </Collapsible>
-                </Card>
-            ))}
         </div>
     );
 };
