@@ -158,7 +158,7 @@ const Auth = () => {
                 .eq('invitation_token', invitationToken)
                 .eq('email', formData.email)
                 .eq('status', 'pending')
-                .single();
+                .maybeSingle();
 
             if (invitationError || !invitation) {
                 throw new Error('Einladung nicht gefunden oder bereits verwendet');
