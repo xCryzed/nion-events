@@ -102,7 +102,7 @@ const Personaldaten: React.FC = () => {
   // Show stepper if no data exists or user explicitly requested to edit
   if (!completion.hasData || showStepper) {
     // Import PersonaldatenStepper component dynamically to avoid circular imports
-    const PersonaldatenStepper = React.lazy(() => import('./PersonaldatenStepper').then(module => ({ default: module.default })));
+    const PersonaldatenStepper = React.lazy(() => import('./PersonaldatenStepper'));
     
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">

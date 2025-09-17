@@ -9,6 +9,7 @@ import { trackEvent } from '@/hooks/use-google-analytics';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { useToast } from '@/components/ui/use-toast';
+import { clearFormData } from '@/utils/localStorage';
 import nionLogo from '@/assets/nion-logo-white.svg';
 
 const Header = () => {
@@ -135,6 +136,9 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
+      // Clear all form data from localStorage before logout
+      clearFormData();
+      
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Logout error:', error);
@@ -151,6 +155,10 @@ const Header = () => {
           title: "Erfolgreich abgemeldet",
           description: "Sie wurden erfolgreich abgemeldet.",
         });
+        // Redirect to homepage after successful logout
+        setTimeout(() => {
+          navigate('/');
+        }, 1000);
       }
     } catch (error) {
       console.error('Logout error:', error);

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { usePersonalDataCompletion } from '@/hooks/use-personal-data-completion';
+import { useToast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 
 interface PersonalDataGuardProps {
@@ -11,6 +12,7 @@ interface PersonalDataGuardProps {
 export const PersonalDataGuard: React.FC<PersonalDataGuardProps> = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { toast } = useToast();
     const [user, setUser] = useState<any>(null);
     const [userRole, setUserRole] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -47,6 +49,11 @@ export const PersonalDataGuard: React.FC<PersonalDataGuardProps> = ({ children }
 
         // Only redirect employees who haven't completed their personal data
         if (user && userRole === 'employee' && !isComplete) {
+            toast({
+                title: "Personaldaten erforderlich",
+                description: "Bitte vervollständigen Sie Ihre Personaldaten, bevor Sie auf andere Bereiche zugreifen können.",
+                variant: "default"
+            });
             navigate('/personaldaten', { replace: true });
         }
     }, [user, userRole, isComplete, loading, completionLoading, location.pathname, navigate]);

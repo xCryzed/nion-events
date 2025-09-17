@@ -53,7 +53,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Create registration URL with invitation token
     // @ts-expect-error - Deno global is available in Deno runtime
     const siteUrl = Deno.env.get('SITE_URL') || 'https://nion-events.de';
-    const registrationUrl = `${siteUrl}/auth?invitation=${invitation.invitation_token}`;
+    const registrationUrl = `${siteUrl}/anmelden?email=${encodeURIComponent(email)}&token=${encodeURIComponent(invitation.invitation_token)}`;
     const emailPreviewUrl = `${siteUrl}/email-preview/${invitation.invitation_token}`;
 
     // Create HTML email template matching the design
