@@ -131,7 +131,7 @@ serve(async (req) => {
       // @ts-expect-error - Deno env in runtime
       Deno.env.get("PUBLIC_SITE_URL") ||
       "https://nion-events.de";
-    const registrationUrl = `${origin}/auth?email=${encodeURIComponent(
+    const registrationUrl = `${origin}/anmelden?email=${encodeURIComponent(
       email,
     )}&token=${encodeURIComponent(invitation.invitation_token)}`;
 

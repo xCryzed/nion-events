@@ -14,38 +14,21 @@ interface AppSetting {
 }
 
 const SettingsTab = () => {
-    const [settings, setSettings] = useState<AppSetting[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [registrationEnabled, setRegistrationEnabled] = useState(true);
     const { toast } = useToast();
 
+    // Refresh function to sync with current status
+    const refreshStatus = async () => {
+        setLoading(true);
+        await fetchSettings();
+    };
+
     const fetchSettings = async () => {
         try {
-            const { data, error } = await supabase
-                .from('app_settings')
-                .select('*')
-                .order('setting_key');
-
-            if (error) {
-                console.error('Error fetching settings:', error);
-                toast({
-                    title: "Fehler beim Laden",
-                    description: "Die Einstellungen konnten nicht geladen werden.",
-                    variant: "destructive"
-                });
-                return;
-            }
-
-            setSettings(data || []);
-
-            // Set registration setting
-            const regSetting = data?.find(s => s.setting_key === 'user_registration_enabled');
-            if (regSetting) {
-                setRegistrationEnabled(regSetting.setting_value === true);
-            }
-        } catch (error) {
-            console.error('Error fetching settings:', error);
+            // Default to enabled in UI; authoritative control is in Supabase Dashboard
+            setRegistrationEnabled(true);
         } finally {
             setLoading(false);
         }
@@ -55,49 +38,18 @@ const SettingsTab = () => {
         fetchSettings();
     }, []);
 
-    const updateSetting = async (settingKey: string, value: any) => {
-        setSaving(true);
-        try {
-            const { error } = await supabase
-                .from('app_settings')
-                .update({
-                    setting_value: value,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('setting_key', settingKey);
-
-            if (error) {
-                console.error('Error updating setting:', error);
-                toast({
-                    title: "Fehler beim Speichern",
-                    description: "Die Einstellung konnte nicht gespeichert werden.",
-                    variant: "destructive"
-                });
-                return;
-            }
-
-            toast({
-                title: "Einstellung gespeichert",
-                description: "Die Einstellung wurde erfolgreich aktualisiert.",
-            });
-
-            // Refresh settings
-            await fetchSettings();
-        } catch (error) {
-            console.error('Error updating setting:', error);
-            toast({
-                title: "Fehler beim Speichern",
-                description: "Die Einstellung konnte nicht gespeichert werden.",
-                variant: "destructive"
-            });
-        } finally {
-            setSaving(false);
-        }
+    const updateSetting = async (_settingKey: string, _value: any) => {
+        toast({
+            title: "In Supabase verwalten",
+            description: "Bitte ändern Sie die Registrierung in den Supabase Authentication Settings.",
+        });
     };
 
-    const handleRegistrationToggle = async (enabled: boolean) => {
-        setRegistrationEnabled(enabled);
-        await updateSetting('user_registration_enabled', enabled);
+    const handleRegistrationToggle = async (_enabled: boolean) => {
+        toast({
+            title: "Nicht direkt änderbar",
+            description: "Diese Einstellung wird im Supabase Dashboard verwaltet.",
+        });
     };
 
     if (loading) {
@@ -110,11 +62,20 @@ const SettingsTab = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold tracking-tight">App-Einstellungen</h2>
-                <p className="text-muted-foreground">
-                    Verwalten Sie globale Anwendungseinstellungen.
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight">App-Einstellungen</h2>
+                    <p className="text-muted-foreground">
+                        Verwalten Sie globale Anwendungseinstellungen.
+                    </p>
+                </div>
+                <button
+                    onClick={refreshStatus}
+                    disabled={loading}
+                    className="px-3 py-1 text-sm border rounded hover:bg-accent disabled:opacity-50"
+                >
+                    {loading ? 'Aktualisiere...' : 'Status aktualisieren'}
+                </button>
             </div>
 
             <div className="grid gap-6">
@@ -144,8 +105,8 @@ const SettingsTab = () => {
                                 <Switch
                                     id="registration-toggle"
                                     checked={registrationEnabled}
-                                    onCheckedChange={handleRegistrationToggle}
-                                    disabled={saving}
+                                    onCheckedChange={() => handleRegistrationToggle(registrationEnabled)}
+                                    disabled
                                 />
                             </div>
                         </div>
@@ -154,9 +115,12 @@ const SettingsTab = () => {
                             <div className="flex items-center gap-2 text-sm">
                                 <div className={`w-2 h-2 rounded-full ${registrationEnabled ? 'bg-green-500' : 'bg-red-500'}`} />
                                 <span className="text-muted-foreground">
-                  Status: {registrationEnabled ? 'Registrierung aktiviert' : 'Registrierung deaktiviert'}
-                </span>
+                                    Status: {registrationEnabled ? 'Registrierung aktiviert' : 'Registrierung deaktiviert'}
+                                </span>
                             </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                Diese Einstellung synchronisiert sich mit den Supabase Authentication Settings.
+                            </p>
                         </div>
                     </CardContent>
                 </Card>

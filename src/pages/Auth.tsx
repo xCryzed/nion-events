@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { trackError } from '@/hooks/use-google-analytics';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useRegistrationStatus } from '@/hooks/use-registration-status';
 import { User, Session } from '@supabase/supabase-js';
 
@@ -25,10 +25,25 @@ const Auth = () => {
         lastName: ''
     });
     const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { toast } = useToast();
     const { isRegistrationEnabled, loading: registrationLoading } = useRegistrationStatus();
+    
+    // Extract invitation token and email from URL
+    const invitationToken = searchParams.get('token');
+    const invitationEmail = searchParams.get('email');
 
+
+    useEffect(() => {
+        // Pre-fill email if invitation email is provided
+        if (invitationEmail) {
+            setFormData(prev => ({ 
+                ...prev, 
+                email: invitationEmail 
+            }));
+        }
+    }, [invitationEmail]);
 
     useEffect(() => {
         // Set up auth state listener FIRST
@@ -91,17 +106,75 @@ const Auth = () => {
         setPasswordErrors(validatePassword(password));
     };
 
-    const handleSignUp = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!isRegistrationEnabled) {
+    const handleEmployeeInvitation = async () => {
+        if (!invitationToken || !formData.email) {
             toast({
-                title: "Registrierung deaktiviert",
-                description: "Die Registrierung neuer Benutzer ist derzeit deaktiviert.",
+                title: "Fehler",
+                description: "Ungültiger Einladungslink.",
                 variant: "destructive"
             });
             return;
         }
+
+        setLoading(true);
+
+        try {
+            // Verify invitation exists and is valid (security check)
+            const { data: invitation, error: invitationError } = await supabase
+                .from('employee_invitations')
+                .select('*')
+                .eq('invitation_token', invitationToken)
+                .eq('email', formData.email)
+                .eq('status', 'pending')
+                .single();
+
+            if (invitationError || !invitation) {
+                throw new Error('Einladung nicht gefunden oder bereits verwendet');
+            }
+
+            // Check if invitation is expired
+            if (new Date(invitation.expires_at) < new Date()) {
+                throw new Error('Einladung ist abgelaufen');
+            }
+
+            // Create user account - the database trigger will automatically:
+            // 1. Set the user role based on the invitation
+            // 2. Mark the invitation as accepted
+            // 3. Create the profile
+            const { error: signUpError } = await supabase.auth.signUp({
+                email: formData.email,
+                password: formData.password,
+                options: {
+                    emailRedirectTo: `${window.location.origin}/`,
+                    data: {
+                        first_name: formData.firstName,
+                        last_name: formData.lastName
+                    }
+                }
+            });
+
+            if (signUpError) {
+                throw signUpError;
+            }
+
+            toast({
+                title: "Registrierung erfolgreich",
+                description: "Ihr Mitarbeiterkonto wurde erstellt. Bitte überprüfen Sie Ihre E-Mails zur Bestätigung.",
+            });
+        } catch (error: any) {
+            console.error('Employee invitation error:', error);
+            toast({
+                title: "Fehler bei der Registrierung",
+                description: error.message || "Ein unbekannter Fehler ist aufgetreten.",
+                variant: "destructive"
+            });
+        }
+
+        setLoading(false);
+    };
+
+    const handleSignUp = async (e: React.FormEvent) => {
+        e.preventDefault();
 
         if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) {
             toast({
@@ -117,6 +190,22 @@ const Auth = () => {
             toast({
                 title: "Passwort-Anforderungen nicht erfüllt",
                 description: passwordValidationErrors.join(", "),
+                variant: "destructive"
+            });
+            return;
+        }
+
+        // If there's an invitation token, handle employee invitation
+        if (invitationToken) {
+            await handleEmployeeInvitation();
+            return;
+        }
+
+        // Regular signup flow
+        if (!isRegistrationEnabled) {
+            toast({
+                title: "Registrierung deaktiviert",
+                description: "Die Registrierung neuer Benutzer ist derzeit deaktiviert.",
                 variant: "destructive"
             });
             return;
@@ -244,20 +333,14 @@ const Auth = () => {
                         </div>
                         <CardTitle className="text-2xl font-bold">NION Events</CardTitle>
                         <CardDescription>
-                            Melden Sie sich an oder erstellen Sie ein neues Konto
+                            {invitationToken ? "Vervollständigen Sie Ihre Mitarbeiter-Registrierung" : "Melden Sie sich an oder erstellen Sie ein neues Konto"}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Tabs defaultValue="signin" className="w-full">
+                        <Tabs defaultValue={invitationToken ? "signup" : "signin"} className="w-full">
                             <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="signin">Anmelden</TabsTrigger>
-                                <TabsTrigger
-                                    value="signup"
-                                    disabled={!isRegistrationEnabled || registrationLoading}
-                                    className={!isRegistrationEnabled ? "opacity-50 cursor-not-allowed" : ""}
-                                >
-                                    Registrieren
-                                </TabsTrigger>
+                                <TabsTrigger value="signin" disabled={!!invitationToken}>Anmelden</TabsTrigger>
+                                <TabsTrigger value="signup">{invitationToken ? "Registrierung abschließen" : "Registrieren"}</TabsTrigger>
                             </TabsList>
 
                             <TabsContent value="signin" className="space-y-4 mt-6">
@@ -308,7 +391,7 @@ const Auth = () => {
                             </TabsContent>
 
                             <TabsContent value="signup" className="space-y-4 mt-6">
-                                {!isRegistrationEnabled ? (
+                                {!isRegistrationEnabled && !invitationToken ? (
                                     <div className="text-center py-8">
                                         <p className="text-muted-foreground">
                                             Die Registrierung neuer Benutzer ist derzeit deaktiviert.
@@ -352,6 +435,7 @@ const Auth = () => {
                                                 placeholder="ihre@email.de"
                                                 value={formData.email}
                                                 onChange={handleInputChange}
+                                                disabled={!!invitationToken}
                                                 required
                                             />
                                         </div>
@@ -407,8 +491,8 @@ const Auth = () => {
                                                 )}
                                             </div>
                                         </div>
-                                        <Button type="submit" className="w-full btn-hero" disabled={loading || !isRegistrationEnabled}>
-                                            {loading ? "Registrieren..." : "Registrieren"}
+                                        <Button type="submit" className="w-full btn-hero" disabled={loading || passwordErrors.length > 0}>
+                                            {loading ? (invitationToken ? "Registrierung wird abgeschlossen..." : "Registrierung läuft...") : (invitationToken ? "Registrierung abschließen" : "Registrieren")}
                                         </Button>
                                     </form>
                                 )}
