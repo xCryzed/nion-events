@@ -155,10 +155,6 @@ const Header = () => {
           title: "Erfolgreich abgemeldet",
           description: "Sie wurden erfolgreich abgemeldet.",
         });
-        // Redirect to homepage after successful logout
-        setTimeout(() => {
-          navigate('/');
-        }, 1000);
       }
     } catch (error) {
       console.error('Logout error:', error);
