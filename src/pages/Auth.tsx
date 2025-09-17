@@ -52,14 +52,29 @@ const Auth = () => {
     }, [invitationEmail]);
 
     useEffect(() => {
-        // Set up auth state listener FIRST
+        // Set up auth state listener FIRST - this handles automatic login after email confirmation
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (event, session) => {
+            async (event, session) => {
+                console.log('Auth state change:', event, session?.user?.email);
                 setSession(session);
                 setUser(session?.user ?? null);
 
-                // If there's an invitation token and user is authenticated, sign them out
-                if (session?.user && invitationToken) {
+                // If user just signed in and has invitation token, redirect to complete setup
+                if (event === 'SIGNED_IN' && session?.user && invitationToken) {
+                    console.log('User signed in with invitation, redirecting to home');
+                    toast({
+                        title: "Erfolgreich eingeloggt",
+                        description: "Willkommen bei NION Events! Ihr Account wurde erfolgreich erstellt.",
+                    });
+                    // Redirect after short delay to allow toast to show
+                    setTimeout(() => {
+                        navigate('/');
+                    }, 1500);
+                    return;
+                }
+
+                // If there's an invitation token and user is authenticated (but not from signin), sign them out
+                if (session?.user && invitationToken && event !== 'SIGNED_IN') {
                     setTimeout(async () => {
                         await supabase.auth.signOut();
                         toast({
@@ -189,6 +204,14 @@ const Auth = () => {
                 throw signUpError;
             }
 
+            // Clear form data on successful invitation signup
+            setFormData({
+                email: '',
+                password: '',
+                firstName: '',
+                lastName: ''
+            });
+            
             toast({
                 title: "Registrierung erfolgreich",
                 description: "Ihr Mitarbeiterkonto wurde erstellt. Bitte überprüfen Sie Ihre E-Mails zur Bestätigung.",

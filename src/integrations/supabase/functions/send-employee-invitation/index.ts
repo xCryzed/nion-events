@@ -53,7 +53,8 @@ const handler = async (req: Request): Promise<Response> => {
     // Create registration URL with invitation token
     // @ts-expect-error - Deno global is available in Deno runtime
     const siteUrl = Deno.env.get('SITE_URL') || 'https://nion-events.de';
-    const registrationUrl = `${supabaseUrl}/auth/v1/signup?redirect_to=${encodeURIComponent(`${siteUrl}/auth?invitation=${invitation.invitation_token}`)}`;
+    const registrationUrl = `${siteUrl}/auth?invitation=${invitation.invitation_token}`;
+    const emailPreviewUrl = `${siteUrl}/email-preview/${invitation.invitation_token}`;
 
     // Create HTML email template matching the design
     const htmlContent = `
@@ -293,6 +294,14 @@ const handler = async (req: Request): Promise<Response> => {
                 <strong>Wichtiger Hinweis:</strong> Diese Einladung ist 7 Tage gültig. 
                 Bitte registrieren Sie sich zeitnah, um Ihren Zugang nicht zu verlieren.
             </div>
+        </div>
+        
+        <div style="text-align: center; padding: 20px; border-top: 1px solid rgba(102, 126, 234, 0.1);">
+            <p style="font-size: 12px; color: #999; margin: 0;">
+                <a href="${emailPreviewUrl}" style="color: #667eea; text-decoration: none;">
+                    📧 Diese E-Mail im Browser anzeigen
+                </a>
+            </p>
         </div>
         
         <div class="footer">

@@ -348,6 +348,14 @@ const EmailPreview = () => {
             </div>
         </div>
         
+        <div style="text-align: center; padding: 20px; border-top: 1px solid rgba(102, 126, 234, 0.1);">
+            <p style="font-size: 12px; color: #999; margin: 0;">
+                <a href="${window.location.href}" style="color: #667eea; text-decoration: none;">
+                    📧 Diese E-Mail im Browser anzeigen
+                </a>
+            </p>
+        </div>
+        
         <div class="footer">
             <div class="footer-text">
                 Sie haben Fragen? Kontaktieren Sie uns gerne!
