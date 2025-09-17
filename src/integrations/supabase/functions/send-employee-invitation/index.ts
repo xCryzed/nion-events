@@ -36,16 +36,19 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Processing employee invitation for:", email);
 
     // Get the invitation token from the database
-    const { data: invitation, error: invitationError } = await supabase
+    const { data, error: invitationError } = await supabase
       .from('employee_invitations')
       .select('invitation_token')
       .eq('email', email)
       .eq('status', 'pending')
-      .single();
+      .order('created_at', { ascending: false })
+      .limit(1);
 
-    if (invitationError || !invitation) {
+    if (invitationError || !data || data.length === 0) {
       throw new Error('Invitation not found');
     }
+
+    const invitation = data[0];
 
     // Create registration URL with invitation token
     // @ts-expect-error - Deno global is available in Deno runtime

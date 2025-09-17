@@ -28,7 +28,7 @@ export const PersonalDataGuard: React.FC<PersonalDataGuardProps> = ({ children }
                     .from('user_roles')
                     .select('role')
                     .eq('user_id', user.id)
-                    .single();
+                    .maybeSingle();
 
                 setUserRole(roleData?.role || null);
             }

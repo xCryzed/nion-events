@@ -103,7 +103,7 @@ const Header = () => {
           .select('role')
           .eq('user_id', userId)
           .eq('role', 'administrator')
-          .single();
+          .maybeSingle();
 
       setIsAdmin(!error && !!data);
     } catch (error) {

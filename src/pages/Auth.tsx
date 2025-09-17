@@ -152,17 +152,20 @@ const Auth = () => {
 
         try {
             // Verify invitation exists and is valid (security check)
-            const { data: invitation, error: invitationError } = await supabase
+            const { data: invitations, error: invitationError } = await supabase
                 .from('employee_invitations')
                 .select('*')
                 .eq('invitation_token', invitationToken)
                 .eq('email', formData.email)
                 .eq('status', 'pending')
-                .maybeSingle();
+                .order('created_at', { ascending: false })
+                .limit(1);
 
-            if (invitationError || !invitation) {
+            if (invitationError || !invitations || invitations.length === 0) {
                 throw new Error('Einladung nicht gefunden oder bereits verwendet');
             }
+
+            const invitation = invitations[0];
 
             // Check if invitation is expired
             if (new Date(invitation.expires_at) < new Date()) {

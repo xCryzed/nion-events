@@ -89,7 +89,7 @@ const Administration = () => {
                 .from('user_roles')
                 .select('role')
                 .eq('user_id', userId)
-                .single();
+                .maybeSingle();
 
             if (error) {
                 console.error('Error checking admin role:', error);

@@ -29,12 +29,13 @@ const EmailPreview = () => {
           .from('employee_invitations')
           .select('*')
           .eq('invitation_token', token)
-          .single();
+          .order('created_at', { ascending: false })
+          .limit(1);
 
-        if (error || !data) {
+        if (error || !data || data.length === 0) {
           setError('Einladung nicht gefunden');
         } else {
-          setInvitation(data);
+          setInvitation(data[0]);
         }
       } catch (error: any) {
         setError('Fehler beim Laden der Einladung');
