@@ -33,6 +33,10 @@ const MeineAnfragen = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    document.title = 'Meine Anfragen - DJ Aachen & Eventtechnik | NION Events Kundenbereich';
+  }, []);
+
+  useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {

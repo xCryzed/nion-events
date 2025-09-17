@@ -2,7 +2,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Download, Calendar, Users, Award, Image, Eye, ExternalLink, Music, Star, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import nionPortrait from '@/assets/artists/nion-portrait.jpg';
 import deePortrait from '@/assets/artists/dee-portrait.jpg';
@@ -11,6 +11,10 @@ import deeLive from '@/assets/artists/dee-live.jpg';
 
 const Presse = () => {
   const [selectedArtist, setSelectedArtist] = useState('NION');
+
+  useEffect(() => {
+    document.title = 'Presse - DJ Aachen & Eventtechnik | NION Events';
+  }, []);
 
   const artists = {
     NION: {

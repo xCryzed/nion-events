@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
@@ -11,6 +12,9 @@ import Team from "@/components/Team.tsx";
 import FAQ from '@/components/FAQ';
 
 const Index = () => {
+  useEffect(() => {
+    document.title = 'DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events';
+  }, []);
   return (
     <div className="min-h-screen">
       <Header />

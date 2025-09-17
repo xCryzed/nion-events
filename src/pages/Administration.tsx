@@ -21,6 +21,10 @@ import { Menu, Shield, AlertTriangle, Loader2 } from 'lucide-react';
 
 const Administration = () => {
     const [session, setSession] = useState<Session | null>(null);
+    
+    useEffect(() => {
+        document.title = 'Administration - DJ Aachen & Eventtechnik | NION Events Mitarbeiterbereich';
+    }, []);
     const [counts, setCounts] = useState({
         contactRequests: 0,
         eventRequests: 0,

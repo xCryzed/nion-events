@@ -1,7 +1,11 @@
+import { useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 const Impressum = () => {
+  useEffect(() => {
+    document.title = 'Impressum - DJ Aachen & Eventtechnik | NION Events';
+  }, []);
   return (
       <div className="min-h-screen">
         <Header />

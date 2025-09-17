@@ -20,6 +20,7 @@ import MeineAngebote from "./pages/MeineAngebote";
 import MeineAnfragen from "./pages/MeineAnfragen";
 import AnstehendeEvents from "./pages/AnstehendeEvents";
 import Personaldaten from "./pages/Personaldaten";
+import EmailPreview from "./pages/EmailPreview";
 import { PersonalDataGuard } from "./components/PersonalDataGuard";
 
 const queryClient = new QueryClient();
@@ -78,6 +79,7 @@ const AppContent = () => {
             <Route path="/datenschutz" element={<Datenschutz />} />
             <Route path="/agb" element={<AGB />} />
             <Route path="/anmelden" element={<Auth />} />
+            <Route path="/email-preview/:token" element={<EmailPreview />} />
             <Route path="/personaldaten" element={<Personaldaten />} />
             <Route path="/meine-angebote" element={<PersonalDataGuard><MeineAngebote /></PersonalDataGuard>} />
             <Route path="/meine-anfragen" element={<PersonalDataGuard><MeineAnfragen /></PersonalDataGuard>} />

@@ -1,9 +1,13 @@
+import { useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { trackEvent } from '@/hooks/use-google-analytics';
 import { Calendar, Users, MapPin, Music } from 'lucide-react';
 
 const Portfolio = () => {
+  useEffect(() => {
+    document.title = 'Portfolio - DJ Aachen & Eventtechnik | NION Events';
+  }, []);
   const events = [
     {
       id: 1,

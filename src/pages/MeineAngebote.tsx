@@ -35,6 +35,10 @@ const MeineAngebote = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    document.title = 'Meine Angebote - DJ Aachen & Eventtechnik | NION Events Kundenbereich';
+  }, []);
+
+  useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {

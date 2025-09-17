@@ -34,8 +34,14 @@ const Auth = () => {
     const invitationToken = searchParams.get('token');
     const invitationEmail = searchParams.get('email');
 
+    useEffect(() => {
+        document.title = 'Anmelden - DJ Aachen & Eventtechnik | NION Events Kundenbereich';
+    }, []);
+
 
     useEffect(() => {
+        document.title = 'Anmelden - DJ Aachen & Eventtechnik | NION Events Kundenbereich';
+        
         // Pre-fill email if invitation email is provided
         if (invitationEmail) {
             setFormData(prev => ({ 
@@ -52,8 +58,21 @@ const Auth = () => {
                 setSession(session);
                 setUser(session?.user ?? null);
 
-                // Redirect to home if user is authenticated
-                if (session?.user) {
+                // If there's an invitation token and user is authenticated, sign them out
+                if (session?.user && invitationToken) {
+                    setTimeout(async () => {
+                        await supabase.auth.signOut();
+                        toast({
+                            title: "Automatisch abgemeldet",
+                            description: "Sie wurden abgemeldet, damit Sie sich mit Ihrem neuen Mitarbeiterkonto registrieren können.",
+                            variant: "default"
+                        });
+                    }, 0);
+                    return;
+                }
+
+                // Redirect to home if user is authenticated (and no invitation token)
+                if (session?.user && !invitationToken) {
                     navigate('/');
                 }
             }
@@ -64,14 +83,27 @@ const Auth = () => {
             setSession(session);
             setUser(session?.user ?? null);
 
-            // Redirect to home if already authenticated
-            if (session?.user) {
+            // If there's an invitation token and user is authenticated, sign them out
+            if (session?.user && invitationToken) {
+                setTimeout(async () => {
+                    await supabase.auth.signOut();
+                    toast({
+                        title: "Automatisch abgemeldet",
+                        description: "Sie wurden abgemeldet, damit Sie sich mit Ihrem neuen Mitarbeiterkonto registrieren können.",
+                        variant: "default"
+                    });
+                }, 0);
+                return;
+            }
+
+            // Redirect to home if already authenticated (and no invitation token)
+            if (session?.user && !invitationToken) {
                 navigate('/');
             }
         });
 
         return () => subscription.unsubscribe();
-    }, [navigate]);
+    }, [navigate, invitationToken, toast]);
 
     const validatePassword = (password: string): string[] => {
         const errors: string[] = [];
@@ -340,7 +372,7 @@ const Auth = () => {
                         <Tabs defaultValue={invitationToken ? "signup" : "signin"} className="w-full">
                             <TabsList className="grid w-full grid-cols-2">
                                 <TabsTrigger value="signin" disabled={!!invitationToken}>Anmelden</TabsTrigger>
-                                <TabsTrigger value="signup">{invitationToken ? "Registrierung abschließen" : "Registrieren"}</TabsTrigger>
+                                <TabsTrigger value="signup">{invitationToken ? "Registrierung" : "Registrieren"}</TabsTrigger>
                             </TabsList>
 
                             <TabsContent value="signin" className="space-y-4 mt-6">

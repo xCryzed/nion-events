@@ -64,6 +64,10 @@ const AnstehendeEvents = () => {
     const [userRegistrations, setUserRegistrations] = useState<EventRegistration[]>([]);
     const [showEventDialog, setShowEventDialog] = useState(false);
 
+    useEffect(() => {
+        document.title = 'Anstehende Events - DJ Aachen & Eventtechnik | NION Events Mitarbeiterbereich';
+    }, []);
+
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const eventsPerPage = 5;

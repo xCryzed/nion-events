@@ -108,6 +108,10 @@ const steps = [
 
 const Angebot = () => {
     const [currentStep, setCurrentStep] = useState(1);
+    
+    useEffect(() => {
+        document.title = 'Angebot anfordern - DJ Aachen & Eventtechnik | NION Events';
+    }, []);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [timeLeft, setTimeLeft] = useState(24 * 60 * 60); // 24 Stunden in Sekunden

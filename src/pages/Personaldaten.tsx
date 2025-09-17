@@ -19,6 +19,10 @@ const Personaldaten: React.FC = () => {
   const completion = usePersonalDataCompletion(user?.id);
 
   useEffect(() => {
+    document.title = 'Personaldaten - DJ Aachen & Eventtechnik | NION Events Mitarbeiterbereich';
+  }, []);
+
+  useEffect(() => {
     const getUser = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
