@@ -25,17 +25,23 @@ const EmailPreview = () => {
       }
 
       try {
-        const { data, error } = await supabase
-          .from('employee_invitations')
-          .select('*')
-          .eq('invitation_token', token)
-          .order('created_at', { ascending: false })
-          .limit(1);
+        // Use secure Edge Function to verify invitation
+        const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-invitation', {
+          body: {
+            token: token,
+            // For email preview, we don't have email yet, so edge function will handle token-only lookup
+            email: null
+          }
+        });
 
-        if (error || !data || data.length === 0) {
+        if (verifyError || !verifyData?.valid) {
           setError('Einladung nicht gefunden');
         } else {
-          setInvitation(data[0]);
+          // Create a minimal invitation object for the email preview
+          setInvitation({
+            email: verifyData.email,
+            invitation_token: token
+          });
         }
       } catch (error: any) {
         setError('Fehler beim Laden der Einladung');

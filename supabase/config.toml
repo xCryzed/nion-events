@@ -11,3 +11,7 @@ verify_jwt = true
 
 [functions.registration-status]
 verify_jwt = false
+
+[functions.verify-invitation]
+verify_jwt = false
+

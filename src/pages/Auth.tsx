@@ -151,26 +151,23 @@ const Auth = () => {
         setLoading(true);
 
         try {
-            // Verify invitation exists and is valid (security check)
-            const { data: invitations, error: invitationError } = await supabase
-                .from('employee_invitations')
-                .select('*')
-                .eq('invitation_token', invitationToken)
-                .eq('email', formData.email)
-                .eq('status', 'pending')
-                .order('created_at', { ascending: false })
-                .limit(1);
+            // Verify invitation using secure Edge Function (bypasses RLS)
+            const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-invitation', {
+                body: {
+                    token: invitationToken,
+                    email: formData.email,
+                }
+            });
 
-            if (invitationError || !invitations || invitations.length === 0) {
-                throw new Error('Einladung nicht gefunden oder bereits verwendet');
+            if (verifyError) {
+                throw new Error(verifyError.message || 'Einladung nicht gefunden oder bereits verwendet');
             }
 
-            const invitation = invitations[0];
-
-            // Check if invitation is expired
-            if (new Date(invitation.expires_at) < new Date()) {
-                throw new Error('Einladung ist abgelaufen');
+            // Pre-fill email if provided by verification
+            if (verifyData?.email && !formData.email) {
+                setFormData(prev => ({ ...prev, email: verifyData.email }));
             }
+
 
             // Create user account - the database trigger will automatically:
             // 1. Set the user role based on the invitation
