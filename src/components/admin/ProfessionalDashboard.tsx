@@ -1,22 +1,22 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   BarChart,
   Bar,
@@ -30,7 +30,7 @@ import {
   PieChart,
   Pie,
   Cell,
-} from 'recharts';
+} from "recharts";
 import {
   TrendingUp,
   TrendingDown,
@@ -44,10 +44,10 @@ import {
   RefreshCw,
   Download,
   Filter,
-} from 'lucide-react';
-import { format, subDays, parseISO } from 'date-fns';
-import { de } from 'date-fns/locale';
-import packageJson from '../../../package.json';
+} from "lucide-react";
+import { format, subDays, parseISO } from "date-fns";
+import { de } from "date-fns/locale";
+import packageJson from "../../../package.json";
 
 interface DashboardStats {
   totalUsers: number;
@@ -64,7 +64,11 @@ interface DashboardStats {
 
 interface ActivityItem {
   id: string;
-  type: 'user_registered' | 'event_created' | 'contact_received' | 'invitation_sent';
+  type:
+    | "user_registered"
+    | "event_created"
+    | "contact_received"
+    | "invitation_sent";
   description: string;
   timestamp: string;
   user?: string;
@@ -80,7 +84,7 @@ interface ChartData {
 const ProfessionalDashboard = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [timeFilter, setTimeFilter] = useState('7d');
+  const [timeFilter, setTimeFilter] = useState("7d");
   const [refreshing, setRefreshing] = useState(false);
   const { toast } = useToast();
 
@@ -91,7 +95,7 @@ const ProfessionalDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Get basic counts
       const [
         { count: totalUsers },
@@ -99,58 +103,79 @@ const ProfessionalDashboard = () => {
         { count: totalContacts },
         { count: pendingInvitations },
         { count: completedPersonalData },
-        { count: totalPersonnel }
+        { count: totalPersonnel },
       ] = await Promise.all([
-        supabase.from('user_roles').select('*', { count: 'exact', head: true }),
-        supabase.from('event_requests').select('*', { count: 'exact', head: true }),
-        supabase.from('contact_requests').select('*', { count: 'exact', head: true }),
-        supabase.from('employee_invitations').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-        supabase.from('employee_personal_data').select('*', { count: 'exact', head: true }).eq('is_complete', true),
-        supabase.from('user_roles').select('*', { count: 'exact', head: true }).in('role', ['administrator', 'employee'])
+        supabase.from("user_roles").select("*", { count: "exact", head: true }),
+        supabase
+          .from("event_requests")
+          .select("*", { count: "exact", head: true }),
+        supabase
+          .from("contact_requests")
+          .select("*", { count: "exact", head: true }),
+        supabase
+          .from("employee_invitations")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "pending"),
+        supabase
+          .from("employee_personal_data")
+          .select("*", { count: "exact", head: true })
+          .eq("is_complete", true),
+        supabase
+          .from("user_roles")
+          .select("*", { count: "exact", head: true })
+          .in("role", ["administrator", "employee"]),
       ]);
 
       // Get recent activity (simulated for now)
       const recentActivity: ActivityItem[] = [
         {
-          id: '1',
-          type: 'contact_received',
-          description: 'Neue Kontaktanfrage eingegangen',
+          id: "1",
+          type: "contact_received",
+          description: "Neue Kontaktanfrage eingegangen",
           timestamp: new Date().toISOString(),
         },
         {
-          id: '2',
-          type: 'user_registered',
-          description: 'Neuer Benutzer registriert',
+          id: "2",
+          type: "user_registered",
+          description: "Neuer Benutzer registriert",
           timestamp: subDays(new Date(), 1).toISOString(),
         },
         {
-          id: '3',
-          type: 'event_created',
-          description: 'Event-Anfrage erstellt',
+          id: "3",
+          type: "event_created",
+          description: "Event-Anfrage erstellt",
           timestamp: subDays(new Date(), 2).toISOString(),
         },
       ];
 
       // Get events by month (last 6 months)
       const eventsByMonth: ChartData[] = [
-        { name: 'Jul', value: 12 },
-        { name: 'Aug', value: 19 },
-        { name: 'Sep', value: 15 },
-        { name: 'Okt', value: 8 },
-        { name: 'Nov', value: 22 },
-        { name: 'Dez', value: 16 },
+        { name: "Jul", value: 12 },
+        { name: "Aug", value: 19 },
+        { name: "Sep", value: 15 },
+        { name: "Okt", value: 8 },
+        { name: "Nov", value: 22 },
+        { name: "Dez", value: 16 },
       ];
 
       // Get contacts by status
       const contactsByStatus: ChartData[] = [
-        { name: 'Eingegangen', value: totalContacts || 0, color: '#8884d8' },
-        { name: 'Bearbeitet', value: Math.floor((totalContacts || 0) * 0.7), color: '#82ca9d' },
-        { name: 'Abgeschlossen', value: Math.floor((totalContacts || 0) * 0.3), color: '#ffc658' },
+        { name: "Eingegangen", value: totalContacts || 0, color: "#8884d8" },
+        {
+          name: "Bearbeitet",
+          value: Math.floor((totalContacts || 0) * 0.7),
+          color: "#82ca9d",
+        },
+        {
+          name: "Abgeschlossen",
+          value: Math.floor((totalContacts || 0) * 0.3),
+          color: "#ffc658",
+        },
       ];
 
       // User growth (last 30 days)
       const userGrowth: ChartData[] = Array.from({ length: 7 }, (_, i) => ({
-        name: format(subDays(new Date(), 6 - i), 'dd.MM'),
+        name: format(subDays(new Date(), 6 - i), "dd.MM"),
         value: Math.floor(Math.random() * 5) + 1,
       }));
 
@@ -167,11 +192,11 @@ const ProfessionalDashboard = () => {
         userGrowth,
       });
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error("Error fetching dashboard data:", error);
       toast({
-        title: 'Fehler',
-        description: 'Dashboard-Daten konnten nicht geladen werden.',
-        variant: 'destructive',
+        title: "Fehler",
+        description: "Dashboard-Daten konnten nicht geladen werden.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -183,20 +208,20 @@ const ProfessionalDashboard = () => {
     await fetchDashboardData();
     setRefreshing(false);
     toast({
-      title: 'Aktualisiert',
-      description: 'Dashboard-Daten wurden erfolgreich aktualisiert.',
+      title: "Aktualisiert",
+      description: "Dashboard-Daten wurden erfolgreich aktualisiert.",
     });
   };
 
-  const getActivityIcon = (type: ActivityItem['type']) => {
+  const getActivityIcon = (type: ActivityItem["type"]) => {
     switch (type) {
-      case 'user_registered':
+      case "user_registered":
         return <Users className="h-4 w-4 text-blue-500" />;
-      case 'event_created':
+      case "event_created":
         return <Calendar className="h-4 w-4 text-green-500" />;
-      case 'contact_received':
+      case "contact_received":
         return <Mail className="h-4 w-4 text-orange-500" />;
-      case 'invitation_sent':
+      case "invitation_sent":
         return <UserCheck className="h-4 w-4 text-purple-500" />;
       default:
         return <Activity className="h-4 w-4 text-gray-500" />;
@@ -240,7 +265,9 @@ const ProfessionalDashboard = () => {
             onClick={handleRefresh}
             disabled={refreshing}
           >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+            />
           </Button>
         </div>
       </div>
@@ -249,7 +276,9 @@ const ProfessionalDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Gesamte Benutzer</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Gesamte Benutzer
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -263,7 +292,9 @@ const ProfessionalDashboard = () => {
 
         <Card className="hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Event-Anfragen</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Event-Anfragen
+            </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -277,7 +308,9 @@ const ProfessionalDashboard = () => {
 
         <Card className="hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kontaktanfragen</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Kontaktanfragen
+            </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -310,7 +343,9 @@ const ProfessionalDashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle>Benutzer-Wachstum</CardTitle>
-            <CardDescription>Neue Registrierungen in den letzten 7 Tagen</CardDescription>
+            <CardDescription>
+              Neue Registrierungen in den letzten 7 Tagen
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -319,7 +354,12 @@ const ProfessionalDashboard = () => {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" strokeWidth={2} />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#8884d8"
+                  strokeWidth={2}
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -354,12 +394,21 @@ const ProfessionalDashboard = () => {
           <CardContent>
             <div className="space-y-4">
               {stats?.recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
+                <div
+                  key={activity.id}
+                  className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50"
+                >
                   {getActivityIcon(activity.type)}
                   <div className="flex-1">
-                    <p className="text-sm font-medium">{activity.description}</p>
+                    <p className="text-sm font-medium">
+                      {activity.description}
+                    </p>
                     <p className="text-xs text-muted-foreground">
-                      {format(parseISO(activity.timestamp), 'dd.MM.yyyy HH:mm', { locale: de })}
+                      {format(
+                        parseISO(activity.timestamp),
+                        "dd.MM.yyyy HH:mm",
+                        { locale: de },
+                      )}
                     </p>
                   </div>
                 </div>
@@ -390,10 +439,12 @@ const ProfessionalDashboard = () => {
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Letzte Aktualisierung</span>
+              <span className="text-sm text-muted-foreground">
+                Letzte Aktualisierung
+              </span>
               <div className="flex items-center">
                 <Clock className="h-3 w-3 mr-1" />
-                <span className="text-xs">{format(new Date(), 'HH:mm')}</span>
+                <span className="text-xs">{format(new Date(), "HH:mm")}</span>
               </div>
             </div>
             <Button variant="outline" size="sm" className="w-full">

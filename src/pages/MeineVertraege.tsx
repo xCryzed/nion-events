@@ -1,13 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { FileText, Download, Calendar, Euro, Clock, CheckCircle, Signature } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
-import { WorkContractDialog } from '@/components/WorkContractDialog';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  FileText,
+  Download,
+  Calendar,
+  Euro,
+  Clock,
+  CheckCircle,
+  Signature,
+} from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { de } from "date-fns/locale";
+import { WorkContractDialog } from "@/components/WorkContractDialog";
 
 interface WorkContract {
   id: string;
@@ -45,7 +53,8 @@ const MeineVertraege = () => {
   const [contracts, setContracts] = useState<WorkContract[]>([]);
   const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedRegistration, setSelectedRegistration] = useState<EventRegistration | null>(null);
+  const [selectedRegistration, setSelectedRegistration] =
+    useState<EventRegistration | null>(null);
   const [showContractDialog, setShowContractDialog] = useState(false);
   const [user, setUser] = useState<any>(null);
 
@@ -54,7 +63,9 @@ const MeineVertraege = () => {
   }, []);
 
   const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (user) {
       setUser(user);
       fetchContracts(user.id);
@@ -65,22 +76,24 @@ const MeineVertraege = () => {
   const fetchContracts = async (userId: string) => {
     try {
       const { data, error } = await supabase
-        .from('work_contracts')
-        .select(`
+        .from("work_contracts")
+        .select(
+          `
           *,
           internal_events (title)
-        `)
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+        `,
+        )
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setContracts(data || []);
     } catch (error) {
-      console.error('Error fetching contracts:', error);
+      console.error("Error fetching contracts:", error);
       toast({
-        title: 'Fehler',
-        description: 'Fehler beim Laden der Arbeitsverträge.',
-        variant: 'destructive',
+        title: "Fehler",
+        description: "Fehler beim Laden der Arbeitsverträge.",
+        variant: "destructive",
       });
     }
   };
@@ -88,8 +101,9 @@ const MeineVertraege = () => {
   const fetchRegistrations = async (userId: string) => {
     try {
       const { data, error } = await supabase
-        .from('event_registrations')
-        .select(`
+        .from("event_registrations")
+        .select(
+          `
           *,
           internal_events (
             id,
@@ -98,29 +112,32 @@ const MeineVertraege = () => {
             end_date,
             contract_required
           )
-        `)
-        .eq('user_id', userId)
-        .eq('status', 'bestätigt')
-        .order('created_at', { ascending: false });
+        `,
+        )
+        .eq("user_id", userId)
+        .eq("status", "bestätigt")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
-      
+
       // Filter only registrations that require contracts but don't have them yet
-      const contractRequiredRegistrations = (data || []).filter(reg => 
-        reg.internal_events?.contract_required && 
-        !contracts.some(contract => 
-          contract.event_id === reg.event_id && 
-          contract.staff_category === reg.staff_category
-        )
+      const contractRequiredRegistrations = (data || []).filter(
+        (reg) =>
+          reg.internal_events?.contract_required &&
+          !contracts.some(
+            (contract) =>
+              contract.event_id === reg.event_id &&
+              contract.staff_category === reg.staff_category,
+          ),
       );
-      
+
       setRegistrations(contractRequiredRegistrations);
     } catch (error) {
-      console.error('Error fetching registrations:', error);
+      console.error("Error fetching registrations:", error);
       toast({
-        title: 'Fehler',
-        description: 'Fehler beim Laden der Event-Anmeldungen.',
-        variant: 'destructive',
+        title: "Fehler",
+        description: "Fehler beim Laden der Event-Anmeldungen.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -136,26 +153,38 @@ const MeineVertraege = () => {
     try {
       // Implementation would generate PDF from contract data
       toast({
-        title: 'PDF Export',
-        description: 'Arbeitsvertrag wird als PDF exportiert...',
+        title: "PDF Export",
+        description: "Arbeitsvertrag wird als PDF exportiert...",
       });
     } catch (error) {
-      console.error('Error exporting contract PDF:', error);
+      console.error("Error exporting contract PDF:", error);
       toast({
-        title: 'Fehler beim PDF Export',
-        description: 'Bitte versuchen Sie es erneut.',
-        variant: 'destructive',
+        title: "Fehler beim PDF Export",
+        description: "Bitte versuchen Sie es erneut.",
+        variant: "destructive",
       });
     }
   };
 
   const getContractStatus = (contract: WorkContract) => {
     if (contract.signed_by_employee && contract.signed_by_employer) {
-      return { status: 'Vollständig unterzeichnet', color: 'bg-green-500', icon: CheckCircle };
+      return {
+        status: "Vollständig unterzeichnet",
+        color: "bg-green-500",
+        icon: CheckCircle,
+      };
     } else if (contract.signed_by_employee) {
-      return { status: 'Wartet auf Arbeitgeber', color: 'bg-yellow-500', icon: Clock };
+      return {
+        status: "Wartet auf Arbeitgeber",
+        color: "bg-yellow-500",
+        icon: Clock,
+      };
     } else {
-      return { status: 'Wartet auf Unterschrift', color: 'bg-red-500', icon: Signature };
+      return {
+        status: "Wartet auf Unterschrift",
+        color: "bg-red-500",
+        icon: Signature,
+      };
     }
   };
 
@@ -174,7 +203,8 @@ const MeineVertraege = () => {
       <div>
         <h1 className="text-3xl font-bold">Meine Arbeitsverträge</h1>
         <p className="text-muted-foreground mt-2">
-          Verwalten Sie Ihre Arbeitsverträge und unterschreiben Sie neue Verträge für Events.
+          Verwalten Sie Ihre Arbeitsverträge und unterschreiben Sie neue
+          Verträge für Events.
         </p>
       </div>
 
@@ -194,15 +224,20 @@ const MeineVertraege = () => {
                 className="flex justify-between items-center p-4 border rounded-lg"
               >
                 <div>
-                  <h3 className="font-medium">{registration.internal_events?.title}</h3>
+                  <h3 className="font-medium">
+                    {registration.internal_events?.title}
+                  </h3>
                   <p className="text-sm text-muted-foreground">
                     Position: {registration.staff_category}
                   </p>
                   <p className="text-sm text-muted-foreground flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    {registration.internal_events?.event_date && 
-                      format(new Date(registration.internal_events.event_date), 'dd.MM.yyyy', { locale: de })
-                    }
+                    {registration.internal_events?.event_date &&
+                      format(
+                        new Date(registration.internal_events.event_date),
+                        "dd.MM.yyyy",
+                        { locale: de },
+                      )}
                   </p>
                 </div>
                 <Button onClick={() => handleCreateContract(registration)}>
@@ -233,7 +268,7 @@ const MeineVertraege = () => {
               {contracts.map((contract) => {
                 const statusInfo = getContractStatus(contract);
                 const StatusIcon = statusInfo.icon;
-                
+
                 return (
                   <div
                     key={contract.id}
@@ -246,7 +281,7 @@ const MeineVertraege = () => {
                           {contract.internal_events?.title}
                         </p>
                       </div>
-                      
+
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Euro className="h-4 w-4" />
@@ -254,8 +289,13 @@ const MeineVertraege = () => {
                         </span>
                         <span className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
-                          {format(new Date(contract.start_date), 'dd.MM.yyyy', { locale: de })} - 
-                          {format(new Date(contract.end_date), 'dd.MM.yyyy', { locale: de })}
+                          {format(new Date(contract.start_date), "dd.MM.yyyy", {
+                            locale: de,
+                          })}{" "}
+                          -
+                          {format(new Date(contract.end_date), "dd.MM.yyyy", {
+                            locale: de,
+                          })}
                         </span>
                       </div>
 
@@ -298,11 +338,17 @@ const MeineVertraege = () => {
             }
           }}
           eventId={selectedRegistration.event_id}
-          eventTitle={selectedRegistration.internal_events?.title || ''}
-          eventStartDate={selectedRegistration.internal_events?.event_date || ''}
-          eventEndDate={selectedRegistration.internal_events?.end_date || selectedRegistration.internal_events?.event_date || ''}
+          eventTitle={selectedRegistration.internal_events?.title || ""}
+          eventStartDate={
+            selectedRegistration.internal_events?.event_date || ""
+          }
+          eventEndDate={
+            selectedRegistration.internal_events?.end_date ||
+            selectedRegistration.internal_events?.event_date ||
+            ""
+          }
           staffCategory={selectedRegistration.staff_category}
-          userId={user?.id || ''}
+          userId={user?.id || ""}
           userName=""
         />
       )}

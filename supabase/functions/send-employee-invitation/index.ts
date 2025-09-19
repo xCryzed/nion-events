@@ -65,7 +65,10 @@ serve(async (req) => {
         payload = JSON.parse(raw);
         console.log("send-employee-invitation: parsed JSON body");
       } catch (e) {
-        console.warn("send-employee-invitation: JSON parse failed, trying urlencoded", e);
+        console.warn(
+          "send-employee-invitation: JSON parse failed, trying urlencoded",
+          e,
+        );
         // Try urlencoded
         try {
           const params = new URLSearchParams(raw);
@@ -84,9 +87,12 @@ serve(async (req) => {
     // Fallback: query params
     if (!payload || !payload.email) {
       const url = new URL(req.url);
-      const email = payload?.email || url.searchParams.get("email") || undefined;
+      const email =
+        payload?.email || url.searchParams.get("email") || undefined;
       const inviterName =
-        payload?.inviterName || url.searchParams.get("inviterName") || undefined;
+        payload?.inviterName ||
+        url.searchParams.get("inviterName") ||
+        undefined;
       payload = { email, inviterName };
       console.log("send-employee-invitation: using query params fallback");
     }
@@ -109,10 +115,7 @@ serve(async (req) => {
 
     if (invitationError || !invitation) {
       console.error("Invitation lookup failed", invitationError);
-      return json(
-        { error: "No valid invitation found for this email" },
-        404,
-      );
+      return json({ error: "No valid invitation found for this email" }, 404);
     }
 
     // Validate status and expiry
@@ -134,7 +137,7 @@ serve(async (req) => {
     const registrationUrl = `${origin}/anmelden?email=${encodeURIComponent(
       email,
     )}&token=${encodeURIComponent(invitation.invitation_token)}`;
-    
+
     // Build email preview URL
     const emailPreviewUrl = `${origin}/email-preview/${encodeURIComponent(invitation.invitation_token)}`;
 

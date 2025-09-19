@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const EmailPreview = () => {
   const { token } = useParams<{ token: string }>();
@@ -11,40 +11,41 @@ const EmailPreview = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    document.title = 'Registrierung - DJ Aachen & Eventtechnik | NION Events';
+    document.title = "Registrierung - DJ Aachen & Eventtechnik | NION Events";
   }, []);
 
   useEffect(() => {
-    document.title = 'Registrierung - DJ Aachen & Eventtechnik | NION Events';
-    
+    document.title = "Registrierung - DJ Aachen & Eventtechnik | NION Events";
+
     const fetchInvitation = async () => {
       if (!token) {
-        setError('Kein gültiger Token');
+        setError("Kein gültiger Token");
         setLoading(false);
         return;
       }
 
       try {
         // Use secure Edge Function to verify invitation
-        const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-invitation', {
-          body: {
-            token: token,
-            // For email preview, we don't have email yet, so edge function will handle token-only lookup
-            email: null
-          }
-        });
+        const { data: verifyData, error: verifyError } =
+          await supabase.functions.invoke("verify-invitation", {
+            body: {
+              token: token,
+              // For email preview, we don't have email yet, so edge function will handle token-only lookup
+              email: null,
+            },
+          });
 
         if (verifyError || !verifyData?.valid) {
-          setError('Einladung nicht gefunden');
+          setError("Einladung nicht gefunden");
         } else {
           // Create a minimal invitation object for the email preview
           setInvitation({
             email: verifyData.email,
-            invitation_token: token
+            invitation_token: token,
           });
         }
       } catch (error: any) {
-        setError('Fehler beim Laden der Einladung');
+        setError("Fehler beim Laden der Einladung");
       }
 
       setLoading(false);
@@ -68,7 +69,9 @@ const EmailPreview = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background/50 to-accent/5 flex items-center justify-center p-4">
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-bold text-destructive mb-4">Email nicht gefunden</h1>
+          <h1 className="text-2xl font-bold text-destructive mb-4">
+            Email nicht gefunden
+          </h1>
           <p className="text-muted-foreground mb-6">{error}</p>
           <Link to="/">
             <Button variant="outline">
@@ -106,7 +109,7 @@ const EmailPreview = () => {
           </div>
 
           {/* Email Content */}
-          <div 
+          <div
             className="p-0"
             dangerouslySetInnerHTML={{
               __html: `
@@ -366,14 +369,14 @@ const EmailPreview = () => {
         </div>
     </div>
 </body>
-</html>`
-            }} 
+</html>`,
+            }}
           />
         </div>
 
         {/* Action Button */}
         <div className="text-center mt-8">
-          <a 
+          <a
             href={registrationUrl}
             className="inline-flex items-center gap-2 bg-white text-primary px-6 py-3 rounded-lg font-medium hover:bg-white/90 transition-colors shadow-lg"
           >

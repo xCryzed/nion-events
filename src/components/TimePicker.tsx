@@ -1,6 +1,12 @@
-import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+import React from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface TimePickerProps {
   value: string;
@@ -9,30 +15,39 @@ interface TimePickerProps {
   disabled?: boolean;
 }
 
-export function TimePicker({ value, onChange, label, disabled }: TimePickerProps) {
-  const [hour, minute] = value ? value.split(':') : ['', ''];
+export function TimePicker({
+  value,
+  onChange,
+  label,
+  disabled,
+}: TimePickerProps) {
+  const [hour, minute] = value ? value.split(":") : ["", ""];
 
   const handleHourChange = (newHour: string) => {
-    onChange(`${newHour}:${minute || '00'}`);
+    onChange(`${newHour}:${minute || "00"}`);
   };
 
   const handleMinuteChange = (newMinute: string) => {
-    onChange(`${hour || '00'}:${newMinute}`);
+    onChange(`${hour || "00"}:${newMinute}`);
   };
 
-  const hours = Array.from({ length: 24 }, (_, i) => 
-    i.toString().padStart(2, '0')
+  const hours = Array.from({ length: 24 }, (_, i) =>
+    i.toString().padStart(2, "0"),
   );
 
-  const minutes = Array.from({ length: 12 }, (_, i) => 
-    (i * 5).toString().padStart(2, '0')
+  const minutes = Array.from({ length: 12 }, (_, i) =>
+    (i * 5).toString().padStart(2, "0"),
   );
 
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
       <div className="flex items-center gap-2">
-        <Select value={hour} onValueChange={handleHourChange} disabled={disabled}>
+        <Select
+          value={hour}
+          onValueChange={handleHourChange}
+          disabled={disabled}
+        >
           <SelectTrigger className="w-20">
             <SelectValue placeholder="Std" />
           </SelectTrigger>
@@ -44,10 +59,14 @@ export function TimePicker({ value, onChange, label, disabled }: TimePickerProps
             ))}
           </SelectContent>
         </Select>
-        
+
         <span className="text-muted-foreground">:</span>
-        
-        <Select value={minute} onValueChange={handleMinuteChange} disabled={disabled}>
+
+        <Select
+          value={minute}
+          onValueChange={handleMinuteChange}
+          disabled={disabled}
+        >
           <SelectTrigger className="w-20">
             <SelectValue placeholder="Min" />
           </SelectTrigger>

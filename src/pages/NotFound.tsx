@@ -9,11 +9,12 @@ const NotFound = () => {
   const location = useLocation();
 
   useEffect(() => {
-    document.title = 'Seite nicht gefunden - DJ Aachen & Eventtechnik | NION Events';
-    
+    document.title =
+      "Seite nicht gefunden - DJ Aachen & Eventtechnik | NION Events";
+
     console.error(
       "404 Error: User attempted to access non-existent route:",
-      location.pathname
+      location.pathname,
     );
   }, [location.pathname]);
 
@@ -49,10 +50,15 @@ const NotFound = () => {
                 Diese Seite konnte nicht gefunden werden
               </h2>
               <p className="text-body-large text-muted-foreground max-w-2xl mx-auto mb-4">
-                Die angeforderte Seite <span className="text-primary font-mono bg-muted px-2 py-1 rounded">{location.pathname}</span> existiert nicht oder wurde verschoben.
+                Die angeforderte Seite{" "}
+                <span className="text-primary font-mono bg-muted px-2 py-1 rounded">
+                  {location.pathname}
+                </span>{" "}
+                existiert nicht oder wurde verschoben.
               </p>
               <p className="text-body text-muted-foreground max-w-xl mx-auto">
-                Möglicherweise haben Sie einen veralteten Link verwendet oder sich bei der URL vertippt.
+                Möglicherweise haben Sie einen veralteten Link verwendet oder
+                sich bei der URL vertippt.
               </p>
             </div>
 
@@ -83,9 +89,12 @@ const NotFound = () => {
                   to="/"
                   onClick={() => {
                     setTimeout(() => {
-                      const target = document.getElementById('services');
+                      const target = document.getElementById("services");
                       if (target) {
-                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        target.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
                       }
                     }, 100);
                   }}
@@ -96,7 +105,9 @@ const NotFound = () => {
                   </div>
                   <div className="text-left">
                     <div className="font-medium">Unsere Leistungen</div>
-                    <div className="text-sm text-muted-foreground">Event Services entdecken</div>
+                    <div className="text-sm text-muted-foreground">
+                      Event Services entdecken
+                    </div>
                   </div>
                 </Link>
 
@@ -104,9 +115,12 @@ const NotFound = () => {
                   to="/"
                   onClick={() => {
                     setTimeout(() => {
-                      const target = document.getElementById('contact');
+                      const target = document.getElementById("contact");
                       if (target) {
-                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        target.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
                       }
                     }, 100);
                   }}
@@ -117,7 +131,9 @@ const NotFound = () => {
                   </div>
                   <div className="text-left">
                     <div className="font-medium">Kontakt</div>
-                    <div className="text-sm text-muted-foreground">Projekt besprechen</div>
+                    <div className="text-sm text-muted-foreground">
+                      Projekt besprechen
+                    </div>
                   </div>
                 </Link>
               </div>

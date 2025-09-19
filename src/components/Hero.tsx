@@ -1,12 +1,14 @@
-import { ArrowRight, Play, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { trackEvent } from '@/hooks/use-google-analytics';
-import heroImage from '@/assets/hero-image.jpg';
+import { ArrowRight, Play, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/hooks/use-google-analytics";
+import heroImage from "@/assets/hero-image.jpg";
 
 const calculateDynamicStats = () => {
   const startOfYear = new Date(new Date().getFullYear(), 0, 1);
   const now = new Date();
-  const daysSinceStartOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
+  const daysSinceStartOfYear = Math.floor(
+    (now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24),
+  );
   const weeksSinceStartOfYear = Math.floor(daysSinceStartOfYear / 7);
 
   const successfulEvents = 500 + Math.floor(daysSinceStartOfYear * 0.5);
@@ -17,13 +19,16 @@ const calculateDynamicStats = () => {
     events: `${successfulEvents}+`,
     clients: `${clients}+`,
     years: `${yearsExperience}+`,
-    support: '24/7'
+    support: "24/7",
   };
 };
 
 const Hero = () => {
   return (
-    <section id="home" className="relative min-h-screen flex items-center bg-gradient-hero overflow-hidden">
+    <section
+      id="home"
+      className="relative min-h-screen flex items-center bg-gradient-hero overflow-hidden"
+    >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <img
@@ -40,21 +45,23 @@ const Hero = () => {
           {/* Badge */}
           <div className="inline-flex items-center px-4 py-2 rounded-full glass-card mb-6 animate-fade-in">
             <span className="w-2 h-2 bg-primary rounded-full mr-3 animate-glow-pulse"></span>
-            <span className="text-sm font-medium">Ihr Partner für unvergessliche Events</span>
+            <span className="text-sm font-medium">
+              Ihr Partner für unvergessliche Events
+            </span>
           </div>
 
           {/* Main Heading */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-fade-in-up">
-            <span className="block sm:inline">Außergewöhnliche{' '}</span>
-            <span className="text-gradient block sm:inline">Events{' '}</span>
+            <span className="block sm:inline">Außergewöhnliche </span>
+            <span className="text-gradient block sm:inline">Events </span>
             <span className="block sm:inline">perfekt inszeniert</span>
           </h1>
 
           {/* Subheading */}
           <p className="text-body-large text-muted-foreground mb-8 max-w-2xl animate-fade-in-up">
             Von der ersten Idee bis zur erfolgreichen Umsetzung – NION Events
-            verwandelt Ihre Vision in ein unvergessliches Erlebnis. Professionell,
-            kreativ und mit Leidenschaft für Details.
+            verwandelt Ihre Vision in ein unvergessliches Erlebnis.
+            Professionell, kreativ und mit Leidenschaft für Details.
           </p>
 
           {/* CTA Buttons */}
@@ -62,8 +69,8 @@ const Hero = () => {
             <Button
               className="btn-hero group"
               onClick={() => {
-                trackEvent('click', 'conversion', 'hero_projekt_starten');
-                window.location.href = '/angebot';
+                trackEvent("click", "conversion", "hero_projekt_starten");
+                window.location.href = "/angebot";
               }}
             >
               Angebot einholen
@@ -73,10 +80,11 @@ const Hero = () => {
               variant="outline"
               className="group bg-transparent border-border/50 hover:bg-card/50 backdrop-blur-sm"
               onClick={() => {
-                trackEvent('click', 'navigation', 'hero_portfolio_ansehen');
-                const portfolioElement = document.getElementById('event-portfolio');
+                trackEvent("click", "navigation", "hero_portfolio_ansehen");
+                const portfolioElement =
+                  document.getElementById("event-portfolio");
                 if (portfolioElement) {
-                  portfolioElement.scrollIntoView({ behavior: 'smooth' });
+                  portfolioElement.scrollIntoView({ behavior: "smooth" });
                 }
               }}
             >
@@ -90,10 +98,10 @@ const Hero = () => {
             {(() => {
               const stats = calculateDynamicStats();
               return [
-                { number: stats.events, label: 'Erfolgreiche Events' },
-                { number: stats.clients, label: 'Zufriedene Kunden' },
-                { number: stats.years, label: 'Jahre Erfahrung' },
-                { number: stats.support, label: 'Support' },
+                { number: stats.events, label: "Erfolgreiche Events" },
+                { number: stats.clients, label: "Zufriedene Kunden" },
+                { number: stats.years, label: "Jahre Erfahrung" },
+                { number: stats.support, label: "Support" },
               ].map((stat, index) => (
                 <div key={index} className="text-center">
                   <div className="text-2xl md:text-3xl font-bold text-gradient mb-2">
@@ -117,16 +125,16 @@ const Hero = () => {
         <div
           className="flex flex-col items-center cursor-pointer group hover:cursor-pointer"
           onClick={() => {
-            trackEvent('click', 'navigation', 'hero_scroll_down');
-            const target = document.getElementById('unternehmen');
+            trackEvent("click", "navigation", "hero_scroll_down");
+            const target = document.getElementById("unternehmen");
             if (target) {
               target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+                behavior: "smooth",
+                block: "start",
               });
             }
           }}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: "pointer" }}
         >
           <div className="w-6 h-10 border-2 border-muted-foreground/50 rounded-full flex justify-center group-hover:border-primary transition-colors pointer-events-auto">
             <div className="w-1 h-3 bg-muted-foreground/50 rounded-full mt-2 group-hover:bg-primary transition-colors animate-pulse"></div>

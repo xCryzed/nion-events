@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Table,
   TableBody,
@@ -8,17 +8,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,7 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -38,15 +38,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import {
   Mail,
   Search,
@@ -58,9 +58,9 @@ import {
   Send,
   Loader2,
   UserPlus,
-} from 'lucide-react';
-import { format, parseISO, isValid, isPast } from 'date-fns';
-import { de } from 'date-fns/locale';
+} from "lucide-react";
+import { format, parseISO, isValid, isPast } from "date-fns";
+import { de } from "date-fns/locale";
 
 interface Invitation {
   id: string;
@@ -76,13 +76,17 @@ interface Invitation {
 
 const InvitationsTab = () => {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
-  const [filteredInvitations, setFilteredInvitations] = useState<Invitation[]>([]);
+  const [filteredInvitations, setFilteredInvitations] = useState<Invitation[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState<'employee' | 'administrator'>('employee');
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<"employee" | "administrator">(
+    "employee",
+  );
   const [sendingInvite, setSendingInvite] = useState(false);
   const { toast } = useToast();
 
@@ -94,8 +98,10 @@ const InvitationsTab = () => {
     const filtered = invitations.filter(
       (invitation) =>
         invitation.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invitation.inviter_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invitation.status.toLowerCase().includes(searchTerm.toLowerCase())
+        invitation.inviter_name
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        invitation.status.toLowerCase().includes(searchTerm.toLowerCase()),
     );
     setFilteredInvitations(filtered);
   }, [invitations, searchTerm]);
@@ -106,43 +112,47 @@ const InvitationsTab = () => {
 
       // Get invitations
       const { data: invitationsData, error: invitationsError } = await supabase
-        .from('employee_invitations')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from("employee_invitations")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       if (invitationsError) {
         throw invitationsError;
       }
 
       // Get profiles for invited_by users
-      const inviterIds = invitationsData?.map(inv => inv.invited_by) || [];
+      const inviterIds = invitationsData?.map((inv) => inv.invited_by) || [];
       const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, first_name, last_name')
-        .in('user_id', inviterIds);
+        .from("profiles")
+        .select("user_id, first_name, last_name")
+        .in("user_id", inviterIds);
 
       if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
+        console.error("Error fetching profiles:", profilesError);
       }
 
       // Format the data with inviter names
-      const formattedInvitations: Invitation[] = invitationsData?.map((invitation) => {
-        const inviterProfile = profiles?.find(p => p.user_id === invitation.invited_by);
-        return {
-          ...invitation,
-          inviter_name: inviterProfile?.first_name && inviterProfile?.last_name
-            ? `${inviterProfile.first_name} ${inviterProfile.last_name}`
-            : 'Unbekannt'
-        };
-      }) || [];
+      const formattedInvitations: Invitation[] =
+        invitationsData?.map((invitation) => {
+          const inviterProfile = profiles?.find(
+            (p) => p.user_id === invitation.invited_by,
+          );
+          return {
+            ...invitation,
+            inviter_name:
+              inviterProfile?.first_name && inviterProfile?.last_name
+                ? `${inviterProfile.first_name} ${inviterProfile.last_name}`
+                : "Unbekannt",
+          };
+        }) || [];
 
       setInvitations(formattedInvitations);
     } catch (error) {
-      console.error('Error fetching invitations:', error);
+      console.error("Error fetching invitations:", error);
       toast({
-        title: 'Fehler',
-        description: 'Einladungen konnten nicht geladen werden.',
-        variant: 'destructive',
+        title: "Fehler",
+        description: "Einladungen konnten nicht geladen werden.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -153,54 +163,62 @@ const InvitationsTab = () => {
     setActionLoading(invitation.id);
     try {
       // Get current user profile for inviter name
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name')
-        .eq('user_id', user?.id)
+        .from("profiles")
+        .select("first_name, last_name")
+        .eq("user_id", user?.id)
         .maybeSingle();
 
-      const inviterName = profile?.first_name && profile?.last_name 
-        ? `${profile.first_name} ${profile.last_name}`
-        : 'Das NION Events Team';
+      const inviterName =
+        profile?.first_name && profile?.last_name
+          ? `${profile.first_name} ${profile.last_name}`
+          : "Das NION Events Team";
 
       // Update expiry date
       const { error: updateError } = await supabase
-        .from('employee_invitations')
+        .from("employee_invitations")
         .update({
-          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-          updated_at: new Date().toISOString()
+          expires_at: new Date(
+            Date.now() + 7 * 24 * 60 * 60 * 1000,
+          ).toISOString(), // 7 days from now
+          updated_at: new Date().toISOString(),
         })
-        .eq('id', invitation.id);
+        .eq("id", invitation.id);
 
       if (updateError) {
         throw updateError;
       }
 
       // Send invitation email
-      const { error: emailError } = await supabase.functions.invoke('send-employee-invitation', {
-        body: {
-          email: invitation.email,
-          inviterName,
+      const { error: emailError } = await supabase.functions.invoke(
+        "send-employee-invitation",
+        {
+          body: {
+            email: invitation.email,
+            inviterName,
+          },
         },
-      });
+      );
 
       if (emailError) {
         throw emailError;
       }
 
       toast({
-        title: 'Einladung erneut gesendet',
+        title: "Einladung erneut gesendet",
         description: `Einladung wurde erfolgreich an ${invitation.email} erneut gesendet.`,
       });
 
       fetchInvitations(); // Refresh the list
     } catch (error: any) {
-      console.error('Error resending invitation:', error);
+      console.error("Error resending invitation:", error);
       toast({
-        title: 'Fehler',
-        description: 'Einladung konnte nicht erneut gesendet werden.',
-        variant: 'destructive',
+        title: "Fehler",
+        description: "Einladung konnte nicht erneut gesendet werden.",
+        variant: "destructive",
       });
     } finally {
       setActionLoading(null);
@@ -211,26 +229,26 @@ const InvitationsTab = () => {
     setActionLoading(invitation.id);
     try {
       const { error } = await supabase
-        .from('employee_invitations')
+        .from("employee_invitations")
         .delete()
-        .eq('id', invitation.id);
+        .eq("id", invitation.id);
 
       if (error) {
         throw error;
       }
 
       toast({
-        title: 'Einladung gelöscht',
+        title: "Einladung gelöscht",
         description: `Einladung für ${invitation.email} wurde gelöscht.`,
       });
 
       fetchInvitations(); // Refresh the list
     } catch (error: any) {
-      console.error('Error deleting invitation:', error);
+      console.error("Error deleting invitation:", error);
       toast({
-        title: 'Fehler',
-        description: 'Einladung konnte nicht gelöscht werden.',
-        variant: 'destructive',
+        title: "Fehler",
+        description: "Einladung konnte nicht gelöscht werden.",
+        variant: "destructive",
       });
     } finally {
       setActionLoading(null);
@@ -240,9 +258,9 @@ const InvitationsTab = () => {
   const handleInviteEmployee = async () => {
     if (!inviteEmail.trim()) {
       toast({
-        title: 'Fehler',
-        description: 'Bitte geben Sie eine E-Mail-Adresse ein.',
-        variant: 'destructive',
+        title: "Fehler",
+        description: "Bitte geben Sie eine E-Mail-Adresse ein.",
+        variant: "destructive",
       });
       return;
     }
@@ -250,25 +268,30 @@ const InvitationsTab = () => {
     setSendingInvite(true);
     try {
       // Get current user profile for inviter name
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name')
-        .eq('user_id', user?.id)
+        .from("profiles")
+        .select("first_name, last_name")
+        .eq("user_id", user?.id)
         .maybeSingle();
 
-      const inviterName = profile?.first_name && profile?.last_name 
-        ? `${profile.first_name} ${profile.last_name}`
-        : 'Das NION Events Team';
+      const inviterName =
+        profile?.first_name && profile?.last_name
+          ? `${profile.first_name} ${profile.last_name}`
+          : "Das NION Events Team";
 
       // Create invitation in database
       const { error: insertError } = await supabase
-        .from('employee_invitations')
+        .from("employee_invitations")
         .insert({
           email: inviteEmail.trim().toLowerCase(),
           role: inviteRole,
           invited_by: user?.id,
-          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
+          expires_at: new Date(
+            Date.now() + 7 * 24 * 60 * 60 * 1000,
+          ).toISOString(), // 7 days
         });
 
       if (insertError) {
@@ -276,33 +299,35 @@ const InvitationsTab = () => {
       }
 
       // Send invitation email
-      const { error: emailError } = await supabase.functions.invoke('send-employee-invitation', {
-        body: {
-          email: inviteEmail.trim().toLowerCase(),
-          inviterName,
+      const { error: emailError } = await supabase.functions.invoke(
+        "send-employee-invitation",
+        {
+          body: {
+            email: inviteEmail.trim().toLowerCase(),
+            inviterName,
+          },
         },
-      });
+      );
 
       if (emailError) {
         throw emailError;
       }
 
       toast({
-        title: 'Einladung gesendet',
+        title: "Einladung gesendet",
         description: `Einladung wurde erfolgreich an ${inviteEmail} gesendet.`,
       });
 
-      setInviteEmail('');
-      setInviteRole('employee');
+      setInviteEmail("");
+      setInviteRole("employee");
       setInviteDialogOpen(false);
       fetchInvitations(); // Refresh the list
-
     } catch (error: any) {
-      console.error('Error sending invitation:', error);
+      console.error("Error sending invitation:", error);
       toast({
-        title: 'Fehler',
-        description: 'Einladung konnte nicht gesendet werden.',
-        variant: 'destructive',
+        title: "Fehler",
+        description: "Einladung konnte nicht gesendet werden.",
+        variant: "destructive",
       });
     } finally {
       setSendingInvite(false);
@@ -314,7 +339,7 @@ const InvitationsTab = () => {
     const isExpired = isPast(expiresAt);
 
     switch (invitation.status) {
-      case 'pending':
+      case "pending":
         return isExpired ? (
           <Badge variant="destructive" className="flex items-center gap-1">
             <XCircle className="h-3 w-3" />
@@ -326,7 +351,7 @@ const InvitationsTab = () => {
             Ausstehend
           </Badge>
         );
-      case 'accepted':
+      case "accepted":
         return (
           <Badge variant="default" className="flex items-center gap-1">
             <CheckCircle className="h-3 w-3" />
@@ -334,17 +359,15 @@ const InvitationsTab = () => {
           </Badge>
         );
       default:
-        return (
-          <Badge variant="outline">
-            {invitation.status}
-          </Badge>
-        );
+        return <Badge variant="outline">{invitation.status}</Badge>;
     }
   };
 
   const formatDate = (dateString: string) => {
     const date = parseISO(dateString);
-    return isValid(date) ? format(date, 'dd.MM.yyyy HH:mm', { locale: de }) : '-';
+    return isValid(date)
+      ? format(date, "dd.MM.yyyy HH:mm", { locale: de })
+      : "-";
   };
 
   if (loading) {
@@ -377,7 +400,12 @@ const InvitationsTab = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {invitations.filter((i) => i.status === 'pending' && !isPast(new Date(i.expires_at))).length}
+              {
+                invitations.filter(
+                  (i) =>
+                    i.status === "pending" && !isPast(new Date(i.expires_at)),
+                ).length
+              }
             </div>
           </CardContent>
         </Card>
@@ -389,7 +417,7 @@ const InvitationsTab = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {invitations.filter((i) => i.status === 'accepted').length}
+              {invitations.filter((i) => i.status === "accepted").length}
             </div>
           </CardContent>
         </Card>
@@ -401,7 +429,12 @@ const InvitationsTab = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {invitations.filter((i) => i.status === 'pending' && isPast(new Date(i.expires_at))).length}
+              {
+                invitations.filter(
+                  (i) =>
+                    i.status === "pending" && isPast(new Date(i.expires_at)),
+                ).length
+              }
             </div>
           </CardContent>
         </Card>
@@ -420,14 +453,17 @@ const InvitationsTab = () => {
                 className="max-w-sm"
               />
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <Button variant="outline" onClick={fetchInvitations} size="sm">
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Aktualisieren
               </Button>
-              
-              <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+
+              <Dialog
+                open={inviteDialogOpen}
+                onOpenChange={setInviteDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button>
                     <UserPlus className="h-4 w-4 mr-2" />
@@ -438,7 +474,8 @@ const InvitationsTab = () => {
                   <DialogHeader>
                     <DialogTitle>Neuen Mitarbeiter einladen</DialogTitle>
                     <DialogDescription>
-                      Senden Sie eine Einladung an die E-Mail-Adresse des neuen Mitarbeiters.
+                      Senden Sie eine Einladung an die E-Mail-Adresse des neuen
+                      Mitarbeiters.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
@@ -454,13 +491,20 @@ const InvitationsTab = () => {
                     </div>
                     <div>
                       <Label htmlFor="role">Rolle</Label>
-                      <Select value={inviteRole} onValueChange={(value: 'employee' | 'administrator') => setInviteRole(value)}>
+                      <Select
+                        value={inviteRole}
+                        onValueChange={(value: "employee" | "administrator") =>
+                          setInviteRole(value)
+                        }
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Rolle auswählen" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="employee">Mitarbeiter</SelectItem>
-                          <SelectItem value="administrator">Administrator</SelectItem>
+                          <SelectItem value="administrator">
+                            Administrator
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -469,8 +513,8 @@ const InvitationsTab = () => {
                     <Button
                       variant="outline"
                       onClick={() => {
-                        setInviteEmail('');
-                        setInviteRole('employee');
+                        setInviteEmail("");
+                        setInviteRole("employee");
                         setInviteDialogOpen(false);
                       }}
                     >
@@ -510,8 +554,9 @@ const InvitationsTab = () => {
               <TableBody>
                 {filteredInvitations.map((invitation) => {
                   const isExpired = isPast(new Date(invitation.expires_at));
-                  const canResend = invitation.status === 'pending' && isExpired;
-                  const canDelete = invitation.status !== 'accepted';
+                  const canResend =
+                    invitation.status === "pending" && isExpired;
+                  const canDelete = invitation.status !== "accepted";
 
                   return (
                     <TableRow key={invitation.id}>
@@ -524,18 +569,18 @@ const InvitationsTab = () => {
                       <TableCell>
                         <Badge variant="outline">{invitation.role}</Badge>
                       </TableCell>
-                      <TableCell>
-                        {getStatusBadge(invitation)}
-                      </TableCell>
+                      <TableCell>{getStatusBadge(invitation)}</TableCell>
                       <TableCell>{invitation.inviter_name}</TableCell>
                       <TableCell>{formatDate(invitation.created_at)}</TableCell>
                       <TableCell>
-                        <span className={isExpired ? 'text-destructive' : ''}>
+                        <span className={isExpired ? "text-destructive" : ""}>
                           {formatDate(invitation.expires_at)}
                         </span>
                       </TableCell>
                       <TableCell>
-                        {invitation.accepted_at ? formatDate(invitation.accepted_at) : '-'}
+                        {invitation.accepted_at
+                          ? formatDate(invitation.accepted_at)
+                          : "-"}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end space-x-2">
@@ -566,16 +611,23 @@ const InvitationsTab = () => {
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Einladung löschen</AlertDialogTitle>
+                                  <AlertDialogTitle>
+                                    Einladung löschen
+                                  </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Sind Sie sicher, dass Sie die Einladung für {invitation.email} löschen möchten?
-                                    Diese Aktion kann nicht rückgängig gemacht werden.
+                                    Sind Sie sicher, dass Sie die Einladung für{" "}
+                                    {invitation.email} löschen möchten? Diese
+                                    Aktion kann nicht rückgängig gemacht werden.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                                  <AlertDialogCancel>
+                                    Abbrechen
+                                  </AlertDialogCancel>
                                   <AlertDialogAction
-                                    onClick={() => handleDeleteInvitation(invitation)}
+                                    onClick={() =>
+                                      handleDeleteInvitation(invitation)
+                                    }
                                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                   >
                                     Löschen

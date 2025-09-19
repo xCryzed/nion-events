@@ -4,864 +4,867 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[]
+  | Json[];
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.12 (cd3cf9e)"
-  }
+    PostgrestVersion: "12.2.12 (cd3cf9e)";
+  };
   public: {
     Tables: {
       contact_requests: {
         Row: {
-          callback_time: string | null
-          company: string | null
-          created_at: string
-          email: string
-          event_type: string | null
-          id: string
-          message: string
-          mobile: string | null
-          name: string
-          phone: string | null
-          responded_at: string | null
-          responded_by: string | null
-          response_message: string | null
-          status: string
-          updated_at: string
-          venue: string | null
-        }
+          callback_time: string | null;
+          company: string | null;
+          created_at: string;
+          email: string;
+          event_type: string | null;
+          id: string;
+          message: string;
+          mobile: string | null;
+          name: string;
+          phone: string | null;
+          responded_at: string | null;
+          responded_by: string | null;
+          response_message: string | null;
+          status: string;
+          updated_at: string;
+          venue: string | null;
+        };
         Insert: {
-          callback_time?: string | null
-          company?: string | null
-          created_at?: string
-          email: string
-          event_type?: string | null
-          id?: string
-          message: string
-          mobile?: string | null
-          name: string
-          phone?: string | null
-          responded_at?: string | null
-          responded_by?: string | null
-          response_message?: string | null
-          status?: string
-          updated_at?: string
-          venue?: string | null
-        }
+          callback_time?: string | null;
+          company?: string | null;
+          created_at?: string;
+          email: string;
+          event_type?: string | null;
+          id?: string;
+          message: string;
+          mobile?: string | null;
+          name: string;
+          phone?: string | null;
+          responded_at?: string | null;
+          responded_by?: string | null;
+          response_message?: string | null;
+          status?: string;
+          updated_at?: string;
+          venue?: string | null;
+        };
         Update: {
-          callback_time?: string | null
-          company?: string | null
-          created_at?: string
-          email?: string
-          event_type?: string | null
-          id?: string
-          message?: string
-          mobile?: string | null
-          name?: string
-          phone?: string | null
-          responded_at?: string | null
-          responded_by?: string | null
-          response_message?: string | null
-          status?: string
-          updated_at?: string
-          venue?: string | null
-        }
-        Relationships: []
-      }
+          callback_time?: string | null;
+          company?: string | null;
+          created_at?: string;
+          email?: string;
+          event_type?: string | null;
+          id?: string;
+          message?: string;
+          mobile?: string | null;
+          name?: string;
+          phone?: string | null;
+          responded_at?: string | null;
+          responded_by?: string | null;
+          response_message?: string | null;
+          status?: string;
+          updated_at?: string;
+          venue?: string | null;
+        };
+        Relationships: [];
+      };
       employee_data_audit_log: {
         Row: {
-          accessed_by: string
-          accessed_fields: string[] | null
-          action: string
-          created_at: string
-          id: string
-          ip_address: unknown | null
-          user_agent: string | null
-          user_id: string
-        }
+          accessed_by: string;
+          accessed_fields: string[] | null;
+          action: string;
+          created_at: string;
+          id: string;
+          ip_address: unknown | null;
+          user_agent: string | null;
+          user_id: string;
+        };
         Insert: {
-          accessed_by: string
-          accessed_fields?: string[] | null
-          action: string
-          created_at?: string
-          id?: string
-          ip_address?: unknown | null
-          user_agent?: string | null
-          user_id: string
-        }
+          accessed_by: string;
+          accessed_fields?: string[] | null;
+          action: string;
+          created_at?: string;
+          id?: string;
+          ip_address?: unknown | null;
+          user_agent?: string | null;
+          user_id: string;
+        };
         Update: {
-          accessed_by?: string
-          accessed_fields?: string[] | null
-          action?: string
-          created_at?: string
-          id?: string
-          ip_address?: unknown | null
-          user_agent?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
+          accessed_by?: string;
+          accessed_fields?: string[] | null;
+          action?: string;
+          created_at?: string;
+          id?: string;
+          ip_address?: unknown | null;
+          user_agent?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       employee_invitations: {
         Row: {
-          accepted_at: string | null
-          created_at: string
-          email: string
-          expires_at: string
-          id: string
-          invitation_token: string
-          invited_by: string
-          role: Database["public"]["Enums"]["app_role"]
-          status: string
-          user_id: string | null
-        }
+          accepted_at: string | null;
+          created_at: string;
+          email: string;
+          expires_at: string;
+          id: string;
+          invitation_token: string;
+          invited_by: string;
+          role: Database["public"]["Enums"]["app_role"];
+          status: string;
+          user_id: string | null;
+        };
         Insert: {
-          accepted_at?: string | null
-          created_at?: string
-          email: string
-          expires_at?: string
-          id?: string
-          invitation_token?: string
-          invited_by: string
-          role?: Database["public"]["Enums"]["app_role"]
-          status?: string
-          user_id?: string | null
-        }
+          accepted_at?: string | null;
+          created_at?: string;
+          email: string;
+          expires_at?: string;
+          id?: string;
+          invitation_token?: string;
+          invited_by: string;
+          role?: Database["public"]["Enums"]["app_role"];
+          status?: string;
+          user_id?: string | null;
+        };
         Update: {
-          accepted_at?: string | null
-          created_at?: string
-          email?: string
-          expires_at?: string
-          id?: string
-          invitation_token?: string
-          invited_by?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          status?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+          accepted_at?: string | null;
+          created_at?: string;
+          email?: string;
+          expires_at?: string;
+          id?: string;
+          invitation_token?: string;
+          invited_by?: string;
+          role?: Database["public"]["Enums"]["app_role"];
+          status?: string;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
       employee_personal_data: {
         Row: {
-          bic: string
-          birth_country: string | null
-          birth_name: string | null
-          birth_place: string | null
-          child_allowances: number | null
-          city: string
-          created_at: string
-          date_of_birth: string
-          employee_declaration: boolean | null
-          employment_type: string[]
-          first_name: string
-          gender: string
-          has_additional_employment: boolean | null
-          has_other_employment: boolean
-          health_insurance_company: string | null
-          highest_professional_qualification: string | null
-          highest_school_degree: string | null
-          iban: string
-          id: string
-          is_complete: boolean | null
-          is_marginal_employment: boolean | null
-          job_title: string
-          last_name: string
-          marital_status: string
-          nationality: string
-          other_employment_details: Json | null
-          postal_code: string
-          religious_affiliation: string | null
-          signature_data_url: string | null
-          signature_date: string | null
-          social_insurance_number: string | null
-          start_date: string
-          street_address: string
-          tax_class_factor: string | null
-          tax_id: string | null
-          updated_at: string
-          user_id: string
-        }
+          bic: string;
+          birth_country: string | null;
+          birth_name: string | null;
+          birth_place: string | null;
+          child_allowances: number | null;
+          city: string;
+          created_at: string;
+          date_of_birth: string;
+          employee_declaration: boolean | null;
+          employment_type: string[];
+          first_name: string;
+          gender: string;
+          has_additional_employment: boolean | null;
+          has_other_employment: boolean;
+          health_insurance_company: string | null;
+          highest_professional_qualification: string | null;
+          highest_school_degree: string | null;
+          iban: string;
+          id: string;
+          is_complete: boolean | null;
+          is_marginal_employment: boolean | null;
+          job_title: string;
+          last_name: string;
+          marital_status: string;
+          nationality: string;
+          other_employment_details: Json | null;
+          postal_code: string;
+          religious_affiliation: string | null;
+          signature_data_url: string | null;
+          signature_date: string | null;
+          social_insurance_number: string | null;
+          start_date: string;
+          street_address: string;
+          tax_class_factor: string | null;
+          tax_id: string | null;
+          updated_at: string;
+          user_id: string;
+        };
         Insert: {
-          bic: string
-          birth_country?: string | null
-          birth_name?: string | null
-          birth_place?: string | null
-          child_allowances?: number | null
-          city: string
-          created_at?: string
-          date_of_birth: string
-          employee_declaration?: boolean | null
-          employment_type?: string[]
-          first_name: string
-          gender: string
-          has_additional_employment?: boolean | null
-          has_other_employment?: boolean
-          health_insurance_company?: string | null
-          highest_professional_qualification?: string | null
-          highest_school_degree?: string | null
-          iban: string
-          id?: string
-          is_complete?: boolean | null
-          is_marginal_employment?: boolean | null
-          job_title: string
-          last_name: string
-          marital_status: string
-          nationality: string
-          other_employment_details?: Json | null
-          postal_code: string
-          religious_affiliation?: string | null
-          signature_data_url?: string | null
-          signature_date?: string | null
-          social_insurance_number?: string | null
-          start_date: string
-          street_address: string
-          tax_class_factor?: string | null
-          tax_id?: string | null
-          updated_at?: string
-          user_id: string
-        }
+          bic: string;
+          birth_country?: string | null;
+          birth_name?: string | null;
+          birth_place?: string | null;
+          child_allowances?: number | null;
+          city: string;
+          created_at?: string;
+          date_of_birth: string;
+          employee_declaration?: boolean | null;
+          employment_type?: string[];
+          first_name: string;
+          gender: string;
+          has_additional_employment?: boolean | null;
+          has_other_employment?: boolean;
+          health_insurance_company?: string | null;
+          highest_professional_qualification?: string | null;
+          highest_school_degree?: string | null;
+          iban: string;
+          id?: string;
+          is_complete?: boolean | null;
+          is_marginal_employment?: boolean | null;
+          job_title: string;
+          last_name: string;
+          marital_status: string;
+          nationality: string;
+          other_employment_details?: Json | null;
+          postal_code: string;
+          religious_affiliation?: string | null;
+          signature_data_url?: string | null;
+          signature_date?: string | null;
+          social_insurance_number?: string | null;
+          start_date: string;
+          street_address: string;
+          tax_class_factor?: string | null;
+          tax_id?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
         Update: {
-          bic?: string
-          birth_country?: string | null
-          birth_name?: string | null
-          birth_place?: string | null
-          child_allowances?: number | null
-          city?: string
-          created_at?: string
-          date_of_birth?: string
-          employee_declaration?: boolean | null
-          employment_type?: string[]
-          first_name?: string
-          gender?: string
-          has_additional_employment?: boolean | null
-          has_other_employment?: boolean
-          health_insurance_company?: string | null
-          highest_professional_qualification?: string | null
-          highest_school_degree?: string | null
-          iban?: string
-          id?: string
-          is_complete?: boolean | null
-          is_marginal_employment?: boolean | null
-          job_title?: string
-          last_name?: string
-          marital_status?: string
-          nationality?: string
-          other_employment_details?: Json | null
-          postal_code?: string
-          religious_affiliation?: string | null
-          signature_data_url?: string | null
-          signature_date?: string | null
-          social_insurance_number?: string | null
-          start_date?: string
-          street_address?: string
-          tax_class_factor?: string | null
-          tax_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
+          bic?: string;
+          birth_country?: string | null;
+          birth_name?: string | null;
+          birth_place?: string | null;
+          child_allowances?: number | null;
+          city?: string;
+          created_at?: string;
+          date_of_birth?: string;
+          employee_declaration?: boolean | null;
+          employment_type?: string[];
+          first_name?: string;
+          gender?: string;
+          has_additional_employment?: boolean | null;
+          has_other_employment?: boolean;
+          health_insurance_company?: string | null;
+          highest_professional_qualification?: string | null;
+          highest_school_degree?: string | null;
+          iban?: string;
+          id?: string;
+          is_complete?: boolean | null;
+          is_marginal_employment?: boolean | null;
+          job_title?: string;
+          last_name?: string;
+          marital_status?: string;
+          nationality?: string;
+          other_employment_details?: Json | null;
+          postal_code?: string;
+          religious_affiliation?: string | null;
+          signature_data_url?: string | null;
+          signature_date?: string | null;
+          social_insurance_number?: string | null;
+          start_date?: string;
+          street_address?: string;
+          tax_class_factor?: string | null;
+          tax_id?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       employee_qualifications: {
         Row: {
-          acquired_date: string | null
-          created_at: string
-          expires_at: string | null
-          expires_date: string | null
-          id: string
-          proof_files: Json | null
-          qualification_id: string
-          updated_at: string
-          user_id: string
-        }
+          acquired_date: string | null;
+          created_at: string;
+          expires_at: string | null;
+          expires_date: string | null;
+          id: string;
+          proof_files: Json | null;
+          qualification_id: string;
+          updated_at: string;
+          user_id: string;
+        };
         Insert: {
-          acquired_date?: string | null
-          created_at?: string
-          expires_at?: string | null
-          expires_date?: string | null
-          id?: string
-          proof_files?: Json | null
-          qualification_id: string
-          updated_at?: string
-          user_id: string
-        }
+          acquired_date?: string | null;
+          created_at?: string;
+          expires_at?: string | null;
+          expires_date?: string | null;
+          id?: string;
+          proof_files?: Json | null;
+          qualification_id: string;
+          updated_at?: string;
+          user_id: string;
+        };
         Update: {
-          acquired_date?: string | null
-          created_at?: string
-          expires_at?: string | null
-          expires_date?: string | null
-          id?: string
-          proof_files?: Json | null
-          qualification_id?: string
-          updated_at?: string
-          user_id?: string
-        }
+          acquired_date?: string | null;
+          created_at?: string;
+          expires_at?: string | null;
+          expires_date?: string | null;
+          id?: string;
+          proof_files?: Json | null;
+          qualification_id?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "employee_qualifications_qualification_id_fkey"
-            columns: ["qualification_id"]
-            isOneToOne: false
-            referencedRelation: "qualifications"
-            referencedColumns: ["id"]
+            foreignKeyName: "employee_qualifications_qualification_id_fkey";
+            columns: ["qualification_id"];
+            isOneToOne: false;
+            referencedRelation: "qualifications";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       event_registrations: {
         Row: {
-          created_at: string
-          event_id: string
-          id: string
-          notes: string | null
-          staff_category: string
-          status: string | null
-          updated_at: string
-          user_id: string
-        }
+          created_at: string;
+          event_id: string;
+          id: string;
+          notes: string | null;
+          staff_category: string;
+          status: string | null;
+          updated_at: string;
+          user_id: string;
+        };
         Insert: {
-          created_at?: string
-          event_id: string
-          id?: string
-          notes?: string | null
-          staff_category: string
-          status?: string | null
-          updated_at?: string
-          user_id: string
-        }
+          created_at?: string;
+          event_id: string;
+          id?: string;
+          notes?: string | null;
+          staff_category: string;
+          status?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
         Update: {
-          created_at?: string
-          event_id?: string
-          id?: string
-          notes?: string | null
-          staff_category?: string
-          status?: string | null
-          updated_at?: string
-          user_id?: string
-        }
+          created_at?: string;
+          event_id?: string;
+          id?: string;
+          notes?: string | null;
+          staff_category?: string;
+          status?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "event_registrations_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "internal_events"
-            referencedColumns: ["id"]
+            foreignKeyName: "event_registrations_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "internal_events";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       event_requests: {
         Row: {
-          additional_wishes: string | null
-          contact_city: string | null
-          contact_company: string | null
-          contact_email: string
-          contact_house_number: string | null
-          contact_name: string
-          contact_phone: string | null
-          contact_postal_code: string | null
-          contact_street: string | null
-          created_at: string
-          dj_genres: string[] | null
-          end_date: string | null
-          end_time: string | null
-          event_date: string
-          event_title: string
-          guest_count: string
-          id: string
-          light_operator: boolean | null
-          location: string
-          offer_number: string | null
-          photographer: boolean | null
-          status: Database["public"]["Enums"]["request_status"] | null
-          tech_requirements: string[]
-          updated_at: string
-          user_id: string | null
-          videographer: boolean | null
-        }
+          additional_wishes: string | null;
+          contact_city: string | null;
+          contact_company: string | null;
+          contact_email: string;
+          contact_house_number: string | null;
+          contact_name: string;
+          contact_phone: string | null;
+          contact_postal_code: string | null;
+          contact_street: string | null;
+          created_at: string;
+          dj_genres: string[] | null;
+          end_date: string | null;
+          end_time: string | null;
+          event_date: string;
+          event_title: string;
+          guest_count: string;
+          id: string;
+          light_operator: boolean | null;
+          location: string;
+          offer_number: string | null;
+          photographer: boolean | null;
+          status: Database["public"]["Enums"]["request_status"] | null;
+          tech_requirements: string[];
+          updated_at: string;
+          user_id: string | null;
+          videographer: boolean | null;
+        };
         Insert: {
-          additional_wishes?: string | null
-          contact_city?: string | null
-          contact_company?: string | null
-          contact_email: string
-          contact_house_number?: string | null
-          contact_name: string
-          contact_phone?: string | null
-          contact_postal_code?: string | null
-          contact_street?: string | null
-          created_at?: string
-          dj_genres?: string[] | null
-          end_date?: string | null
-          end_time?: string | null
-          event_date: string
-          event_title: string
-          guest_count: string
-          id?: string
-          light_operator?: boolean | null
-          location: string
-          offer_number?: string | null
-          photographer?: boolean | null
-          status?: Database["public"]["Enums"]["request_status"] | null
-          tech_requirements?: string[]
-          updated_at?: string
-          user_id?: string | null
-          videographer?: boolean | null
-        }
+          additional_wishes?: string | null;
+          contact_city?: string | null;
+          contact_company?: string | null;
+          contact_email: string;
+          contact_house_number?: string | null;
+          contact_name: string;
+          contact_phone?: string | null;
+          contact_postal_code?: string | null;
+          contact_street?: string | null;
+          created_at?: string;
+          dj_genres?: string[] | null;
+          end_date?: string | null;
+          end_time?: string | null;
+          event_date: string;
+          event_title: string;
+          guest_count: string;
+          id?: string;
+          light_operator?: boolean | null;
+          location: string;
+          offer_number?: string | null;
+          photographer?: boolean | null;
+          status?: Database["public"]["Enums"]["request_status"] | null;
+          tech_requirements?: string[];
+          updated_at?: string;
+          user_id?: string | null;
+          videographer?: boolean | null;
+        };
         Update: {
-          additional_wishes?: string | null
-          contact_city?: string | null
-          contact_company?: string | null
-          contact_email?: string
-          contact_house_number?: string | null
-          contact_name?: string
-          contact_phone?: string | null
-          contact_postal_code?: string | null
-          contact_street?: string | null
-          created_at?: string
-          dj_genres?: string[] | null
-          end_date?: string | null
-          end_time?: string | null
-          event_date?: string
-          event_title?: string
-          guest_count?: string
-          id?: string
-          light_operator?: boolean | null
-          location?: string
-          offer_number?: string | null
-          photographer?: boolean | null
-          status?: Database["public"]["Enums"]["request_status"] | null
-          tech_requirements?: string[]
-          updated_at?: string
-          user_id?: string | null
-          videographer?: boolean | null
-        }
-        Relationships: []
-      }
+          additional_wishes?: string | null;
+          contact_city?: string | null;
+          contact_company?: string | null;
+          contact_email?: string;
+          contact_house_number?: string | null;
+          contact_name?: string;
+          contact_phone?: string | null;
+          contact_postal_code?: string | null;
+          contact_street?: string | null;
+          created_at?: string;
+          dj_genres?: string[] | null;
+          end_date?: string | null;
+          end_time?: string | null;
+          event_date?: string;
+          event_title?: string;
+          guest_count?: string;
+          id?: string;
+          light_operator?: boolean | null;
+          location?: string;
+          offer_number?: string | null;
+          photographer?: boolean | null;
+          status?: Database["public"]["Enums"]["request_status"] | null;
+          tech_requirements?: string[];
+          updated_at?: string;
+          user_id?: string | null;
+          videographer?: boolean | null;
+        };
+        Relationships: [];
+      };
       internal_events: {
         Row: {
-          contract_required: boolean | null
-          created_at: string
-          created_by: string | null
-          description: string | null
-          end_date: string | null
-          event_date: string
-          guest_count: number | null
-          id: string
-          location: string
-          notes: string | null
-          pricing_structure: Json | null
-          qualification_requirements: Json | null
-          staff_requirements: Json | null
-          status: string | null
-          title: string
-          updated_at: string
-        }
+          contract_required: boolean | null;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          end_date: string | null;
+          event_date: string;
+          guest_count: number | null;
+          id: string;
+          location: string;
+          notes: string | null;
+          pricing_structure: Json | null;
+          qualification_requirements: Json | null;
+          staff_requirements: Json | null;
+          status: string | null;
+          title: string;
+          updated_at: string;
+        };
         Insert: {
-          contract_required?: boolean | null
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          end_date?: string | null
-          event_date: string
-          guest_count?: number | null
-          id?: string
-          location: string
-          notes?: string | null
-          pricing_structure?: Json | null
-          qualification_requirements?: Json | null
-          staff_requirements?: Json | null
-          status?: string | null
-          title: string
-          updated_at?: string
-        }
+          contract_required?: boolean | null;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          end_date?: string | null;
+          event_date: string;
+          guest_count?: number | null;
+          id?: string;
+          location: string;
+          notes?: string | null;
+          pricing_structure?: Json | null;
+          qualification_requirements?: Json | null;
+          staff_requirements?: Json | null;
+          status?: string | null;
+          title: string;
+          updated_at?: string;
+        };
         Update: {
-          contract_required?: boolean | null
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          end_date?: string | null
-          event_date?: string
-          guest_count?: number | null
-          id?: string
-          location?: string
-          notes?: string | null
-          pricing_structure?: Json | null
-          qualification_requirements?: Json | null
-          staff_requirements?: Json | null
-          status?: string | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
+          contract_required?: boolean | null;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          end_date?: string | null;
+          event_date?: string;
+          guest_count?: number | null;
+          id?: string;
+          location?: string;
+          notes?: string | null;
+          pricing_structure?: Json | null;
+          qualification_requirements?: Json | null;
+          staff_requirements?: Json | null;
+          status?: string | null;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
-          created_at: string
-          first_name: string | null
-          id: string
-          last_name: string | null
-          updated_at: string
-          user_id: string
-        }
+          created_at: string;
+          first_name: string | null;
+          id: string;
+          last_name: string | null;
+          updated_at: string;
+          user_id: string;
+        };
         Insert: {
-          created_at?: string
-          first_name?: string | null
-          id?: string
-          last_name?: string | null
-          updated_at?: string
-          user_id: string
-        }
+          created_at?: string;
+          first_name?: string | null;
+          id?: string;
+          last_name?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
         Update: {
-          created_at?: string
-          first_name?: string | null
-          id?: string
-          last_name?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
+          created_at?: string;
+          first_name?: string | null;
+          id?: string;
+          last_name?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       qualification_requests: {
         Row: {
-          admin_notes: string | null
-          created_at: string
-          id: string
-          notes: string | null
-          proof_files: Json | null
-          qualification_id: string
-          requested_at: string
-          reviewed_at: string | null
-          reviewed_by: string | null
-          status: string
-          updated_at: string
-          user_id: string
-        }
+          admin_notes: string | null;
+          created_at: string;
+          id: string;
+          notes: string | null;
+          proof_files: Json | null;
+          qualification_id: string;
+          requested_at: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: string;
+          updated_at: string;
+          user_id: string;
+        };
         Insert: {
-          admin_notes?: string | null
-          created_at?: string
-          id?: string
-          notes?: string | null
-          proof_files?: Json | null
-          qualification_id: string
-          requested_at?: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: string
-          updated_at?: string
-          user_id: string
-        }
+          admin_notes?: string | null;
+          created_at?: string;
+          id?: string;
+          notes?: string | null;
+          proof_files?: Json | null;
+          qualification_id: string;
+          requested_at?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: string;
+          updated_at?: string;
+          user_id: string;
+        };
         Update: {
-          admin_notes?: string | null
-          created_at?: string
-          id?: string
-          notes?: string | null
-          proof_files?: Json | null
-          qualification_id?: string
-          requested_at?: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
+          admin_notes?: string | null;
+          created_at?: string;
+          id?: string;
+          notes?: string | null;
+          proof_files?: Json | null;
+          qualification_id?: string;
+          requested_at?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       qualifications: {
         Row: {
-          created_at: string
-          description: string | null
-          id: string
-          is_expirable: boolean | null
-          name: string
-          proof_types: string[] | null
-          requires_proof: boolean | null
-          updated_at: string
-          validity_period_months: number | null
-        }
+          created_at: string;
+          description: string | null;
+          id: string;
+          is_expirable: boolean | null;
+          name: string;
+          proof_types: string[] | null;
+          requires_proof: boolean | null;
+          updated_at: string;
+          validity_period_months: number | null;
+        };
         Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_expirable?: boolean | null
-          name: string
-          proof_types?: string[] | null
-          requires_proof?: boolean | null
-          updated_at?: string
-          validity_period_months?: number | null
-        }
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          is_expirable?: boolean | null;
+          name: string;
+          proof_types?: string[] | null;
+          requires_proof?: boolean | null;
+          updated_at?: string;
+          validity_period_months?: number | null;
+        };
         Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_expirable?: boolean | null
-          name?: string
-          proof_types?: string[] | null
-          requires_proof?: boolean | null
-          updated_at?: string
-          validity_period_months?: number | null
-        }
-        Relationships: []
-      }
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          is_expirable?: boolean | null;
+          name?: string;
+          proof_types?: string[] | null;
+          requires_proof?: boolean | null;
+          updated_at?: string;
+          validity_period_months?: number | null;
+        };
+        Relationships: [];
+      };
       rate_limit_requests: {
         Row: {
-          created_at: string
-          id: string
-          ip_address: unknown
-          request_count: number
-          request_type: string
-          updated_at: string
-          window_start: string
-        }
+          created_at: string;
+          id: string;
+          ip_address: unknown;
+          request_count: number;
+          request_type: string;
+          updated_at: string;
+          window_start: string;
+        };
         Insert: {
-          created_at?: string
-          id?: string
-          ip_address: unknown
-          request_count?: number
-          request_type: string
-          updated_at?: string
-          window_start?: string
-        }
+          created_at?: string;
+          id?: string;
+          ip_address: unknown;
+          request_count?: number;
+          request_type: string;
+          updated_at?: string;
+          window_start?: string;
+        };
         Update: {
-          created_at?: string
-          id?: string
-          ip_address?: unknown
-          request_count?: number
-          request_type?: string
-          updated_at?: string
-          window_start?: string
-        }
-        Relationships: []
-      }
+          created_at?: string;
+          id?: string;
+          ip_address?: unknown;
+          request_count?: number;
+          request_type?: string;
+          updated_at?: string;
+          window_start?: string;
+        };
+        Relationships: [];
+      };
       time_records: {
         Row: {
-          approved_at: string | null
-          approved_by: string | null
-          break_minutes: number
-          created_at: string
-          end_time: string
-          event_id: string
-          id: string
-          notes: string | null
-          start_time: string
-          status: string
-          updated_at: string
-          user_id: string
-        }
+          approved_at: string | null;
+          approved_by: string | null;
+          break_minutes: number;
+          created_at: string;
+          end_time: string;
+          event_id: string;
+          id: string;
+          notes: string | null;
+          start_time: string;
+          status: string;
+          updated_at: string;
+          user_id: string;
+        };
         Insert: {
-          approved_at?: string | null
-          approved_by?: string | null
-          break_minutes?: number
-          created_at?: string
-          end_time: string
-          event_id: string
-          id?: string
-          notes?: string | null
-          start_time: string
-          status?: string
-          updated_at?: string
-          user_id: string
-        }
+          approved_at?: string | null;
+          approved_by?: string | null;
+          break_minutes?: number;
+          created_at?: string;
+          end_time: string;
+          event_id: string;
+          id?: string;
+          notes?: string | null;
+          start_time: string;
+          status?: string;
+          updated_at?: string;
+          user_id: string;
+        };
         Update: {
-          approved_at?: string | null
-          approved_by?: string | null
-          break_minutes?: number
-          created_at?: string
-          end_time?: string
-          event_id?: string
-          id?: string
-          notes?: string | null
-          start_time?: string
-          status?: string
-          updated_at?: string
-          user_id?: string
-        }
+          approved_at?: string | null;
+          approved_by?: string | null;
+          break_minutes?: number;
+          created_at?: string;
+          end_time?: string;
+          event_id?: string;
+          id?: string;
+          notes?: string | null;
+          start_time?: string;
+          status?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "time_records_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "internal_events"
-            referencedColumns: ["id"]
+            foreignKeyName: "time_records_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "internal_events";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       user_roles: {
         Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          updated_at: string
-          user_id: string
-        }
+          created_at: string;
+          id: string;
+          role: Database["public"]["Enums"]["app_role"];
+          updated_at: string;
+          user_id: string;
+        };
         Insert: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          updated_at?: string
-          user_id: string
-        }
+          created_at?: string;
+          id?: string;
+          role?: Database["public"]["Enums"]["app_role"];
+          updated_at?: string;
+          user_id: string;
+        };
         Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
+          created_at?: string;
+          id?: string;
+          role?: Database["public"]["Enums"]["app_role"];
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       work_contracts: {
         Row: {
-          additional_agreements: string | null
-          contract_html: string
-          created_at: string
-          employer_signature_date: string | null
-          end_date: string
-          event_id: string
-          hourly_wage: number
-          id: string
-          job_title: string
-          signature_data_url: string | null
-          signed_at: string | null
-          signed_by_employee: boolean | null
-          signed_by_employer: boolean | null
-          staff_category: string
-          start_date: string
-          updated_at: string
-          user_id: string
-        }
+          additional_agreements: string | null;
+          contract_html: string;
+          created_at: string;
+          employer_signature_date: string | null;
+          end_date: string;
+          event_id: string;
+          hourly_wage: number;
+          id: string;
+          job_title: string;
+          signature_data_url: string | null;
+          signed_at: string | null;
+          signed_by_employee: boolean | null;
+          signed_by_employer: boolean | null;
+          staff_category: string;
+          start_date: string;
+          updated_at: string;
+          user_id: string;
+        };
         Insert: {
-          additional_agreements?: string | null
-          contract_html: string
-          created_at?: string
-          employer_signature_date?: string | null
-          end_date: string
-          event_id: string
-          hourly_wage: number
-          id?: string
-          job_title: string
-          signature_data_url?: string | null
-          signed_at?: string | null
-          signed_by_employee?: boolean | null
-          signed_by_employer?: boolean | null
-          staff_category: string
-          start_date: string
-          updated_at?: string
-          user_id: string
-        }
+          additional_agreements?: string | null;
+          contract_html: string;
+          created_at?: string;
+          employer_signature_date?: string | null;
+          end_date: string;
+          event_id: string;
+          hourly_wage: number;
+          id?: string;
+          job_title: string;
+          signature_data_url?: string | null;
+          signed_at?: string | null;
+          signed_by_employee?: boolean | null;
+          signed_by_employer?: boolean | null;
+          staff_category: string;
+          start_date: string;
+          updated_at?: string;
+          user_id: string;
+        };
         Update: {
-          additional_agreements?: string | null
-          contract_html?: string
-          created_at?: string
-          employer_signature_date?: string | null
-          end_date?: string
-          event_id?: string
-          hourly_wage?: number
-          id?: string
-          job_title?: string
-          signature_data_url?: string | null
-          signed_at?: string | null
-          signed_by_employee?: boolean | null
-          signed_by_employer?: boolean | null
-          staff_category?: string
-          start_date?: string
-          updated_at?: string
-          user_id?: string
-        }
+          additional_agreements?: string | null;
+          contract_html?: string;
+          created_at?: string;
+          employer_signature_date?: string | null;
+          end_date?: string;
+          event_id?: string;
+          hourly_wage?: number;
+          id?: string;
+          job_title?: string;
+          signature_data_url?: string | null;
+          signed_at?: string | null;
+          signed_by_employee?: boolean | null;
+          signed_by_employer?: boolean | null;
+          staff_category?: string;
+          start_date?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "fk_work_contracts_event"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "internal_events"
-            referencedColumns: ["id"]
+            foreignKeyName: "fk_work_contracts_event";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "internal_events";
+            referencedColumns: ["id"];
           },
-        ]
-      }
-    }
+        ];
+      };
+    };
     Views: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Functions: {
       check_personal_data_access_rate: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+        Args: Record<PropertyKey, never>;
+        Returns: boolean;
+      };
       cleanup_expired_invitations: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+        Args: Record<PropertyKey, never>;
+        Returns: number;
+      };
       cleanup_old_personal_data: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+        Args: Record<PropertyKey, never>;
+        Returns: number;
+      };
       cleanup_rate_limit_records: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
       generate_offer_number: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+        Args: Record<PropertyKey, never>;
+        Returns: string;
+      };
       get_expiring_qualifications: {
-        Args: { days_ahead?: number }
+        Args: { days_ahead?: number };
         Returns: {
-          days_until_expiry: number
-          expires_at: string
-          qualification_id: string
-          qualification_name: string
-          user_id: string
-        }[]
-      }
+          days_until_expiry: number;
+          expires_at: string;
+          qualification_id: string;
+          qualification_name: string;
+          user_id: string;
+        }[];
+      };
       get_user_role: {
-        Args: { _user_id: string }
-        Returns: Database["public"]["Enums"]["app_role"]
-      }
+        Args: { _user_id: string };
+        Returns: Database["public"]["Enums"]["app_role"];
+      };
       has_role: {
         Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+          _role: Database["public"]["Enums"]["app_role"];
+          _user_id: string;
+        };
+        Returns: boolean;
+      };
       is_personal_data_complete: {
         Args: {
-          employee_data_row: Database["public"]["Tables"]["employee_personal_data"]["Row"]
-        }
-        Returns: boolean
-      }
-    }
+          employee_data_row: Database["public"]["Tables"]["employee_personal_data"]["Row"];
+        };
+        Returns: boolean;
+      };
+    };
     Enums: {
-      app_role: "administrator" | "user" | "employee"
+      app_role: "administrator" | "user" | "employee";
       request_status:
         | "ANGEFRAGT"
         | "IN_BEARBEITUNG"
         | "ABGESCHLOSSEN"
-        | "RÜCKFRAGEN_OFFEN"
-    }
+        | "RÜCKFRAGEN_OFFEN";
+    };
     CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+      [_ in never]: never;
+    };
+  };
+};
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<
+  keyof Database,
+  "public"
+>];
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
+      Row: infer R;
     }
     ? R
     : never
@@ -869,95 +872,95 @@ export type Tables<
         DefaultSchema["Views"])
     ? (DefaultSchema["Tables"] &
         DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
+        Row: infer R;
       }
       ? R
       : never
-    : never
+    : never;
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
+      Insert: infer I;
     }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
+        Insert: infer I;
       }
       ? I
       : never
-    : never
+    : never;
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
+      Update: infer U;
     }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
+        Update: infer U;
       }
       ? U
       : never
-    : never
+    : never;
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+    : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+    : never;
 
 export const Constants = {
   public: {
@@ -971,4 +974,4 @@ export const Constants = {
       ],
     },
   },
-} as const
+} as const;

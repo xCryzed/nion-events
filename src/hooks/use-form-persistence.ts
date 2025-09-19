@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { useEffect } from "react";
+import { UseFormReturn } from "react-hook-form";
 
 export const useFormPersistence = <T extends Record<string, any>>(
   form: UseFormReturn<T>,
   storageKey: string,
-  onSuccessfulSubmit?: () => void
+  onSuccessfulSubmit?: () => void,
 ) => {
   // Load saved data on mount
   useEffect(() => {
@@ -15,7 +15,7 @@ export const useFormPersistence = <T extends Record<string, any>>(
         // Reset form with saved data
         form.reset(parsedData);
       } catch (error) {
-        console.error('Error parsing saved form data:', error);
+        console.error("Error parsing saved form data:", error);
         localStorage.removeItem(storageKey);
       }
     }
@@ -27,7 +27,7 @@ export const useFormPersistence = <T extends Record<string, any>>(
       try {
         localStorage.setItem(storageKey, JSON.stringify(data));
       } catch (error) {
-        console.error('Error saving form data:', error);
+        console.error("Error saving form data:", error);
       }
     });
 

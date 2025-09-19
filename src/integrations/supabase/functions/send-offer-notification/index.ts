@@ -3,175 +3,184 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 // @ts-expect-error - npm imports are valid in Deno runtime
 import { Resend } from "npm:resend@2.0.0";
 // @ts-expect-error - Supabase imports are valid in Deno runtime
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // @ts-expect-error - Deno global is available in Deno runtime
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 // @ts-expect-error - Deno global is available in Deno runtime
-const supabaseUrl = Deno.env.get('SUPABASE_URL');
+const supabaseUrl = Deno.env.get("SUPABASE_URL");
 // @ts-expect-error - Deno global is available in Deno runtime
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers":
-        "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface OfferRequest {
-    id: string;
-    offer_number: string;
-    event_title: string;
-    event_date: string;
-    end_date?: string;
-    location: string;
-    guest_count: string;
-    tech_requirements: string[];
-    dj_genres: string[];
-    photographer: boolean;
-    videographer: boolean;
-    light_operator: boolean;
-    additional_wishes: string;
-    contact_name: string;
-    contact_email: string;
-    contact_phone: string;
-    contact_company?: string;
-    contact_street: string;
-    contact_house_number: string;
-    contact_postal_code: string;
-    contact_city: string;
-    created_at: string;
+  id: string;
+  offer_number: string;
+  event_title: string;
+  event_date: string;
+  end_date?: string;
+  location: string;
+  guest_count: string;
+  tech_requirements: string[];
+  dj_genres: string[];
+  photographer: boolean;
+  videographer: boolean;
+  light_operator: boolean;
+  additional_wishes: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone: string;
+  contact_company?: string;
+  contact_street: string;
+  contact_house_number: string;
+  contact_postal_code: string;
+  contact_city: string;
+  created_at: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
-    // Handle CORS preflight requests
-    if (req.method === "OPTIONS") {
-        return new Response(null, { headers: corsHeaders });
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    // Get client IP address
+    const clientIP =
+      req.headers.get("x-forwarded-for") ||
+      req.headers.get("x-real-ip") ||
+      "127.0.0.1";
+
+    console.log("Processing event request from IP:", clientIP);
+
+    // Check rate limiting - max 2 requests per hour for event request form
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
+    // Get existing rate limit record
+    const { data: existingRecords, error: selectError } = await supabase
+      .from("rate_limit_requests")
+      .select("*")
+      .eq("ip_address", clientIP)
+      .eq("request_type", "event_request")
+      .gte("window_start", oneHourAgo)
+      .order("window_start", { ascending: false })
+      .limit(1);
+
+    if (selectError) {
+      console.error("Error checking rate limit:", selectError);
     }
 
-    try {
-        // Get client IP address
-        const clientIP = req.headers.get('x-forwarded-for') || 
-                        req.headers.get('x-real-ip') || 
-                        '127.0.0.1';
+    let currentCount = 0;
+    let recordId: string | null = null;
 
-        console.log("Processing event request from IP:", clientIP);
+    if (existingRecords && existingRecords.length > 0) {
+      const record = existingRecords[0];
+      currentCount = record.request_count;
+      recordId = record.id;
 
-        // Check rate limiting - max 2 requests per hour for event request form
-        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-        
-        // Get existing rate limit record
-        const { data: existingRecords, error: selectError } = await supabase
-            .from('rate_limit_requests')
-            .select('*')
-            .eq('ip_address', clientIP)
-            .eq('request_type', 'event_request')
-            .gte('window_start', oneHourAgo)
-            .order('window_start', { ascending: false })
-            .limit(1);
+      // Check if rate limit exceeded
+      if (currentCount >= 2) {
+        console.log(
+          `Rate limit exceeded for IP ${clientIP}: ${currentCount} requests in the last hour`,
+        );
+        return new Response(
+          JSON.stringify({
+            error: "Rate limit exceeded",
+            message:
+              "Zu viele Angebotsanfragen. Bitte versuchen Sie es in einer Stunde erneut.",
+            nextAllowedTime: new Date(
+              Date.now() + 60 * 60 * 1000,
+            ).toISOString(),
+          }),
+          {
+            status: 429,
+            headers: {
+              "Content-Type": "application/json",
+              "Retry-After": "3600",
+              ...corsHeaders,
+            },
+          },
+        );
+      }
+    }
 
-        if (selectError) {
-            console.error("Error checking rate limit:", selectError);
-        }
+    // Update or create rate limit record
+    if (recordId) {
+      // Update existing record
+      const { error: updateError } = await supabase
+        .from("rate_limit_requests")
+        .update({
+          request_count: currentCount + 1,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", recordId);
 
-        let currentCount = 0;
-        let recordId: string | null = null;
+      if (updateError) {
+        console.error("Error updating rate limit:", updateError);
+      }
+    } else {
+      // Create new record
+      const { error: insertError } = await supabase
+        .from("rate_limit_requests")
+        .insert({
+          ip_address: clientIP,
+          request_type: "event_request",
+          request_count: 1,
+          window_start: new Date().toISOString(),
+        });
 
-        if (existingRecords && existingRecords.length > 0) {
-            const record = existingRecords[0];
-            currentCount = record.request_count;
-            recordId = record.id;
-            
-            // Check if rate limit exceeded
-            if (currentCount >= 2) {
-                console.log(`Rate limit exceeded for IP ${clientIP}: ${currentCount} requests in the last hour`);
-                return new Response(
-                    JSON.stringify({ 
-                        error: "Rate limit exceeded", 
-                        message: "Zu viele Angebotsanfragen. Bitte versuchen Sie es in einer Stunde erneut.",
-                        nextAllowedTime: new Date(Date.now() + 60 * 60 * 1000).toISOString()
-                    }), 
-                    {
-                        status: 429,
-                        headers: { 
-                            "Content-Type": "application/json", 
-                            "Retry-After": "3600",
-                            ...corsHeaders 
-                        },
-                    }
-                );
-            }
-        }
+      if (insertError) {
+        console.error("Error creating rate limit record:", insertError);
+      }
+    }
 
-        // Update or create rate limit record
-        if (recordId) {
-            // Update existing record
-            const { error: updateError } = await supabase
-                .from('rate_limit_requests')
-                .update({ request_count: currentCount + 1, updated_at: new Date().toISOString() })
-                .eq('id', recordId);
-                
-            if (updateError) {
-                console.error("Error updating rate limit:", updateError);
-            }
-        } else {
-            // Create new record
-            const { error: insertError } = await supabase
-                .from('rate_limit_requests')
-                .insert({
-                    ip_address: clientIP,
-                    request_type: 'event_request',
-                    request_count: 1,
-                    window_start: new Date().toISOString()
-                });
-                
-            if (insertError) {
-                console.error("Error creating rate limit record:", insertError);
-            }
-        }
+    const offerRequest: OfferRequest = await req.json();
 
-        const offerRequest: OfferRequest = await req.json();
+    console.log("Processing offer notification:", offerRequest);
 
-        console.log("Processing offer notification:", offerRequest);
+    // Helper function to format tech requirements
+    const formatTechRequirements = (techArray: string[]) => {
+      const techLabels: { [key: string]: string } = {
+        sound: "Soundsystem",
+        licht: "Lichttechnik",
+        buehne: "Bühnentechnik",
+        led: "LED-Wände",
+        projektion: "Projektion",
+      };
+      return techArray.map((tech) => techLabels[tech] || tech).join(", ");
+    };
 
-        // Helper function to format tech requirements
-        const formatTechRequirements = (techArray: string[]) => {
-            const techLabels: { [key: string]: string } = {
-                'sound': 'Soundsystem',
-                'licht': 'Lichttechnik', 
-                'buehne': 'Bühnentechnik',
-                'led': 'LED-Wände',
-                'projektion': 'Projektion'
-            };
-            return techArray.map(tech => techLabels[tech] || tech).join(', ');
-        };
+    // Format date
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("de-DE", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    };
 
-        // Format date
-        const formatDate = (dateString: string) => {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('de-DE', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        };
+    const formatDateTime = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("de-DE", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    };
 
-        const formatDateTime = (dateString: string) => {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('de-DE', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        };
-
-        // Create HTML email template
-        const htmlContent = `
+    // Create HTML email template
+    const htmlContent = `
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -443,13 +452,17 @@ const handler = async (req: Request): Promise<Response> => {
                         <div class="info-label">Startdatum</div>
                         <div class="info-value">${formatDate(offerRequest.event_date)}</div>
                     </div>
-                    ${offerRequest.end_date ? `
+                    ${
+                      offerRequest.end_date
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Enddatum</div>
                         <div class="info-value">${formatDate(offerRequest.end_date)}</div>
                     </div>
-                    ` : ''}
-                    <div class="info-item ${!offerRequest.end_date ? 'full-width' : ''}">
+                    `
+                        : ""
+                    }
+                    <div class="info-item ${!offerRequest.end_date ? "full-width" : ""}">
                         <div class="info-label">Veranstaltungsort</div>
                         <div class="info-value">${offerRequest.location}</div>
                     </div>
@@ -465,33 +478,49 @@ const handler = async (req: Request): Promise<Response> => {
                 <div class="info-item">
                     <div class="info-label">Gewünschte Veranstaltungstechnik</div>
                     <div class="service-list">
-                        ${offerRequest.tech_requirements.map(tech => 
-                            `<span class="service-item">${formatTechRequirements([tech])}</span>`
-                        ).join('')}
+                        ${offerRequest.tech_requirements
+                          .map(
+                            (tech) =>
+                              `<span class="service-item">${formatTechRequirements([tech])}</span>`,
+                          )
+                          .join("")}
                     </div>
                 </div>
                 
-                ${offerRequest.dj_genres && offerRequest.dj_genres.length > 0 ? `
+                ${
+                  offerRequest.dj_genres && offerRequest.dj_genres.length > 0
+                    ? `
                 <div class="info-item" style="margin-top: 15px;">
                     <div class="info-label">DJ Musik-Genres</div>
                     <div class="genre-list">
-                        ${offerRequest.dj_genres.map(genre => 
-                            `<span class="genre-item">${genre}</span>`
-                        ).join('')}
+                        ${offerRequest.dj_genres
+                          .map(
+                            (genre) =>
+                              `<span class="genre-item">${genre}</span>`,
+                          )
+                          .join("")}
                     </div>
                 </div>
-                ` : ''}
+                `
+                    : ""
+                }
                 
-                ${(offerRequest.photographer || offerRequest.videographer || offerRequest.light_operator) ? `
+                ${
+                  offerRequest.photographer ||
+                  offerRequest.videographer ||
+                  offerRequest.light_operator
+                    ? `
                 <div class="info-item" style="margin-top: 15px;">
                     <div class="info-label">Zusätzliche Services</div>
                     <div class="service-list">
-                        ${offerRequest.photographer ? '<span class="service-item included">📸 Fotograf</span>' : ''}
-                        ${offerRequest.videographer ? '<span class="service-item included">🎥 Videograf</span>' : ''}
-                        ${offerRequest.light_operator ? '<span class="service-item included">💡 Lichtoperator</span>' : ''}
+                        ${offerRequest.photographer ? '<span class="service-item included">📸 Fotograf</span>' : ""}
+                        ${offerRequest.videographer ? '<span class="service-item included">🎥 Videograf</span>' : ""}
+                        ${offerRequest.light_operator ? '<span class="service-item included">💡 Lichtoperator</span>' : ""}
                     </div>
                 </div>
-                ` : ''}
+                `
+                    : ""
+                }
             </div>
             
             <div class="section">
@@ -509,12 +538,16 @@ const handler = async (req: Request): Promise<Response> => {
                         <div class="info-label">Telefon</div>
                         <div class="info-value">${offerRequest.contact_phone}</div>
                     </div>
-                    ${offerRequest.contact_company ? `
+                    ${
+                      offerRequest.contact_company
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Unternehmen</div>
                         <div class="info-value">${offerRequest.contact_company}</div>
                     </div>
-                    ` : ''}
+                    `
+                        : ""
+                    }
                     <div class="info-item full-width">
                         <div class="info-label">Adresse</div>
                         <div class="info-value">
@@ -525,14 +558,18 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
             </div>
             
-            ${offerRequest.additional_wishes ? `
+            ${
+              offerRequest.additional_wishes
+                ? `
             <div class="section">
                 <h2 class="section-title">Zusätzliche Wünsche</h2>
                 <div class="message-box">
                     <div class="message-text">${offerRequest.additional_wishes}</div>
                 </div>
             </div>
-            ` : ''}
+            `
+                : ""
+            }
         </div>
         
         <div class="footer">
@@ -547,33 +584,30 @@ const handler = async (req: Request): Promise<Response> => {
 </body>
 </html>`;
 
-        // Send email notification
-        const emailResponse = await resend.emails.send({
-            from: "NION Events <info@nion-events.de>",
-            to: ["info@nion-events.de"],
-            subject: `🎯 Neue Angebotsanfrage: ${offerRequest.event_title} | ${offerRequest.offer_number}`,
-            html: htmlContent,
-        });
+    // Send email notification
+    const emailResponse = await resend.emails.send({
+      from: "NION Events <info@nion-events.de>",
+      to: ["info@nion-events.de"],
+      subject: `🎯 Neue Angebotsanfrage: ${offerRequest.event_title} | ${offerRequest.offer_number}`,
+      html: htmlContent,
+    });
 
-        console.log("Offer notification email sent successfully:", emailResponse);
+    console.log("Offer notification email sent successfully:", emailResponse);
 
-        return new Response(JSON.stringify({ success: true, emailResponse }), {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-                ...corsHeaders,
-            },
-        });
-    } catch (error: any) {
-        console.error("Error in send-offer-notification function:", error);
-        return new Response(
-            JSON.stringify({ error: error.message }),
-            {
-                status: 500,
-                headers: { "Content-Type": "application/json", ...corsHeaders },
-            }
-        );
-    }
+    return new Response(JSON.stringify({ success: true, emailResponse }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        ...corsHeaders,
+      },
+    });
+  } catch (error: any) {
+    console.error("Error in send-offer-notification function:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
 };
 
 serve(handler);

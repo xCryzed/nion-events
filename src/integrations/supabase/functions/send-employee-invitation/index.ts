@@ -3,14 +3,14 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 // @ts-expect-error - npm imports are valid in Deno runtime
 import { Resend } from "npm:resend@2.0.0";
 // @ts-expect-error - Supabase imports are valid in Deno runtime
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // @ts-expect-error - Deno global is available in Deno runtime
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 // @ts-expect-error - Deno global is available in Deno runtime
-const supabaseUrl = Deno.env.get('SUPABASE_URL');
+const supabaseUrl = Deno.env.get("SUPABASE_URL");
 // @ts-expect-error - Deno global is available in Deno runtime
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const corsHeaders = {
@@ -37,22 +37,22 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Get the invitation token from the database
     const { data, error: invitationError } = await supabase
-      .from('employee_invitations')
-      .select('invitation_token')
-      .eq('email', email)
-      .eq('status', 'pending')
-      .order('created_at', { ascending: false })
+      .from("employee_invitations")
+      .select("invitation_token")
+      .eq("email", email)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
       .limit(1);
 
     if (invitationError || !data || data.length === 0) {
-      throw new Error('Invitation not found');
+      throw new Error("Invitation not found");
     }
 
     const invitation = data[0];
 
     // Create registration URL with invitation token
     // @ts-expect-error - Deno global is available in Deno runtime
-    const siteUrl = Deno.env.get('SITE_URL') || 'https://nion-events.de';
+    const siteUrl = Deno.env.get("SITE_URL") || "https://nion-events.de";
     const registrationUrl = `${siteUrl}/anmelden?email=${encodeURIComponent(email)}&token=${encodeURIComponent(invitation.invitation_token)}`;
     const emailPreviewUrl = `${siteUrl}/email-preview/${invitation.invitation_token}`;
 
@@ -335,13 +335,10 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: any) {
     console.error("Error in send-employee-invitation function:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   }
 };
 

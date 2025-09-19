@@ -1,19 +1,19 @@
-import * as React from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker, DropdownProps } from "react-day-picker"
+import * as React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DayPicker, DropdownProps } from "react-day-picker";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
+export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 function Calendar({
   className,
@@ -31,13 +31,16 @@ function Calendar({
         caption: "flex justify-center pt-1 relative items-center",
         caption_label: "sr-only",
         caption_dropdowns: "flex justify-center gap-1",
-        dropdown: "rounded-md border border-input bg-background px-3 py-2 text-sm",
-        dropdown_month: "rounded-md border border-input bg-background px-3 py-2 text-sm",
-        dropdown_year: "rounded-md border border-input bg-background px-3 py-2 text-sm",
+        dropdown:
+          "rounded-md border border-input bg-background px-3 py-2 text-sm",
+        dropdown_month:
+          "rounded-md border border-input bg-background px-3 py-2 text-sm",
+        dropdown_year:
+          "rounded-md border border-input bg-background px-3 py-2 text-sm",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
@@ -46,11 +49,10 @@ function Calendar({
         head_cell:
           "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
         row: "flex w-full mt-2",
-        cell:
-          "h-9 w-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+        cell: "h-9 w-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-full"
+          "h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-full",
         ),
         day_range_end: "day-range-end",
         day_selected:
@@ -67,8 +69,8 @@ function Calendar({
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
         Dropdown: ({ name, ...props }: DropdownProps) => {
-          const currentDate = new Date()
-          const currentYear = currentDate.getFullYear()
+          const currentDate = new Date();
+          const currentYear = currentDate.getFullYear();
 
           if (name === "months") {
             const months = Array.from({ length: 12 }, (_, i) => ({
@@ -77,9 +79,9 @@ function Calendar({
                 navigator.language,
                 {
                   month: "long",
-                }
+                },
               ),
-            }))
+            }));
 
             return (
               <Select
@@ -87,8 +89,8 @@ function Calendar({
                 onValueChange={(value) => {
                   const changeEvent = {
                     target: { value },
-                  } as React.ChangeEvent<HTMLSelectElement>
-                  props.onChange?.(changeEvent)
+                  } as React.ChangeEvent<HTMLSelectElement>;
+                  props.onChange?.(changeEvent);
                 }}
               >
                 <SelectTrigger className="pr-1.5 focus:ring-0">
@@ -104,15 +106,18 @@ function Calendar({
                   </ScrollArea>
                 </SelectContent>
               </Select>
-            )
+            );
           } else if (name === "years") {
-            const startYear = currentYear - 100
-            const endYear = currentYear + 10
+            const startYear = currentYear - 100;
+            const endYear = currentYear + 10;
 
-            const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => ({
-              value: (startYear + i).toString(),
-              label: (startYear + i).toString(),
-            }))
+            const years = Array.from(
+              { length: endYear - startYear + 1 },
+              (_, i) => ({
+                value: (startYear + i).toString(),
+                label: (startYear + i).toString(),
+              }),
+            );
 
             return (
               <Select
@@ -120,8 +125,8 @@ function Calendar({
                 onValueChange={(value) => {
                   const changeEvent = {
                     target: { value },
-                  } as React.ChangeEvent<HTMLSelectElement>
-                  props.onChange?.(changeEvent)
+                  } as React.ChangeEvent<HTMLSelectElement>;
+                  props.onChange?.(changeEvent);
                 }}
               >
                 <SelectTrigger className="pr-1.5 focus:ring-0">
@@ -137,16 +142,16 @@ function Calendar({
                   </ScrollArea>
                 </SelectContent>
               </Select>
-            )
+            );
           }
 
-          return null
+          return null;
         },
       }}
       {...props}
     />
-  )
+  );
 }
-Calendar.displayName = "Calendar"
+Calendar.displayName = "Calendar";
 
-export { Calendar }
+export { Calendar };

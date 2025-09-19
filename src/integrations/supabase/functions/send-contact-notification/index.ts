@@ -3,171 +3,180 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 // @ts-expect-error - npm imports are valid in Deno runtime
 import { Resend } from "npm:resend@2.0.0";
 // @ts-expect-error - Supabase imports are valid in Deno runtime
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // @ts-expect-error - Deno global is available in Deno runtime
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 // @ts-expect-error - Deno global is available in Deno runtime
-const supabaseUrl = Deno.env.get('SUPABASE_URL');
+const supabaseUrl = Deno.env.get("SUPABASE_URL");
 // @ts-expect-error - Deno global is available in Deno runtime
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers":
-        "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface ContactRequest {
-    id: string;
-    name: string;
-    email: string;
-    phone?: string;
-    mobile?: string;
-    company?: string;
-    event_type?: string;
-    callback_time?: string;
-    venue?: string;
-    message: string;
-    created_at: string;
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  mobile?: string;
+  company?: string;
+  event_type?: string;
+  callback_time?: string;
+  venue?: string;
+  message: string;
+  created_at: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
-    // Handle CORS preflight requests
-    if (req.method === "OPTIONS") {
-        return new Response(null, { headers: corsHeaders });
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    // Get client IP address
+    const clientIP =
+      req.headers.get("x-forwarded-for") ||
+      req.headers.get("x-real-ip") ||
+      "127.0.0.1";
+
+    console.log("Processing contact request from IP:", clientIP);
+
+    // Check rate limiting - max 3 requests per hour for contact form
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
+    // Get existing rate limit record
+    const { data: existingRecords, error: selectError } = await supabase
+      .from("rate_limit_requests")
+      .select("*")
+      .eq("ip_address", clientIP)
+      .eq("request_type", "contact")
+      .gte("window_start", oneHourAgo)
+      .order("window_start", { ascending: false })
+      .limit(1);
+
+    if (selectError) {
+      console.error("Error checking rate limit:", selectError);
     }
 
-    try {
-        // Get client IP address
-        const clientIP = req.headers.get('x-forwarded-for') || 
-                        req.headers.get('x-real-ip') || 
-                        '127.0.0.1';
+    let currentCount = 0;
+    let recordId: string | null = null;
 
-        console.log("Processing contact request from IP:", clientIP);
+    if (existingRecords && existingRecords.length > 0) {
+      const record = existingRecords[0];
+      currentCount = record.request_count;
+      recordId = record.id;
 
-        // Check rate limiting - max 3 requests per hour for contact form
-        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-        
-        // Get existing rate limit record
-        const { data: existingRecords, error: selectError } = await supabase
-            .from('rate_limit_requests')
-            .select('*')
-            .eq('ip_address', clientIP)
-            .eq('request_type', 'contact')
-            .gte('window_start', oneHourAgo)
-            .order('window_start', { ascending: false })
-            .limit(1);
+      // Check if rate limit exceeded
+      if (currentCount >= 3) {
+        console.log(
+          `Rate limit exceeded for IP ${clientIP}: ${currentCount} requests in the last hour`,
+        );
+        return new Response(
+          JSON.stringify({
+            error: "Rate limit exceeded",
+            message:
+              "Zu viele Anfragen. Bitte versuchen Sie es in einer Stunde erneut.",
+            nextAllowedTime: new Date(
+              Date.now() + 60 * 60 * 1000,
+            ).toISOString(),
+          }),
+          {
+            status: 429,
+            headers: {
+              "Content-Type": "application/json",
+              "Retry-After": "3600",
+              ...corsHeaders,
+            },
+          },
+        );
+      }
+    }
 
-        if (selectError) {
-            console.error("Error checking rate limit:", selectError);
-        }
+    // Update or create rate limit record
+    if (recordId) {
+      // Update existing record
+      const { error: updateError } = await supabase
+        .from("rate_limit_requests")
+        .update({
+          request_count: currentCount + 1,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", recordId);
 
-        let currentCount = 0;
-        let recordId: string | null = null;
+      if (updateError) {
+        console.error("Error updating rate limit:", updateError);
+      }
+    } else {
+      // Create new record
+      const { error: insertError } = await supabase
+        .from("rate_limit_requests")
+        .insert({
+          ip_address: clientIP,
+          request_type: "contact",
+          request_count: 1,
+          window_start: new Date().toISOString(),
+        });
 
-        if (existingRecords && existingRecords.length > 0) {
-            const record = existingRecords[0];
-            currentCount = record.request_count;
-            recordId = record.id;
-            
-            // Check if rate limit exceeded
-            if (currentCount >= 3) {
-                console.log(`Rate limit exceeded for IP ${clientIP}: ${currentCount} requests in the last hour`);
-                return new Response(
-                    JSON.stringify({ 
-                        error: "Rate limit exceeded", 
-                        message: "Zu viele Anfragen. Bitte versuchen Sie es in einer Stunde erneut.",
-                        nextAllowedTime: new Date(Date.now() + 60 * 60 * 1000).toISOString()
-                    }), 
-                    {
-                        status: 429,
-                        headers: { 
-                            "Content-Type": "application/json", 
-                            "Retry-After": "3600",
-                            ...corsHeaders 
-                        },
-                    }
-                );
-            }
-        }
+      if (insertError) {
+        console.error("Error creating rate limit record:", insertError);
+      }
+    }
 
-        // Update or create rate limit record
-        if (recordId) {
-            // Update existing record
-            const { error: updateError } = await supabase
-                .from('rate_limit_requests')
-                .update({ request_count: currentCount + 1, updated_at: new Date().toISOString() })
-                .eq('id', recordId);
-                
-            if (updateError) {
-                console.error("Error updating rate limit:", updateError);
-            }
-        } else {
-            // Create new record
-            const { error: insertError } = await supabase
-                .from('rate_limit_requests')
-                .insert({
-                    ip_address: clientIP,
-                    request_type: 'contact',
-                    request_count: 1,
-                    window_start: new Date().toISOString()
-                });
-                
-            if (insertError) {
-                console.error("Error creating rate limit record:", insertError);
-            }
-        }
+    const contactRequest: ContactRequest = await req.json();
 
-        const contactRequest: ContactRequest = await req.json();
+    console.log("Processing contact request:", contactRequest);
 
-        console.log("Processing contact request:", contactRequest);
+    // Helper function to get readable labels
+    const getEventTypeLabel = (eventType: string) => {
+      const eventTypes: { [key: string]: string } = {
+        hochzeit: "Hochzeit",
+        firmenveranstaltung: "Firmenveranstaltung",
+        konferenz: "Konferenz",
+        gala: "Gala-Event",
+        geburtstag: "Geburtstag",
+        abschlussfeier: "Abschlussfeier",
+        abiball: "Abiball",
+        produktpräsentation: "Produktpräsentation",
+        messe: "Messe",
+        sonstiges: "Sonstiges",
+      };
+      return eventTypes[eventType] || eventType;
+    };
 
-        // Helper function to get readable labels
-        const getEventTypeLabel = (eventType: string) => {
-            const eventTypes: { [key: string]: string } = {
-                'hochzeit': 'Hochzeit',
-                'firmenveranstaltung': 'Firmenveranstaltung',
-                'konferenz': 'Konferenz',
-                'gala': 'Gala-Event',
-                'geburtstag': 'Geburtstag',
-                'abschlussfeier': 'Abschlussfeier',
-                'abiball': 'Abiball',
-                'produktpräsentation': 'Produktpräsentation',
-                'messe': 'Messe',
-                'sonstiges': 'Sonstiges'
-            };
-            return eventTypes[eventType] || eventType;
-        };
+    const getCallbackTimeLabel = (callbackTime: string) => {
+      const callbackTimes: { [key: string]: string } = {
+        morgens: "Morgens (08:00 - 12:00 Uhr)",
+        mittags: "Mittags (12:00 - 15:00 Uhr)",
+        nachmittags: "Nachmittags (15:00 - 18:00 Uhr)",
+        abends: "Abends (18:00 - 20:00 Uhr)",
+        wochenende: "Am Wochenende",
+        flexibel: "Flexibel",
+      };
+      return callbackTimes[callbackTime] || callbackTime;
+    };
 
-        const getCallbackTimeLabel = (callbackTime: string) => {
-            const callbackTimes: { [key: string]: string } = {
-                'morgens': 'Morgens (08:00 - 12:00 Uhr)',
-                'mittags': 'Mittags (12:00 - 15:00 Uhr)',
-                'nachmittags': 'Nachmittags (15:00 - 18:00 Uhr)',
-                'abends': 'Abends (18:00 - 20:00 Uhr)',
-                'wochenende': 'Am Wochenende',
-                'flexibel': 'Flexibel'
-            };
-            return callbackTimes[callbackTime] || callbackTime;
-        };
+    // Format date
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("de-DE", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    };
 
-        // Format date
-        const formatDate = (dateString: string) => {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('de-DE', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        };
-
-        // Create HTML email template
-        const htmlContent = `
+    // Create HTML email template
+    const htmlContent = `
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -368,52 +377,82 @@ const handler = async (req: Request): Promise<Response> => {
                         <div class="info-label">E-Mail</div>
                         <div class="info-value">${contactRequest.email}</div>
                     </div>
-                    ${contactRequest.phone ? `
+                    ${
+                      contactRequest.phone
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Telefon</div>
                         <div class="info-value">${contactRequest.phone}</div>
                     </div>
-                    ` : ''}
-                    ${contactRequest.mobile ? `
+                    `
+                        : ""
+                    }
+                    ${
+                      contactRequest.mobile
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Mobil</div>
                         <div class="info-value">${contactRequest.mobile}</div>
                     </div>
-                    ` : ''}
-                    ${contactRequest.company ? `
+                    `
+                        : ""
+                    }
+                    ${
+                      contactRequest.company
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Unternehmen</div>
                         <div class="info-value">${contactRequest.company}</div>
                     </div>
-                    ` : ''}
+                    `
+                        : ""
+                    }
                 </div>
             </div>
             
-            ${contactRequest.event_type || contactRequest.callback_time || contactRequest.venue ? `
+            ${
+              contactRequest.event_type ||
+              contactRequest.callback_time ||
+              contactRequest.venue
+                ? `
             <div class="section">
                 <h2 class="section-title">Event-Details</h2>
                 <div class="info-grid">
-                    ${contactRequest.event_type ? `
+                    ${
+                      contactRequest.event_type
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Veranstaltungsart</div>
                         <div class="info-value">${getEventTypeLabel(contactRequest.event_type)}</div>
                     </div>
-                    ` : ''}
-                    ${contactRequest.callback_time ? `
+                    `
+                        : ""
+                    }
+                    ${
+                      contactRequest.callback_time
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Gewünschte Rückrufzeit</div>
                         <div class="info-value">${getCallbackTimeLabel(contactRequest.callback_time)}</div>
                     </div>
-                    ` : ''}
-                    ${contactRequest.venue ? `
+                    `
+                        : ""
+                    }
+                    ${
+                      contactRequest.venue
+                        ? `
                     <div class="info-item" style="grid-column: 1 / -1;">
                         <div class="info-label">Veranstaltungsort</div>
                         <div class="info-value">${contactRequest.venue}</div>
                     </div>
-                    ` : ''}
+                    `
+                        : ""
+                    }
                 </div>
             </div>
-            ` : ''}
+            `
+                : ""
+            }
             
             <div class="section">
                 <h2 class="section-title">Nachricht</h2>
@@ -435,33 +474,30 @@ const handler = async (req: Request): Promise<Response> => {
 </body>
 </html>`;
 
-        // Send email notification
-        const emailResponse = await resend.emails.send({
-            from: "NION Events <info@nion-events.de>",
-            to: ["info@nion-events.de"],
-            subject: `🎉 Neue Kontaktanfrage von ${contactRequest.name} (ID: ${contactRequest.id})`,
-            html: htmlContent,
-        });
+    // Send email notification
+    const emailResponse = await resend.emails.send({
+      from: "NION Events <info@nion-events.de>",
+      to: ["info@nion-events.de"],
+      subject: `🎉 Neue Kontaktanfrage von ${contactRequest.name} (ID: ${contactRequest.id})`,
+      html: htmlContent,
+    });
 
-        console.log("Email sent successfully:", emailResponse);
+    console.log("Email sent successfully:", emailResponse);
 
-        return new Response(JSON.stringify({ success: true, emailResponse }), {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-                ...corsHeaders,
-            },
-        });
-    } catch (error: any) {
-        console.error("Error in send-contact-notification function:", error);
-        return new Response(
-            JSON.stringify({ error: error.message }),
-            {
-                status: 500,
-                headers: { "Content-Type": "application/json", ...corsHeaders },
-            }
-        );
-    }
+    return new Response(JSON.stringify({ success: true, emailResponse }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        ...corsHeaders,
+      },
+    });
+  } catch (error: any) {
+    console.error("Error in send-contact-notification function:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
 };
 
 serve(handler);

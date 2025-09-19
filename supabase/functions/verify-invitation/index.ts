@@ -12,7 +12,8 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -34,7 +35,12 @@ serve(async (req) => {
   }
 
   try {
-    const { token, email } = await req.json().catch(() => ({ token: undefined, email: undefined })) as { token?: string; email?: string };
+    const { token, email } = (await req
+      .json()
+      .catch(() => ({ token: undefined, email: undefined }))) as {
+      token?: string;
+      email?: string;
+    };
 
     const emailNorm = email ? email.toLowerCase().trim() : null;
     const tokenNorm = (token || "").trim();
@@ -45,23 +51,27 @@ serve(async (req) => {
 
     // Load invitation directly with service role (bypasses RLS)
     let query = supabase
-      .from('employee_invitations')
-      .select('id, invitation_token, email, status, expires_at, role')
-      .eq('invitation_token', tokenNorm)
-      .eq('status', 'pending');
+      .from("employee_invitations")
+      .select("id, invitation_token, email, status, expires_at, role")
+      .eq("invitation_token", tokenNorm)
+      .eq("status", "pending");
 
     // If email is provided, filter by email as well
     if (emailNorm) {
-      query = query.eq('email', emailNorm);
+      query = query.eq("email", emailNorm);
     }
 
     const { data: invitation, error } = await query.single();
 
     if (error || !invitation) {
-      return json({ error: "Einladung nicht gefunden oder nicht mehr gültig" }, 404);
+      return json(
+        { error: "Einladung nicht gefunden oder nicht mehr gültig" },
+        404,
+      );
     }
 
-    const expired = invitation.expires_at && new Date(invitation.expires_at) < new Date();
+    const expired =
+      invitation.expires_at && new Date(invitation.expires_at) < new Date();
     if (expired) {
       return json({ error: "Einladung ist abgelaufen" }, 400);
     }
@@ -69,10 +79,10 @@ serve(async (req) => {
     // Only return essential information for security
     return json({
       valid: true,
-      email: invitation.email // Only return email for form pre-filling
+      email: invitation.email, // Only return email for form pre-filling
     });
   } catch (e: any) {
-    console.error('verify-invitation error', e);
-    return json({ error: e?.message || 'Internal Server Error' }, 500);
+    console.error("verify-invitation error", e);
+    return json({ error: e?.message || "Internal Server Error" }, 500);
   }
 });

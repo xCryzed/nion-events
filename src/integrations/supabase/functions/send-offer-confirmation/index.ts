@@ -7,84 +7,87 @@ import { Resend } from "npm:resend@2.0.0";
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers":
-        "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface OfferRequest {
-    id: string;
-    offer_number: string;
-    event_title: string;
-    event_date: string;
-    end_date?: string;
-    location: string;
-    guest_count: string;
-    tech_requirements: string[];
-    dj_genres: string[];
-    photographer: boolean;
-    videographer: boolean;
-    light_operator: boolean;
-    additional_wishes: string;
-    contact_name: string;
-    contact_email: string;
-    contact_phone: string;
-    contact_company?: string;
-    contact_street: string;
-    contact_house_number: string;
-    contact_postal_code: string;
-    contact_city: string;
-    created_at: string;
+  id: string;
+  offer_number: string;
+  event_title: string;
+  event_date: string;
+  end_date?: string;
+  location: string;
+  guest_count: string;
+  tech_requirements: string[];
+  dj_genres: string[];
+  photographer: boolean;
+  videographer: boolean;
+  light_operator: boolean;
+  additional_wishes: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone: string;
+  contact_company?: string;
+  contact_street: string;
+  contact_house_number: string;
+  contact_postal_code: string;
+  contact_city: string;
+  created_at: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
-    // Handle CORS preflight requests
-    if (req.method === "OPTIONS") {
-        return new Response(null, { headers: corsHeaders });
-    }
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
 
-    try {
-        const offerRequest: OfferRequest = await req.json();
+  try {
+    const offerRequest: OfferRequest = await req.json();
 
-        console.log("Processing offer confirmation for:", offerRequest.contact_email);
+    console.log(
+      "Processing offer confirmation for:",
+      offerRequest.contact_email,
+    );
 
-        // Helper function to format tech requirements
-        const formatTechRequirements = (techArray: string[]) => {
-            const techLabels: { [key: string]: string } = {
-                'sound': 'Soundsystem',
-                'licht': 'Lichttechnik', 
-                'buehne': 'Bühnentechnik',
-                'led': 'LED-Wände',
-                'projektion': 'Projektion'
-            };
-            return techArray.map(tech => techLabels[tech] || tech).join(', ');
-        };
+    // Helper function to format tech requirements
+    const formatTechRequirements = (techArray: string[]) => {
+      const techLabels: { [key: string]: string } = {
+        sound: "Soundsystem",
+        licht: "Lichttechnik",
+        buehne: "Bühnentechnik",
+        led: "LED-Wände",
+        projektion: "Projektion",
+      };
+      return techArray.map((tech) => techLabels[tech] || tech).join(", ");
+    };
 
-        // Format date
-        const formatDate = (dateString: string) => {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('de-DE', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        };
+    // Format date
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("de-DE", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    };
 
-        const formatDateTime = (dateString: string) => {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('de-DE', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        };
+    const formatDateTime = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("de-DE", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    };
 
-        // Create HTML email template for customer confirmation
-        const htmlContent = `
+    // Create HTML email template for customer confirmation
+    const htmlContent = `
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -470,13 +473,17 @@ const handler = async (req: Request): Promise<Response> => {
                         <div class="info-label">Datum</div>
                         <div class="info-value">${formatDate(offerRequest.event_date)}</div>
                     </div>
-                    ${offerRequest.end_date ? `
+                    ${
+                      offerRequest.end_date
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Bis</div>
                         <div class="info-value">${formatDate(offerRequest.end_date)}</div>
                     </div>
-                    ` : ''}
-                    <div class="info-item ${!offerRequest.end_date ? 'full-width' : ''}">
+                    `
+                        : ""
+                    }
+                    <div class="info-item ${!offerRequest.end_date ? "full-width" : ""}">
                         <div class="info-label">Location</div>
                         <div class="info-value">${offerRequest.location}</div>
                     </div>
@@ -489,40 +496,60 @@ const handler = async (req: Request): Promise<Response> => {
                 <div class="info-item">
                     <div class="info-label">Gewünschte Technik</div>
                     <div class="service-list">
-                        ${offerRequest.tech_requirements.map(tech => 
-                            `<span class="service-item">${formatTechRequirements([tech])}</span>`
-                        ).join('')}
+                        ${offerRequest.tech_requirements
+                          .map(
+                            (tech) =>
+                              `<span class="service-item">${formatTechRequirements([tech])}</span>`,
+                          )
+                          .join("")}
                     </div>
                 </div>
                 
-                ${offerRequest.dj_genres && offerRequest.dj_genres.length > 0 ? `
+                ${
+                  offerRequest.dj_genres && offerRequest.dj_genres.length > 0
+                    ? `
                 <div class="info-item" style="margin-top: 15px;">
                     <div class="info-label">Gewünschte Musik-Genres</div>
                     <div class="genre-list">
-                        ${offerRequest.dj_genres.map(genre => 
-                            `<span class="genre-item">${genre}</span>`
-                        ).join('')}
+                        ${offerRequest.dj_genres
+                          .map(
+                            (genre) =>
+                              `<span class="genre-item">${genre}</span>`,
+                          )
+                          .join("")}
                     </div>
                 </div>
-                ` : ''}
+                `
+                    : ""
+                }
                 
-                ${(offerRequest.photographer || offerRequest.videographer || offerRequest.light_operator) ? `
+                ${
+                  offerRequest.photographer ||
+                  offerRequest.videographer ||
+                  offerRequest.light_operator
+                    ? `
                 <div class="info-item" style="margin-top: 15px;">
                     <div class="info-label">Zusätzliche Services</div>
                     <div class="service-list">
-                        ${offerRequest.photographer ? '<span class="service-item included">📸 Fotograf</span>' : ''}
-                        ${offerRequest.videographer ? '<span class="service-item included">🎥 Videograf</span>' : ''}
-                        ${offerRequest.light_operator ? '<span class="service-item included">💡 Lichtoperator</span>' : ''}
+                        ${offerRequest.photographer ? '<span class="service-item included">📸 Fotograf</span>' : ""}
+                        ${offerRequest.videographer ? '<span class="service-item included">🎥 Videograf</span>' : ""}
+                        ${offerRequest.light_operator ? '<span class="service-item included">💡 Lichtoperator</span>' : ""}
                     </div>
                 </div>
-                ` : ''}
+                `
+                    : ""
+                }
                 
-                ${offerRequest.additional_wishes ? `
+                ${
+                  offerRequest.additional_wishes
+                    ? `
                 <div class="message-box" style="margin-top: 15px;">
                     <div class="info-label">Ihre zusätzlichen Wünsche</div>
                     <div class="message-text">${offerRequest.additional_wishes}</div>
                 </div>
-                ` : ''}
+                `
+                    : ""
+                }
             </div>
             
             <div class="next-steps">
@@ -577,33 +604,30 @@ const handler = async (req: Request): Promise<Response> => {
 </body>
 </html>`;
 
-        // Send customer confirmation email
-        const emailResponse = await resend.emails.send({
-            from: "NION Events <info@nion-events.de>",
-            to: [offerRequest.contact_email],
-            subject: `Angebot wird erstellt: ${offerRequest.event_title} | ${offerRequest.offer_number} 🎉`,
-            html: htmlContent,
-        });
+    // Send customer confirmation email
+    const emailResponse = await resend.emails.send({
+      from: "NION Events <info@nion-events.de>",
+      to: [offerRequest.contact_email],
+      subject: `Angebot wird erstellt: ${offerRequest.event_title} | ${offerRequest.offer_number} 🎉`,
+      html: htmlContent,
+    });
 
-        console.log("Offer confirmation email sent successfully:", emailResponse);
+    console.log("Offer confirmation email sent successfully:", emailResponse);
 
-        return new Response(JSON.stringify({ success: true, emailResponse }), {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-                ...corsHeaders,
-            },
-        });
-    } catch (error: any) {
-        console.error("Error in send-offer-confirmation function:", error);
-        return new Response(
-            JSON.stringify({ error: error.message }),
-            {
-                status: 500,
-                headers: { "Content-Type": "application/json", ...corsHeaders },
-            }
-        );
-    }
+    return new Response(JSON.stringify({ success: true, emailResponse }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        ...corsHeaders,
+      },
+    });
+  } catch (error: any) {
+    console.error("Error in send-offer-confirmation function:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
 };
 
 serve(handler);

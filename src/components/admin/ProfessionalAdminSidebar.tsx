@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React from "react";
+import { NavLink } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +12,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   useSidebar,
-} from '@/components/ui/sidebar';
+} from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
   Calendar,
@@ -28,12 +28,12 @@ import {
   ChevronRight,
   Award,
   Clock,
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import nionLogo from '@/assets/nion-logo-white.svg';
-import packageJson from '../../../package.json';
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import nionLogo from "@/assets/nion-logo-white.svg";
+import packageJson from "../../../package.json";
 
 interface ProfessionalAdminSidebarProps {
   activeTab: string;
@@ -64,129 +64,128 @@ export function ProfessionalAdminSidebar({
       label: "Übersicht",
       items: [
         {
-          id: 'dashboard',
-          title: 'Dashboard',
+          id: "dashboard",
+          title: "Dashboard",
           icon: LayoutDashboard,
           count: null,
-          description: 'Übersicht und Statistiken'
+          description: "Übersicht und Statistiken",
         },
         {
-          id: 'analytics',
-          title: 'Analytics',
+          id: "analytics",
+          title: "Analytics",
           icon: BarChart3,
           count: null,
-          description: 'Detaillierte Auswertungen'
+          description: "Detaillierte Auswertungen",
         },
-      ]
+      ],
     },
     {
       label: "Verwaltung",
       items: [
         {
-          id: 'event-requests',
-          title: 'Angebotsanfragen',
+          id: "event-requests",
+          title: "Angebotsanfragen",
           icon: Calendar,
           count: eventRequestsCount,
-          description: 'Event-Anfragen bearbeiten'
+          description: "Event-Anfragen bearbeiten",
         },
         {
-          id: 'contacts',
-          title: 'Kontaktanfragen',
+          id: "contacts",
+          title: "Kontaktanfragen",
           icon: MessageSquare,
           count: contactRequestsCount,
-          description: 'Kundenkommunikation'
+          description: "Kundenkommunikation",
         },
         {
-          id: 'events',
-          title: 'Veranstaltungen',
+          id: "events",
+          title: "Veranstaltungen",
           icon: Calendar,
           count: internalEventsCount,
-          description: 'Interne Events verwalten'
+          description: "Interne Events verwalten",
         },
-      ]
+      ],
     },
     {
       label: "Personal",
       items: [
         {
-          id: 'users',
-          title: 'Benutzer',
+          id: "users",
+          title: "Benutzer",
           icon: Users,
           count: usersCount,
-          description: 'Benutzerverwaltung'
+          description: "Benutzerverwaltung",
         },
         {
-          id: 'invitations',
-          title: 'Einladungen',
+          id: "invitations",
+          title: "Einladungen",
           icon: UserPlus,
           count: invitationsCount,
-          description: 'Mitarbeiter einladen'
+          description: "Mitarbeiter einladen",
         },
         {
-          id: 'personnel',
-          title: 'Personalakten',
+          id: "personnel",
+          title: "Personalakten",
           icon: FileText,
           count: personnelCount,
-          description: 'Mitarbeiterdaten'
+          description: "Mitarbeiterdaten",
         },
         {
-          id: 'qualifications',
-          title: 'Qualifikationen',
+          id: "qualifications",
+          title: "Qualifikationen",
           icon: Award,
           count: null,
-          description: 'Qualifikationen verwalten'
+          description: "Qualifikationen verwalten",
         },
         {
-          id: 'time-records',
-          title: 'Stundenerfassung',
+          id: "time-records",
+          title: "Stundenerfassung",
           icon: Clock,
           count: null,
-          description: 'Arbeitszeiten verwalten'
+          description: "Arbeitszeiten verwalten",
         },
-      ]
+      ],
     },
     {
       label: "System",
       items: [
         {
-          id: 'settings',
-          title: 'Einstellungen',
+          id: "settings",
+          title: "Einstellungen",
           icon: Settings,
           count: null,
-          description: 'Systemkonfiguration'
+          description: "Systemkonfiguration",
         },
         {
-          id: 'security',
-          title: 'Sicherheit',
+          id: "security",
+          title: "Sicherheit",
           icon: Shield,
           count: null,
-          description: 'Sicherheitseinstellungen'
+          description: "Sicherheitseinstellungen",
         },
         {
-          id: 'logs',
-          title: 'System-Logs',
+          id: "logs",
+          title: "System-Logs",
           icon: Database,
           count: null,
-          description: 'Protokolle einsehen'
+          description: "Protokolle einsehen",
         },
-      ]
-    }
+      ],
+    },
   ];
 
   const isActive = (itemId: string) => activeTab === itemId;
 
   return (
-      <Sidebar
-        collapsible="icon"
-        className="z-40"
-      >
+    <Sidebar collapsible="icon" className="z-40">
       {/* Header */}
       <SidebarHeader className="border-b border-border/50">
-        <div className={`flex items-center gap-3 p-4 ${collapsed ? 'justify-center' : ''}`}>
+        <div
+          className={`flex items-center gap-3 p-4 ${collapsed ? "justify-center" : ""}`}
+        >
           <div className="flex-shrink-0">
-            <img 
-              src={nionLogo} 
-              alt="NION Logo" 
+            <img
+              src={nionLogo}
+              alt="NION Logo"
               className="h-8 w-8 text-primary"
             />
           </div>
@@ -202,7 +201,7 @@ export function ProfessionalAdminSidebar({
       <SidebarContent className="px-2">
         {navigationGroups.map((group, groupIndex) => (
           <SidebarGroup key={group.label} className="py-2">
-            <SidebarGroupLabel 
+            <SidebarGroupLabel
               className={`px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider ${
                 collapsed ? "sr-only" : ""
               }`}
@@ -226,10 +225,14 @@ export function ProfessionalAdminSidebar({
                         className="w-full h-full justify-start relative group"
                       >
                         <div className="flex items-center w-full">
-                          <item.icon className={`h-5 w-5 flex-shrink-0 ${
-                            isActive(item.id) ? 'text-primary' : 'text-muted-foreground'
-                          }`} />
-                          
+                          <item.icon
+                            className={`h-5 w-5 flex-shrink-0 ${
+                              isActive(item.id)
+                                ? "text-primary"
+                                : "text-muted-foreground"
+                            }`}
+                          />
+
                           {!collapsed && (
                             <>
                               <div className="flex flex-col items-start ml-3 flex-1 min-w-0">
@@ -240,11 +243,15 @@ export function ProfessionalAdminSidebar({
                                   {item.description}
                                 </span>
                               </div>
-                              
+
                               <div className="flex items-center gap-1">
                                 {item.count !== null && item.count > 0 && (
                                   <Badge
-                                    variant={isActive(item.id) ? "default" : "secondary"}
+                                    variant={
+                                      isActive(item.id)
+                                        ? "default"
+                                        : "secondary"
+                                    }
                                     className="text-xs h-5 px-2"
                                   >
                                     {item.count}
@@ -257,13 +264,16 @@ export function ProfessionalAdminSidebar({
                             </>
                           )}
                         </div>
-                        
+
                         {/* Tooltip for collapsed state */}
                         {collapsed && (
                           <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-sm rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
                             {item.title}
                             {item.count !== null && item.count > 0 && (
-                              <Badge variant="secondary" className="ml-2 text-xs">
+                              <Badge
+                                variant="secondary"
+                                className="ml-2 text-xs"
+                              >
                                 {item.count}
                               </Badge>
                             )}
@@ -275,10 +285,11 @@ export function ProfessionalAdminSidebar({
                 ))}
               </SidebarMenu>
             </SidebarGroupContent>
-            {groupIndex < navigationGroups.length - 1 && <Separator className="my-2" />}
+            {groupIndex < navigationGroups.length - 1 && (
+              <Separator className="my-2" />
+            )}
           </SidebarGroup>
         ))}
-
       </SidebarContent>
 
       {/* Footer */}
@@ -293,9 +304,9 @@ export function ProfessionalAdminSidebar({
               <Home className="h-4 w-4" />
               <span>Zur Hauptseite</span>
             </NavLink>
-            
+
             <Separator />
-            
+
             {/* Version Info */}
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>Version</span>

@@ -41,15 +41,20 @@ serve(async (req) => {
     }
 
     const jwt = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: userError } = await supabase.auth.getUser(jwt);
-    
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser(jwt);
+
     if (userError || !user) {
       return json({ error: "Unauthorized" }, 401);
     }
 
     // Check if user has administrator role
-    const { data: hasAdminRole, error: roleError } = await supabase
-      .rpc('has_role', { _user_id: user.id, _role: 'administrator' });
+    const { data: hasAdminRole, error: roleError } = await supabase.rpc(
+      "has_role",
+      { _user_id: user.id, _role: "administrator" },
+    );
 
     if (roleError) {
       console.error("Error checking user role:", roleError);
@@ -69,21 +74,23 @@ serve(async (req) => {
     const normalizedEmail = email.toLowerCase().trim();
 
     // Check if user exists in auth.users
-    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+    const { data: authUsers, error: authError } =
+      await supabase.auth.admin.listUsers();
 
     if (authError) {
       console.error("Error checking auth users:", authError);
       return json({ error: "Failed to check user existence" }, 500);
     }
 
-    const userExists = authUsers.users.some(user => 
-      user.email?.toLowerCase() === normalizedEmail
+    const userExists = authUsers.users.some(
+      (user) => user.email?.toLowerCase() === normalizedEmail,
     );
 
     if (userExists) {
-      return json({ 
-        exists: true, 
-        message: "Ein Benutzer mit dieser E-Mail-Adresse ist bereits registriert." 
+      return json({
+        exists: true,
+        message:
+          "Ein Benutzer mit dieser E-Mail-Adresse ist bereits registriert.",
       });
     }
 
@@ -101,16 +108,18 @@ serve(async (req) => {
 
     if (invitation) {
       if (invitation.status === "accepted") {
-        return json({ 
-          exists: true, 
-          message: "Ein Benutzer mit dieser E-Mail-Adresse ist bereits als Mitarbeiter registriert." 
+        return json({
+          exists: true,
+          message:
+            "Ein Benutzer mit dieser E-Mail-Adresse ist bereits als Mitarbeiter registriert.",
         });
       } else if (invitation.status === "pending") {
         const expiresAt = new Date(invitation.expires_at);
         if (expiresAt > new Date()) {
-          return json({ 
-            exists: true, 
-            message: "Für diese E-Mail-Adresse existiert bereits eine ausstehende Einladung." 
+          return json({
+            exists: true,
+            message:
+              "Für diese E-Mail-Adresse existiert bereits eine ausstehende Einladung.",
           });
         }
       }

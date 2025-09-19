@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Table,
   TableBody,
@@ -8,24 +8,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +33,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,8 +41,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useIsMobile } from '@/hooks/use-mobile';
+} from "@/components/ui/dropdown-menu";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   User,
   Search,
@@ -58,9 +58,9 @@ import {
   Trash2,
   Save,
   X,
-} from 'lucide-react';
-import { format, parseISO, isValid } from 'date-fns';
-import { de } from 'date-fns/locale';
+} from "lucide-react";
+import { format, parseISO, isValid } from "date-fns";
+import { de } from "date-fns/locale";
 
 interface UserWithRole {
   user_id: string;
@@ -76,12 +76,12 @@ const ProfessionalUsersTab = () => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
-  const [editingRole, setEditingRole] = useState<string>('');
+  const [editingRole, setEditingRole] = useState<string>("");
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -99,13 +99,13 @@ const ProfessionalUsersTab = () => {
           user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           user.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.role.toLowerCase().includes(searchTerm.toLowerCase())
+          user.role.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
     // Role filter
-    if (roleFilter !== 'all') {
-      filtered = filtered.filter(user => user.role === roleFilter);
+    if (roleFilter !== "all") {
+      filtered = filtered.filter((user) => user.role === roleFilter);
     }
 
     setFilteredUsers(filtered);
@@ -114,12 +114,12 @@ const ProfessionalUsersTab = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      
+
       // Get ALL profiles first
       const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, first_name, last_name')
-        .order('created_at', { ascending: false });
+        .from("profiles")
+        .select("user_id, first_name, last_name")
+        .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;
 
@@ -129,25 +129,29 @@ const ProfessionalUsersTab = () => {
       }
 
       // Get user roles for these users (left join style)
-      const userIds = profiles.map(profile => profile.user_id);
+      const userIds = profiles.map((profile) => profile.user_id);
       const { data: userRoles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('*')
-        .in('user_id', userIds);
+        .from("user_roles")
+        .select("*")
+        .in("user_id", userIds);
 
       if (rolesError) {
-        console.error('Error fetching user roles:', rolesError);
+        console.error("Error fetching user roles:", rolesError);
       }
 
       // Combine data - show all users, with or without roles
       const usersWithRoles: UserWithRole[] = profiles.map((profile) => {
-        const roleRecord = userRoles?.find(r => r.user_id === profile.user_id);
+        const roleRecord = userRoles?.find(
+          (r) => r.user_id === profile.user_id,
+        );
         return {
           user_id: profile.user_id,
-          first_name: profile.first_name || '',
-          last_name: profile.last_name || '',
-          email: '', // Email would need to be fetched from auth if needed
-          role: roleRecord?.role || 'user' as 'user' | 'administrator' | 'employee', // Default to 'user' if no role assigned
+          first_name: profile.first_name || "",
+          last_name: profile.last_name || "",
+          email: "", // Email would need to be fetched from auth if needed
+          role:
+            roleRecord?.role ||
+            ("user" as "user" | "administrator" | "employee"), // Default to 'user' if no role assigned
           created_at: roleRecord?.created_at || new Date().toISOString(),
           updated_at: roleRecord?.updated_at || new Date().toISOString(),
         };
@@ -155,11 +159,11 @@ const ProfessionalUsersTab = () => {
 
       setUsers(usersWithRoles);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error("Error fetching users:", error);
       toast({
-        title: 'Fehler',
-        description: 'Benutzerdaten konnten nicht geladen werden.',
-        variant: 'destructive',
+        title: "Fehler",
+        description: "Benutzerdaten konnten nicht geladen werden.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -168,21 +172,21 @@ const ProfessionalUsersTab = () => {
 
   const getRoleBadge = (role: string) => {
     switch (role) {
-      case 'administrator':
+      case "administrator":
         return (
           <Badge variant="destructive" className="flex items-center gap-1">
             <Crown className="h-3 w-3" />
             Administrator
           </Badge>
         );
-      case 'employee':
+      case "employee":
         return (
           <Badge variant="default" className="flex items-center gap-1">
             <UserCheck className="h-3 w-3" />
             Mitarbeiter
           </Badge>
         );
-      case 'user':
+      case "user":
         return (
           <Badge variant="secondary" className="flex items-center gap-1">
             <User className="h-3 w-3" />
@@ -190,17 +194,15 @@ const ProfessionalUsersTab = () => {
           </Badge>
         );
       default:
-        return (
-          <Badge variant="outline">
-            {role}
-          </Badge>
-        );
+        return <Badge variant="outline">{role}</Badge>;
     }
   };
 
   const formatDate = (dateString: string) => {
     const date = parseISO(dateString);
-    return isValid(date) ? format(date, 'dd.MM.yyyy HH:mm', { locale: de }) : '-';
+    return isValid(date)
+      ? format(date, "dd.MM.yyyy HH:mm", { locale: de })
+      : "-";
   };
 
   const handleViewUser = (user: UserWithRole) => {
@@ -217,9 +219,9 @@ const ProfessionalUsersTab = () => {
     try {
       // Check if user already has a role
       const { data: existingRole, error: checkError } = await supabase
-        .from('user_roles')
-        .select('id')
-        .eq('user_id', userId)
+        .from("user_roles")
+        .select("id")
+        .eq("user_id", userId)
         .maybeSingle();
 
       if (checkError) throw checkError;
@@ -227,41 +229,46 @@ const ProfessionalUsersTab = () => {
       if (existingRole) {
         // Update existing role
         const { error: updateError } = await supabase
-          .from('user_roles')
-          .update({ role: editingRole as 'user' | 'administrator' | 'employee' })
-          .eq('user_id', userId);
+          .from("user_roles")
+          .update({
+            role: editingRole as "user" | "administrator" | "employee",
+          })
+          .eq("user_id", userId);
 
         if (updateError) throw updateError;
       } else {
         // Insert new role
         const { error: insertError } = await supabase
-          .from('user_roles')
-          .insert({ user_id: userId, role: editingRole as 'user' | 'administrator' | 'employee' });
+          .from("user_roles")
+          .insert({
+            user_id: userId,
+            role: editingRole as "user" | "administrator" | "employee",
+          });
 
         if (insertError) throw insertError;
       }
 
       toast({
-        title: 'Erfolg',
-        description: 'Benutzerrolle wurde erfolgreich aktualisiert.',
+        title: "Erfolg",
+        description: "Benutzerrolle wurde erfolgreich aktualisiert.",
       });
 
       setEditingUserId(null);
-      setEditingRole('');
+      setEditingRole("");
       fetchUsers();
     } catch (error) {
-      console.error('Error updating user role:', error);
+      console.error("Error updating user role:", error);
       toast({
-        title: 'Fehler',
-        description: 'Benutzerrolle konnte nicht aktualisiert werden.',
-        variant: 'destructive',
+        title: "Fehler",
+        description: "Benutzerrolle konnte nicht aktualisiert werden.",
+        variant: "destructive",
       });
     }
   };
 
   const handleCancelEdit = () => {
     setEditingUserId(null);
-    setEditingRole('');
+    setEditingRole("");
   };
 
   // Mobile Card Component
@@ -274,7 +281,9 @@ const ProfessionalUsersTab = () => {
               {user.first_name} {user.last_name}
             </h3>
             <p className="text-xs text-muted-foreground">{user.email}</p>
-            <p className="text-xs text-muted-foreground">ID: {user.user_id.slice(0, 8)}...</p>
+            <p className="text-xs text-muted-foreground">
+              ID: {user.user_id.slice(0, 8)}...
+            </p>
           </div>
           <div className="flex items-center gap-2">
             {getRoleBadge(user.role)}
@@ -284,7 +293,10 @@ const ProfessionalUsersTab = () => {
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-popover border shadow-lg z-50">
+              <DropdownMenuContent
+                align="end"
+                className="bg-popover border shadow-lg z-50"
+              >
                 <DropdownMenuLabel>Aktionen</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => handleViewUser(user)}>
@@ -303,7 +315,7 @@ const ProfessionalUsersTab = () => {
             </DropdownMenu>
           </div>
         </div>
-        
+
         <div className="text-xs text-muted-foreground">
           Erstellt: {formatDate(user.created_at)}
         </div>
@@ -336,12 +348,14 @@ const ProfessionalUsersTab = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Administratoren</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Administratoren
+            </CardTitle>
             <Crown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {users.filter(u => u.role === 'administrator').length}
+              {users.filter((u) => u.role === "administrator").length}
             </div>
           </CardContent>
         </Card>
@@ -353,7 +367,7 @@ const ProfessionalUsersTab = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {users.filter(u => u.role === 'employee').length}
+              {users.filter((u) => u.role === "employee").length}
             </div>
           </CardContent>
         </Card>
@@ -365,7 +379,7 @@ const ProfessionalUsersTab = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {users.filter(u => u.role === 'user').length}
+              {users.filter((u) => u.role === "user").length}
             </div>
           </CardContent>
         </Card>
@@ -436,45 +450,61 @@ const ProfessionalUsersTab = () => {
                           <span className="font-medium">
                             {user.first_name} {user.last_name}
                           </span>
-                          <span className="text-sm text-muted-foreground">{user.email}</span>
+                          <span className="text-sm text-muted-foreground">
+                            {user.email}
+                          </span>
                           <span className="text-xs text-muted-foreground">
                             ID: {user.user_id.slice(0, 8)}...
                           </span>
                         </div>
                       </TableCell>
-                        <TableCell>
-                          {editingUserId === user.user_id ? (
-                            <div className="flex items-center gap-2">
-                              <Select value={editingRole} onValueChange={setEditingRole}>
-                                <SelectTrigger className="w-32">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="bg-popover border shadow-lg z-50">
-                                  <SelectItem value="user">Benutzer</SelectItem>
-                                  <SelectItem value="employee">Mitarbeiter</SelectItem>
-                                  <SelectItem value="administrator">Administrator</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <Button size="sm" onClick={() => handleSaveRole(user.user_id)}>
-                                <Save className="h-3 w-3" />
-                              </Button>
-                              <Button size="sm" variant="outline" onClick={handleCancelEdit}>
-                                <X className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              {getRoleBadge(user.role)}
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                onClick={() => handleEditRole(user)}
-                              >
-                                <Edit className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          )}
-                        </TableCell>
+                      <TableCell>
+                        {editingUserId === user.user_id ? (
+                          <div className="flex items-center gap-2">
+                            <Select
+                              value={editingRole}
+                              onValueChange={setEditingRole}
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="bg-popover border shadow-lg z-50">
+                                <SelectItem value="user">Benutzer</SelectItem>
+                                <SelectItem value="employee">
+                                  Mitarbeiter
+                                </SelectItem>
+                                <SelectItem value="administrator">
+                                  Administrator
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              size="sm"
+                              onClick={() => handleSaveRole(user.user_id)}
+                            >
+                              <Save className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={handleCancelEdit}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            {getRoleBadge(user.role)}
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleEditRole(user)}
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        )}
+                      </TableCell>
                       <TableCell>{formatDate(user.created_at)}</TableCell>
                       <TableCell>{formatDate(user.updated_at)}</TableCell>
                       <TableCell className="text-right">
@@ -484,14 +514,21 @@ const ProfessionalUsersTab = () => {
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="bg-popover border shadow-lg z-50">
+                          <DropdownMenuContent
+                            align="end"
+                            className="bg-popover border shadow-lg z-50"
+                          >
                             <DropdownMenuLabel>Aktionen</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleViewUser(user)}>
+                            <DropdownMenuItem
+                              onClick={() => handleViewUser(user)}
+                            >
                               <User className="h-4 w-4 mr-2" />
                               Details anzeigen
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleEditRole(user)}>
+                            <DropdownMenuItem
+                              onClick={() => handleEditRole(user)}
+                            >
                               <Edit className="h-4 w-4 mr-2" />
                               Rolle bearbeiten
                             </DropdownMenuItem>
@@ -534,17 +571,33 @@ const ProfessionalUsersTab = () => {
                 <div>
                   <h4 className="font-medium mb-2">Benutzerinformationen</h4>
                   <div className="space-y-2 text-sm">
-                    <div><strong>Name:</strong> {selectedUser.first_name} {selectedUser.last_name}</div>
-                    <div><strong>E-Mail:</strong> {selectedUser.email || 'Nicht verfügbar'}</div>
-                    <div><strong>Benutzer-ID:</strong> {selectedUser.user_id}</div>
-                    <div><strong>Rolle:</strong> {getRoleBadge(selectedUser.role)}</div>
+                    <div>
+                      <strong>Name:</strong> {selectedUser.first_name}{" "}
+                      {selectedUser.last_name}
+                    </div>
+                    <div>
+                      <strong>E-Mail:</strong>{" "}
+                      {selectedUser.email || "Nicht verfügbar"}
+                    </div>
+                    <div>
+                      <strong>Benutzer-ID:</strong> {selectedUser.user_id}
+                    </div>
+                    <div>
+                      <strong>Rolle:</strong> {getRoleBadge(selectedUser.role)}
+                    </div>
                   </div>
                 </div>
                 <div>
                   <h4 className="font-medium mb-2">Account-Details</h4>
                   <div className="space-y-2 text-sm">
-                    <div><strong>Erstellt:</strong> {formatDate(selectedUser.created_at)}</div>
-                    <div><strong>Letztes Update:</strong> {formatDate(selectedUser.updated_at)}</div>
+                    <div>
+                      <strong>Erstellt:</strong>{" "}
+                      {formatDate(selectedUser.created_at)}
+                    </div>
+                    <div>
+                      <strong>Letztes Update:</strong>{" "}
+                      {formatDate(selectedUser.updated_at)}
+                    </div>
                   </div>
                 </div>
               </div>

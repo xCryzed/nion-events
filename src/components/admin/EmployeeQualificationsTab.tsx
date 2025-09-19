@@ -1,16 +1,41 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Pencil, Trash2, Award, X } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Plus, Pencil, Trash2, Award, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface UserQualification {
   id: string;
@@ -43,10 +68,12 @@ const EmployeeQualificationsTab = () => {
   const [qualifications, setQualifications] = useState<Qualification[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-  const [selectedQualification, setSelectedQualification] = useState('');
-  const [acquiredDate, setAcquiredDate] = useState('');
-  const [expiresDate, setExpiresDate] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
+    null,
+  );
+  const [selectedQualification, setSelectedQualification] = useState("");
+  const [acquiredDate, setAcquiredDate] = useState("");
+  const [expiresDate, setExpiresDate] = useState("");
 
   useEffect(() => {
     fetchEmployees();
@@ -55,9 +82,9 @@ const EmployeeQualificationsTab = () => {
 
   const fetchEmployees = async () => {
     try {
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select(`
+      const { data: profiles, error: profilesError } = await supabase.from(
+        "profiles",
+      ).select(`
           user_id,
           first_name,
           last_name
@@ -67,19 +94,22 @@ const EmployeeQualificationsTab = () => {
 
       // Get user emails
       const { data: userRoles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id')
-        .in('role', ['employee', 'administrator']);
+        .from("user_roles")
+        .select("user_id")
+        .in("role", ["employee", "administrator"]);
 
       if (rolesError) throw rolesError;
 
-      const employeeIds = userRoles.map(role => role.user_id);
-      const employeeProfiles = profiles?.filter(profile => employeeIds.includes(profile.user_id)) || [];
+      const employeeIds = userRoles.map((role) => role.user_id);
+      const employeeProfiles =
+        profiles?.filter((profile) => employeeIds.includes(profile.user_id)) ||
+        [];
 
       // Fetch qualifications for each employee
       const { data: userQualifications, error: qualError } = await supabase
-        .from('employee_qualifications')
-        .select(`
+        .from("employee_qualifications")
+        .select(
+          `
           id,
           user_id,
           qualification_id,
@@ -89,22 +119,26 @@ const EmployeeQualificationsTab = () => {
             name,
             description
           )
-        `)
-        .in('user_id', employeeIds);
+        `,
+        )
+        .in("user_id", employeeIds);
 
       if (qualError) throw qualError;
 
       // Combine data
-      const employeesWithQualifications = employeeProfiles.map(profile => ({
+      const employeesWithQualifications = employeeProfiles.map((profile) => ({
         ...profile,
         email: null, // We'll fetch this separately if needed
-        qualifications: userQualifications?.filter(qual => qual.user_id === profile.user_id) || []
+        qualifications:
+          userQualifications?.filter(
+            (qual) => qual.user_id === profile.user_id,
+          ) || [],
       }));
 
       setEmployees(employeesWithQualifications);
     } catch (error) {
-      console.error('Error fetching employees:', error);
-      toast.error('Fehler beim Laden der Mitarbeiter');
+      console.error("Error fetching employees:", error);
+      toast.error("Fehler beim Laden der Mitarbeiter");
     } finally {
       setLoading(false);
     }
@@ -113,62 +147,60 @@ const EmployeeQualificationsTab = () => {
   const fetchQualifications = async () => {
     try {
       const { data, error } = await supabase
-        .from('qualifications')
-        .select('*')
-        .order('name');
+        .from("qualifications")
+        .select("*")
+        .order("name");
 
       if (error) throw error;
       setQualifications(data || []);
     } catch (error) {
-      console.error('Error fetching qualifications:', error);
+      console.error("Error fetching qualifications:", error);
     }
   };
 
   const handleAddQualification = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedEmployee || !selectedQualification) return;
 
     try {
-      const { error } = await supabase
-        .from('employee_qualifications')
-        .insert({
-          user_id: selectedEmployee.user_id,
-          qualification_id: selectedQualification,
-          acquired_date: acquiredDate || null,
-          expires_date: expiresDate || null
-        });
+      const { error } = await supabase.from("employee_qualifications").insert({
+        user_id: selectedEmployee.user_id,
+        qualification_id: selectedQualification,
+        acquired_date: acquiredDate || null,
+        expires_date: expiresDate || null,
+      });
 
       if (error) throw error;
-      
-      toast.success('Qualifikation erfolgreich hinzugefügt');
+
+      toast.success("Qualifikation erfolgreich hinzugefügt");
       setShowDialog(false);
-      setSelectedQualification('');
-      setAcquiredDate('');
-      setExpiresDate('');
+      setSelectedQualification("");
+      setAcquiredDate("");
+      setExpiresDate("");
       fetchEmployees();
     } catch (error) {
-      console.error('Error adding qualification:', error);
-      toast.error('Fehler beim Hinzufügen der Qualifikation');
+      console.error("Error adding qualification:", error);
+      toast.error("Fehler beim Hinzufügen der Qualifikation");
     }
   };
 
   const handleRemoveQualification = async (qualificationId: string) => {
-    if (!confirm('Möchten Sie diese Qualifikation wirklich entfernen?')) return;
+    if (!confirm("Möchten Sie diese Qualifikation wirklich entfernen?")) return;
 
     try {
       const { error } = await supabase
-        .from('employee_qualifications')
+        .from("employee_qualifications")
         .delete()
-        .eq('id', qualificationId);
+        .eq("id", qualificationId);
 
       if (error) throw error;
-      
-      toast.success('Qualifikation erfolgreich entfernt');
+
+      toast.success("Qualifikation erfolgreich entfernt");
       fetchEmployees();
     } catch (error) {
-      console.error('Error removing qualification:', error);
-      toast.error('Fehler beim Entfernen der Qualifikation');
+      console.error("Error removing qualification:", error);
+      toast.error("Fehler beim Entfernen der Qualifikation");
     }
   };
 
@@ -179,9 +211,11 @@ const EmployeeQualificationsTab = () => {
 
   const getAvailableQualifications = () => {
     if (!selectedEmployee) return qualifications;
-    
-    const employeeQualIds = selectedEmployee.qualifications.map(q => q.qualification_id);
-    return qualifications.filter(q => !employeeQualIds.includes(q.id));
+
+    const employeeQualIds = selectedEmployee.qualifications.map(
+      (q) => q.qualification_id,
+    );
+    return qualifications.filter((q) => !employeeQualIds.includes(q.id));
   };
 
   if (loading) {
@@ -218,13 +252,11 @@ const EmployeeQualificationsTab = () => {
                     {employee.first_name} {employee.last_name}
                   </CardTitle>
                   <CardDescription>
-                    {employee.qualifications.length} Qualifikation{employee.qualifications.length !== 1 ? 'en' : ''}
+                    {employee.qualifications.length} Qualifikation
+                    {employee.qualifications.length !== 1 ? "en" : ""}
                   </CardDescription>
                 </div>
-                <Button
-                  onClick={() => openAddDialog(employee)}
-                  size="sm"
-                >
+                <Button onClick={() => openAddDialog(employee)} size="sm">
                   <Plus className="w-4 h-4 mr-2" />
                   Qualifikation hinzufügen
                 </Button>
@@ -238,9 +270,14 @@ const EmployeeQualificationsTab = () => {
               ) : (
                 <div className="space-y-2">
                   {employee.qualifications.map((qual) => (
-                    <div key={qual.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={qual.id}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div className="flex-1">
-                        <div className="font-medium">{qual.qualifications.name}</div>
+                        <div className="font-medium">
+                          {qual.qualifications.name}
+                        </div>
                         {qual.qualifications.description && (
                           <div className="text-sm text-muted-foreground">
                             {qual.qualifications.description}
@@ -248,10 +285,20 @@ const EmployeeQualificationsTab = () => {
                         )}
                         <div className="flex gap-4 text-xs text-muted-foreground mt-1">
                           {qual.acquired_date && (
-                            <span>Erworben: {new Date(qual.acquired_date).toLocaleDateString('de-DE')}</span>
+                            <span>
+                              Erworben:{" "}
+                              {new Date(qual.acquired_date).toLocaleDateString(
+                                "de-DE",
+                              )}
+                            </span>
                           )}
                           {qual.expires_date && (
-                            <span>Läuft ab: {new Date(qual.expires_date).toLocaleDateString('de-DE')}</span>
+                            <span>
+                              Läuft ab:{" "}
+                              {new Date(qual.expires_date).toLocaleDateString(
+                                "de-DE",
+                              )}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -277,18 +324,22 @@ const EmployeeQualificationsTab = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              Qualifikation hinzufügen für {selectedEmployee?.first_name} {selectedEmployee?.last_name}
+              Qualifikation hinzufügen für {selectedEmployee?.first_name}{" "}
+              {selectedEmployee?.last_name}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddQualification} className="space-y-4">
             <div>
               <Label htmlFor="qualification">Qualifikation *</Label>
-              <Select value={selectedQualification} onValueChange={setSelectedQualification}>
+              <Select
+                value={selectedQualification}
+                onValueChange={setSelectedQualification}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Qualifikation auswählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {getAvailableQualifications().map(qual => (
+                  {getAvailableQualifications().map((qual) => (
                     <SelectItem key={qual.id} value={qual.id}>
                       {qual.name}
                     </SelectItem>
@@ -317,7 +368,11 @@ const EmployeeQualificationsTab = () => {
               </div>
             </div>
             <div className="flex gap-2 justify-end">
-              <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowDialog(false)}
+              >
                 Abbrechen
               </Button>
               <Button type="submit" disabled={!selectedQualification}>

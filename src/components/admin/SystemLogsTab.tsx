@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Table,
   TableBody,
@@ -8,25 +8,25 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useIsMobile } from '@/hooks/use-mobile';
+} from "@/components/ui/select";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Database,
   Search,
@@ -38,14 +38,14 @@ import {
   XCircle,
   Loader2,
   Calendar,
-} from 'lucide-react';
-import { format, parseISO, isValid } from 'date-fns';
-import { de } from 'date-fns/locale';
+} from "lucide-react";
+import { format, parseISO, isValid } from "date-fns";
+import { de } from "date-fns/locale";
 
 interface SystemLog {
   id: string;
   timestamp: string;
-  level: 'info' | 'warning' | 'error' | 'success';
+  level: "info" | "warning" | "error" | "success";
   category: string;
   message: string;
   metadata?: any;
@@ -57,9 +57,9 @@ const SystemLogsTab = () => {
   const [logs, setLogs] = useState<SystemLog[]>([]);
   const [filteredLogs, setFilteredLogs] = useState<SystemLog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [levelFilter, setLevelFilter] = useState<string>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [levelFilter, setLevelFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -75,18 +75,18 @@ const SystemLogsTab = () => {
       filtered = filtered.filter(
         (log) =>
           log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          log.category.toLowerCase().includes(searchTerm.toLowerCase())
+          log.category.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
     // Level filter
-    if (levelFilter !== 'all') {
-      filtered = filtered.filter(log => log.level === levelFilter);
+    if (levelFilter !== "all") {
+      filtered = filtered.filter((log) => log.level === levelFilter);
     }
 
     // Category filter
-    if (categoryFilter !== 'all') {
-      filtered = filtered.filter(log => log.category === categoryFilter);
+    if (categoryFilter !== "all") {
+      filtered = filtered.filter((log) => log.category === categoryFilter);
     }
 
     setFilteredLogs(filtered);
@@ -95,63 +95,65 @@ const SystemLogsTab = () => {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      
+
       // Get recent analytics data from Supabase
-      const { data: authLogs, error: authError } = await supabase.functions.invoke('get-auth-logs');
-      const { data: dbLogs, error: dbError } = await supabase.functions.invoke('get-db-logs');
-      
+      const { data: authLogs, error: authError } =
+        await supabase.functions.invoke("get-auth-logs");
+      const { data: dbLogs, error: dbError } =
+        await supabase.functions.invoke("get-db-logs");
+
       // Create mock system logs for demonstration
       const mockLogs: SystemLog[] = [
         {
-          id: '1',
+          id: "1",
           timestamp: new Date().toISOString(),
-          level: 'info',
-          category: 'Authentication',
-          message: 'Benutzer erfolgreich angemeldet',
-          user_id: 'user-123',
-          ip_address: '192.168.1.1'
+          level: "info",
+          category: "Authentication",
+          message: "Benutzer erfolgreich angemeldet",
+          user_id: "user-123",
+          ip_address: "192.168.1.1",
         },
         {
-          id: '2',
+          id: "2",
           timestamp: new Date(Date.now() - 300000).toISOString(),
-          level: 'warning',
-          category: 'Database',
-          message: 'Langsame Abfrage erkannt (2.5s)',
-          metadata: { query_time: '2.5s', table: 'event_requests' }
+          level: "warning",
+          category: "Database",
+          message: "Langsame Abfrage erkannt (2.5s)",
+          metadata: { query_time: "2.5s", table: "event_requests" },
         },
         {
-          id: '3',
+          id: "3",
           timestamp: new Date(Date.now() - 600000).toISOString(),
-          level: 'error',
-          category: 'Email',
-          message: 'E-Mail-Versand fehlgeschlagen',
-          metadata: { error: 'SMTP timeout', recipient: 'user@example.com' }
+          level: "error",
+          category: "Email",
+          message: "E-Mail-Versand fehlgeschlagen",
+          metadata: { error: "SMTP timeout", recipient: "user@example.com" },
         },
         {
-          id: '4',
+          id: "4",
           timestamp: new Date(Date.now() - 900000).toISOString(),
-          level: 'success',
-          category: 'Backup',
-          message: 'Automatisches Backup erfolgreich abgeschlossen',
-          metadata: { size: '125MB', duration: '45s' }
+          level: "success",
+          category: "Backup",
+          message: "Automatisches Backup erfolgreich abgeschlossen",
+          metadata: { size: "125MB", duration: "45s" },
         },
         {
-          id: '5',
+          id: "5",
           timestamp: new Date(Date.now() - 1200000).toISOString(),
-          level: 'info',
-          category: 'System',
-          message: 'Wartungsarbeiten gestartet',
-          metadata: { maintenance_type: 'routine_cleanup' }
-        }
+          level: "info",
+          category: "System",
+          message: "Wartungsarbeiten gestartet",
+          metadata: { maintenance_type: "routine_cleanup" },
+        },
       ];
 
       setLogs(mockLogs);
     } catch (error) {
-      console.error('Error fetching logs:', error);
+      console.error("Error fetching logs:", error);
       toast({
-        title: 'Fehler',
-        description: 'System-Logs konnten nicht geladen werden.',
-        variant: 'destructive',
+        title: "Fehler",
+        description: "System-Logs konnten nicht geladen werden.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -160,28 +162,31 @@ const SystemLogsTab = () => {
 
   const getLevelBadge = (level: string) => {
     switch (level) {
-      case 'info':
+      case "info":
         return (
           <Badge variant="secondary" className="flex items-center gap-1">
             <Info className="h-3 w-3" />
             Info
           </Badge>
         );
-      case 'warning':
+      case "warning":
         return (
-          <Badge variant="outline" className="flex items-center gap-1 border-yellow-500 text-yellow-700">
+          <Badge
+            variant="outline"
+            className="flex items-center gap-1 border-yellow-500 text-yellow-700"
+          >
             <AlertTriangle className="h-3 w-3" />
             Warnung
           </Badge>
         );
-      case 'error':
+      case "error":
         return (
           <Badge variant="destructive" className="flex items-center gap-1">
             <XCircle className="h-3 w-3" />
             Fehler
           </Badge>
         );
-      case 'success':
+      case "success":
         return (
           <Badge variant="default" className="flex items-center gap-1">
             <CheckCircle className="h-3 w-3" />
@@ -189,20 +194,18 @@ const SystemLogsTab = () => {
           </Badge>
         );
       default:
-        return (
-          <Badge variant="outline">
-            {level}
-          </Badge>
-        );
+        return <Badge variant="outline">{level}</Badge>;
     }
   };
 
   const formatDate = (dateString: string) => {
     const date = parseISO(dateString);
-    return isValid(date) ? format(date, 'dd.MM.yyyy HH:mm:ss', { locale: de }) : '-';
+    return isValid(date)
+      ? format(date, "dd.MM.yyyy HH:mm:ss", { locale: de })
+      : "-";
   };
 
-  const categories = [...new Set(logs.map(log => log.category))];
+  const categories = [...new Set(logs.map((log) => log.category))];
 
   // Mobile Card Component
   const LogCard = ({ log }: { log: SystemLog }) => (
@@ -223,7 +226,7 @@ const SystemLogsTab = () => {
             </div>
           </div>
         </div>
-        
+
         {log.metadata && (
           <div className="text-xs bg-muted p-2 rounded">
             <strong>Details:</strong> {JSON.stringify(log.metadata, null, 2)}
@@ -268,7 +271,7 @@ const SystemLogsTab = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {logs.filter(l => l.level === 'error').length}
+              {logs.filter((l) => l.level === "error").length}
             </div>
           </CardContent>
         </Card>
@@ -280,7 +283,7 @@ const SystemLogsTab = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {logs.filter(l => l.level === 'warning').length}
+              {logs.filter((l) => l.level === "warning").length}
             </div>
           </CardContent>
         </Card>
@@ -292,7 +295,7 @@ const SystemLogsTab = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {logs.filter(l => l.level === 'success').length}
+              {logs.filter((l) => l.level === "success").length}
             </div>
           </CardContent>
         </Card>
@@ -370,7 +373,10 @@ const SystemLogsTab = () => {
                 <TableBody>
                   {filteredLogs.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell
+                        colSpan={6}
+                        className="text-center py-8 text-muted-foreground"
+                      >
                         <div className="flex flex-col items-center">
                           <Database className="h-12 w-12 mb-2 opacity-50" />
                           Keine System-Logs gefunden.
@@ -397,13 +403,17 @@ const SystemLogsTab = () => {
                         </TableCell>
                         <TableCell>
                           {log.user_id ? (
-                            <span className="text-sm font-mono">{log.user_id.slice(0, 8)}...</span>
+                            <span className="text-sm font-mono">
+                              {log.user_id.slice(0, 8)}...
+                            </span>
                           ) : (
-                            '-'
+                            "-"
                           )}
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm font-mono">{log.ip_address || '-'}</span>
+                          <span className="text-sm font-mono">
+                            {log.ip_address || "-"}
+                          </span>
                         </TableCell>
                       </TableRow>
                     ))

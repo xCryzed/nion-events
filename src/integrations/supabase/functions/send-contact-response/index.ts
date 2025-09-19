@@ -3,7 +3,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 // @ts-expect-error - npm imports are valid in Deno runtime
 import { Resend } from "npm:resend@2.0.0";
 // @ts-expect-error - ESM import for Deno runtime only
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 
 // @ts-expect-error - Deno global is available in Deno runtime
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
@@ -32,19 +32,24 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { requestId, responseMessage, customerName, customerEmail }: ContactResponseRequest = await req.json();
+    const {
+      requestId,
+      responseMessage,
+      customerName,
+      customerEmail,
+    }: ContactResponseRequest = await req.json();
 
     console.log("Sending response email for contact request:", requestId);
 
     // Update contact request status
     const { error: updateError } = await supabase
-      .from('contact_requests')
+      .from("contact_requests")
       .update({
-        status: 'geantwortet',
+        status: "geantwortet",
         response_message: responseMessage,
         responded_at: new Date().toISOString(),
       })
-      .eq('id', requestId);
+      .eq("id", requestId);
 
     if (updateError) {
       console.error("Error updating contact request:", updateError);
@@ -286,33 +291,33 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Response email sent successfully:", emailResponse);
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
+      JSON.stringify({
+        success: true,
         message: "Response sent successfully",
-        emailId: emailResponse.data?.id 
-      }), 
+        emailId: emailResponse.data?.id,
+      }),
       {
         status: 200,
         headers: {
           "Content-Type": "application/json",
           ...corsHeaders,
         },
-      }
+      },
     );
   } catch (error: any) {
     console.error("Error in send-contact-response function:", error);
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message || "Failed to send response" 
+      JSON.stringify({
+        success: false,
+        error: error.message || "Failed to send response",
       }),
       {
         status: 500,
-        headers: { 
-          "Content-Type": "application/json", 
-          ...corsHeaders 
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
         },
-      }
+      },
     );
   }
 };

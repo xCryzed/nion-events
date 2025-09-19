@@ -21,7 +21,8 @@ function createScopedClient(req: Request) {
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -36,7 +37,9 @@ const BUCKET = "app-config";
 const CONFIG_PATH = "registration.json";
 
 async function readRegistrationEnabled(): Promise<boolean> {
-  const { data } = await supabaseAdmin.storage.from(BUCKET).download(CONFIG_PATH);
+  const { data } = await supabaseAdmin.storage
+    .from(BUCKET)
+    .download(CONFIG_PATH);
   if (!data) {
     return true; // default enabled if not configured
   }
@@ -50,11 +53,17 @@ async function readRegistrationEnabled(): Promise<boolean> {
 }
 
 async function writeRegistrationEnabled(enabled: boolean) {
-  const payload = JSON.stringify({ enabled, updated_at: new Date().toISOString() });
+  const payload = JSON.stringify({
+    enabled,
+    updated_at: new Date().toISOString(),
+  });
   const blob = new Blob([payload], { type: "application/json" });
   const { error } = await supabaseAdmin.storage
     .from(BUCKET)
-    .upload(CONFIG_PATH, blob, { upsert: true, contentType: "application/json" });
+    .upload(CONFIG_PATH, blob, {
+      upsert: true,
+      contentType: "application/json",
+    });
   if (error) throw error;
 }
 
@@ -68,7 +77,9 @@ serve(async (req) => {
   }
 
   try {
-    const { action, enabled } = await req.json().catch(() => ({ action: undefined }));
+    const { action, enabled } = await req
+      .json()
+      .catch(() => ({ action: undefined }));
 
     if (action === "get") {
       const current = await readRegistrationEnabled();

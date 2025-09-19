@@ -1,32 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NION Events - Redirecting...</title>
     <script>
-        // GitHub Pages SPA redirect hack
-        // This script takes the current path and redirects to the index page with the path as a query parameter
-        const segment = 1; // Number of segments in your base path (e.g., /repo-name/ = 1)
-        const l = window.location;
+      // GitHub Pages SPA redirect hack
+      // This script takes the current path and redirects to the index page with the path as a query parameter
+      const segment = 1; // Number of segments in your base path (e.g., /repo-name/ = 1)
+      const l = window.location;
 
-        // If this is a GitHub Pages site and the path has more than the expected segments
-        if (l.pathname.split('/').length > segment + 1) {
-            // Redirect to the index page with the path as a query parameter
-            l.replace(
-                l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-                l.pathname.split('/').slice(0, segment + 1).join('/') +
-                '?p=/' +
-                l.pathname.slice(1).split('/').slice(segment).join('/').replace(/&/g, '~and~') +
-                (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-                l.hash
-            );
-        }
+      // If this is a GitHub Pages site and the path has more than the expected segments
+      if (l.pathname.split("/").length > segment + 1) {
+        // Redirect to the index page with the path as a query parameter
+        l.replace(
+          l.protocol +
+            "//" +
+            l.hostname +
+            (l.port ? ":" + l.port : "") +
+            l.pathname
+              .split("/")
+              .slice(0, segment + 1)
+              .join("/") +
+            "?p=/" +
+            l.pathname
+              .slice(1)
+              .split("/")
+              .slice(segment)
+              .join("/")
+              .replace(/&/g, "~and~") +
+            (l.search ? "&q=" + l.search.slice(1).replace(/&/g, "~and~") : "") +
+            l.hash,
+        );
+      }
     </script>
-</head>
-<body>
-<noscript>
-    <meta http-equiv="refresh" content="0; url=/">
-</noscript>
-</body>
+  </head>
+  <body>
+    <noscript>
+      <meta http-equiv="refresh" content="0; url=/" />
+    </noscript>
+  </body>
 </html>

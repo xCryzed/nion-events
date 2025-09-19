@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Step {
   id: string;
@@ -25,15 +31,15 @@ interface PersonalDataStepperProps {
 }
 
 export const PersonalDataStepper: React.FC<PersonalDataStepperProps> = ({
-                                                                          steps,
-                                                                          currentStep,
-                                                                          onStepChange,
-                                                                          onNext,
-                                                                          onPrevious,
-                                                                          onComplete,
-                                                                          isNextDisabled = false,
-                                                                          isCompleting = false,
-                                                                        }) => {
+  steps,
+  currentStep,
+  onStepChange,
+  onNext,
+  onPrevious,
+  onComplete,
+  isNextDisabled = false,
+  isCompleting = false,
+}) => {
   const progress = ((currentStep + 1) / steps.length) * 100;
   const isLastStep = currentStep === steps.length - 1;
 
@@ -42,7 +48,9 @@ export const PersonalDataStepper: React.FC<PersonalDataStepperProps> = ({
       {/* Progress Bar */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-muted-foreground">
-          <span>Schritt {currentStep + 1} von {steps.length}</span>
+          <span>
+            Schritt {currentStep + 1} von {steps.length}
+          </span>
           <span>{Math.round(progress)}% abgeschlossen</span>
         </div>
         <Progress value={progress} className="h-2" />
@@ -61,14 +69,10 @@ export const PersonalDataStepper: React.FC<PersonalDataStepperProps> = ({
                 ? "bg-primary border-primary text-primary-foreground"
                 : index === currentStep
                   ? "border-primary text-primary bg-primary/10"
-                  : "border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground/50"
+                  : "border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground/50",
             )}
           >
-            {index < currentStep ? (
-              <Check className="w-4 h-4" />
-            ) : (
-              index + 1
-            )}
+            {index < currentStep ? <Check className="w-4 h-4" /> : index + 1}
           </button>
         ))}
       </div>
@@ -82,7 +86,7 @@ export const PersonalDataStepper: React.FC<PersonalDataStepperProps> = ({
         <CardContent>
           {(() => {
             const Comp = steps[currentStep]?.component as any;
-            return typeof Comp === 'function' ? <Comp /> : Comp;
+            return typeof Comp === "function" ? <Comp /> : Comp;
           })()}
         </CardContent>
       </Card>
@@ -107,7 +111,9 @@ export const PersonalDataStepper: React.FC<PersonalDataStepperProps> = ({
             disabled={isNextDisabled || isCompleting}
             className="flex items-center gap-2"
           >
-            {isCompleting ? 'Lade in Personalakte...' : 'In Personalakte hochladen'}
+            {isCompleting
+              ? "Lade in Personalakte..."
+              : "In Personalakte hochladen"}
             <Check className="w-4 h-4" />
           </Button>
         ) : (

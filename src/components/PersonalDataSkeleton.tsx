@@ -1,8 +1,16 @@
-import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import { User, Calendar, MapPin, CreditCard, Building, GraduationCap, FileText } from 'lucide-react';
+import React from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import {
+  User,
+  Calendar,
+  MapPin,
+  CreditCard,
+  Building,
+  GraduationCap,
+  FileText,
+} from "lucide-react";
 
 export const PersonalDataSkeleton: React.FC = () => {
   return (
@@ -12,16 +20,18 @@ export const PersonalDataSkeleton: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="flex items-center gap-3">
             <User className="w-6 h-6 text-primary flex-shrink-0" />
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Personaldaten</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+              Personaldaten
+            </h1>
             <Skeleton className="w-20 h-6" />
           </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-2 ml-auto">
             <Skeleton className="w-32 h-6" />
             <Skeleton className="w-24 h-6" />
           </div>
         </div>
-        
+
         {/* Action Buttons Skeleton */}
         <div className="flex flex-col sm:flex-row gap-2 justify-between">
           <div className="flex flex-col sm:flex-row gap-2">
@@ -118,12 +128,21 @@ export const PersonalDataSkeleton: React.FC = () => {
 
         {/* Additional Cards */}
         {[...Array(3)].map((_, cardIndex) => (
-          <Card key={cardIndex} className="glass-card bg-white/5 border-white/10 text-white">
+          <Card
+            key={cardIndex}
+            className="glass-card bg-white/5 border-white/10 text-white"
+          >
             <CardHeader className="pb-4">
               <div className="flex items-center gap-3">
-                {cardIndex === 0 && <GraduationCap className="w-5 h-5 text-primary flex-shrink-0" />}
-                {cardIndex === 1 && <FileText className="w-5 h-5 text-primary flex-shrink-0" />}
-                {cardIndex === 2 && <Calendar className="w-5 h-5 text-primary flex-shrink-0" />}
+                {cardIndex === 0 && (
+                  <GraduationCap className="w-5 h-5 text-primary flex-shrink-0" />
+                )}
+                {cardIndex === 1 && (
+                  <FileText className="w-5 h-5 text-primary flex-shrink-0" />
+                )}
+                {cardIndex === 2 && (
+                  <Calendar className="w-5 h-5 text-primary flex-shrink-0" />
+                )}
                 <Skeleton className="w-36 h-6" />
               </div>
             </CardHeader>

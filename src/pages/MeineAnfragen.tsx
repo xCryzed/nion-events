@@ -1,13 +1,24 @@
-import { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, Mail, Phone, Building2, MessageSquare, Badge, Loader2, AlertCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import { useState, useEffect } from "react";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Mail,
+  Phone,
+  Building2,
+  MessageSquare,
+  Badge,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { de } from "date-fns/locale";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 interface ContactRequest {
   id: string;
@@ -33,14 +44,17 @@ const MeineAnfragen = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    document.title = 'Meine Anfragen - DJ Aachen & Eventtechnik | NION Events Kundenbereich';
+    document.title =
+      "Meine Anfragen - DJ Aachen & Eventtechnik | NION Events Kundenbereich";
   }, []);
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
-        window.location.href = '/anmelden';
+        window.location.href = "/anmelden";
         return;
       }
       setUser(user);
@@ -63,10 +77,10 @@ const MeineAnfragen = () => {
 
       // Fetch contact requests by email
       const { data: contactRequests, error } = await supabase
-        .from('contact_requests')
-        .select('*')
-        .eq('email', user.email)
-        .order('created_at', { ascending: false });
+        .from("contact_requests")
+        .select("*")
+        .eq("email", user.email)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
@@ -74,16 +88,16 @@ const MeineAnfragen = () => {
 
       if (contactRequests && contactRequests.length > 0) {
         toast({
-          title: 'Anfragen geladen',
+          title: "Anfragen geladen",
           description: `${contactRequests.length} Kontaktanfrage(n) gefunden.`,
         });
       }
     } catch (error) {
-      console.error('Error fetching contact requests:', error);
+      console.error("Error fetching contact requests:", error);
       toast({
-        title: 'Fehler beim Laden',
-        description: 'Ihre Kontaktanfragen konnten nicht geladen werden.',
-        variant: 'destructive',
+        title: "Fehler beim Laden",
+        description: "Ihre Kontaktanfragen konnten nicht geladen werden.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -92,24 +106,26 @@ const MeineAnfragen = () => {
 
   const getEventTypeLabel = (eventType?: string) => {
     const labels: { [key: string]: string } = {
-      'hochzeit': 'Hochzeit',
-      'geburtstag': 'Geburtstag',
-      'firmenfeier': 'Firmenfeier',
-      'jubilaeum': 'Jubiläum',
-      'sonstige': 'Sonstige Feier'
+      hochzeit: "Hochzeit",
+      geburtstag: "Geburtstag",
+      firmenfeier: "Firmenfeier",
+      jubilaeum: "Jubiläum",
+      sonstige: "Sonstige Feier",
     };
-    return eventType ? labels[eventType] || eventType : 'Nicht angegeben';
+    return eventType ? labels[eventType] || eventType : "Nicht angegeben";
   };
 
   const getCallbackTimeLabel = (callbackTime?: string) => {
     const labels: { [key: string]: string } = {
-      'sofort': 'Sofort',
-      'heute': 'Heute',
-      'morgen': 'Morgen',
-      'diese-woche': 'Diese Woche',
-      'naechste-woche': 'Nächste Woche'
+      sofort: "Sofort",
+      heute: "Heute",
+      morgen: "Morgen",
+      "diese-woche": "Diese Woche",
+      "naechste-woche": "Nächste Woche",
     };
-    return callbackTime ? labels[callbackTime] || callbackTime : 'Nicht angegeben';
+    return callbackTime
+      ? labels[callbackTime] || callbackTime
+      : "Nicht angegeben";
   };
 
   if (loading) {
@@ -137,10 +153,14 @@ const MeineAnfragen = () => {
               <Card className="glass-card text-center py-12">
                 <CardContent>
                   <AlertCircle className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
-                  <h3 className="text-title mb-2">E-Mail-Bestätigung erforderlich</h3>
+                  <h3 className="text-title mb-2">
+                    E-Mail-Bestätigung erforderlich
+                  </h3>
                   <p className="text-muted-foreground mb-6">
-                    Um Ihre Kontaktanfragen einsehen zu können, müssen Sie zunächst Ihre E-Mail-Adresse bestätigen.
-                    Bitte überprüfen Sie Ihr E-Mail-Postfach und klicken Sie auf den Bestätigungslink.
+                    Um Ihre Kontaktanfragen einsehen zu können, müssen Sie
+                    zunächst Ihre E-Mail-Adresse bestätigen. Bitte überprüfen
+                    Sie Ihr E-Mail-Postfach und klicken Sie auf den
+                    Bestätigungslink.
                   </p>
                 </CardContent>
               </Card>
@@ -174,9 +194,13 @@ const MeineAnfragen = () => {
                   <MessageSquare className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
                   <h3 className="text-title mb-2">Keine Anfragen gefunden</h3>
                   <p className="text-muted-foreground mb-6">
-                    Sie haben noch keine Kontaktanfragen gestellt oder Ihre E-Mail-Adresse ist noch nicht bestätigt.
+                    Sie haben noch keine Kontaktanfragen gestellt oder Ihre
+                    E-Mail-Adresse ist noch nicht bestätigt.
                   </p>
-                  <Button onClick={() => window.location.href = '/#contact'} className="btn-hero">
+                  <Button
+                    onClick={() => (window.location.href = "/#contact")}
+                    className="btn-hero"
+                  >
                     Kontakt aufnehmen
                   </Button>
                 </CardContent>
@@ -189,7 +213,12 @@ const MeineAnfragen = () => {
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           <CardTitle className="text-title mb-2">
-                            Kontaktanfrage vom {format(new Date(request.created_at), 'dd. MMMM yyyy', { locale: de })}
+                            Kontaktanfrage vom{" "}
+                            {format(
+                              new Date(request.created_at),
+                              "dd. MMMM yyyy",
+                              { locale: de },
+                            )}
                           </CardTitle>
                           <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                             <span className="flex items-center">
@@ -198,7 +227,10 @@ const MeineAnfragen = () => {
                             </span>
                             <span className="flex items-center">
                               <Clock className="w-4 h-4 mr-2" />
-                              {format(new Date(request.created_at), 'HH:mm', { locale: de })} Uhr
+                              {format(new Date(request.created_at), "HH:mm", {
+                                locale: de,
+                              })}{" "}
+                              Uhr
                             </span>
                           </div>
                         </div>
@@ -208,7 +240,9 @@ const MeineAnfragen = () => {
                     <CardContent>
                       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div className="space-y-3">
-                          <h4 className="font-medium text-sm text-muted-foreground">Kontaktdaten</h4>
+                          <h4 className="font-medium text-sm text-muted-foreground">
+                            Kontaktdaten
+                          </h4>
                           <div className="space-y-2">
                             <div className="flex items-center text-sm">
                               <Mail className="w-4 h-4 mr-2 text-muted-foreground" />
@@ -236,11 +270,15 @@ const MeineAnfragen = () => {
                         </div>
 
                         <div className="space-y-3">
-                          <h4 className="font-medium text-sm text-muted-foreground">Event Details</h4>
+                          <h4 className="font-medium text-sm text-muted-foreground">
+                            Event Details
+                          </h4>
                           <div className="space-y-2">
                             <div className="text-sm">
-                              <span className="font-medium">Art:</span>{' '}
-                              <span>{getEventTypeLabel(request.event_type)}</span>
+                              <span className="font-medium">Art:</span>{" "}
+                              <span>
+                                {getEventTypeLabel(request.event_type)}
+                              </span>
                             </div>
                             {request.venue && (
                               <div className="flex items-center text-sm">
@@ -249,22 +287,30 @@ const MeineAnfragen = () => {
                               </div>
                             )}
                             <div className="text-sm">
-                              <span className="font-medium">Rückruf:</span>{' '}
-                              <span>{getCallbackTimeLabel(request.callback_time)}</span>
+                              <span className="font-medium">Rückruf:</span>{" "}
+                              <span>
+                                {getCallbackTimeLabel(request.callback_time)}
+                              </span>
                             </div>
                           </div>
                         </div>
 
                         <div className="md:col-span-2 lg:col-span-1 space-y-3">
-                          <h4 className="font-medium text-sm text-muted-foreground">Status</h4>
+                          <h4 className="font-medium text-sm text-muted-foreground">
+                            Status
+                          </h4>
                           <div className="space-y-2">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                              request.status === 'geantwortet' 
-                                ? 'bg-green-100 text-green-800 border border-green-200' 
-                                : 'bg-blue-100 text-blue-800 border border-blue-200'
-                            }`}>
+                            <span
+                              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                                request.status === "geantwortet"
+                                  ? "bg-green-100 text-green-800 border border-green-200"
+                                  : "bg-blue-100 text-blue-800 border border-blue-200"
+                              }`}
+                            >
                               <MessageSquare className="w-3 h-3 mr-1" />
-                              {request.status === 'geantwortet' ? 'Beantwortet' : 'Eingegangen'}
+                              {request.status === "geantwortet"
+                                ? "Beantwortet"
+                                : "Eingegangen"}
                             </span>
                           </div>
                         </div>
@@ -272,18 +318,32 @@ const MeineAnfragen = () => {
 
                       {request.message && (
                         <div className="mt-6 p-4 bg-muted/30 rounded-lg">
-                          <h4 className="font-medium text-sm text-muted-foreground mb-2">Nachricht</h4>
-                          <p className="text-sm whitespace-pre-wrap">{request.message}</p>
+                          <h4 className="font-medium text-sm text-muted-foreground mb-2">
+                            Nachricht
+                          </h4>
+                          <p className="text-sm whitespace-pre-wrap">
+                            {request.message}
+                          </p>
                         </div>
                       )}
 
                       {request.response_message && (
                         <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                          <h4 className="font-medium text-sm text-green-800 mb-2">Antwort von NION Events</h4>
-                          <p className="text-sm text-green-700 whitespace-pre-wrap">{request.response_message}</p>
+                          <h4 className="font-medium text-sm text-green-800 mb-2">
+                            Antwort von NION Events
+                          </h4>
+                          <p className="text-sm text-green-700 whitespace-pre-wrap">
+                            {request.response_message}
+                          </p>
                           {request.responded_at && (
                             <p className="text-xs text-green-600 mt-2">
-                              Beantwortet am: {format(new Date(request.responded_at), 'dd. MMMM yyyy, HH:mm', { locale: de })} Uhr
+                              Beantwortet am:{" "}
+                              {format(
+                                new Date(request.responded_at),
+                                "dd. MMMM yyyy, HH:mm",
+                                { locale: de },
+                              )}{" "}
+                              Uhr
                             </p>
                           )}
                         </div>

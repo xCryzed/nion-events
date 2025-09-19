@@ -3,7 +3,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useGoogleAnalytics, trackPageView } from "@/hooks/use-google-analytics";
+import {
+  useGoogleAnalytics,
+  trackPageView,
+} from "@/hooks/use-google-analytics";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { useEffect } from "react";
 import Index from "./pages/Index";
@@ -36,24 +39,39 @@ const PageTracker = () => {
   useEffect(() => {
     // Track page view when location changes
     const pageTitles: { [key: string]: string } = {
-      '/': 'DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
-      '/angebot': 'Angebot anfordern - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
-      '/presse': 'Presse - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
-      '/impressum': 'Impressum - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
-      '/datenschutz': 'Datenschutz - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
-      '/agb': 'AGB - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events',
-      '/anmelden': 'Anmelden - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
-      '/meine-angebote': 'Meine Angebote - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
-      '/meine-anfragen': 'Meine Anfragen - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
-      '/anstehende-events': 'Anstehende Events - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
-      '/meine-events': 'Meine Events - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
-      '/qualifikationen': 'Qualifikationen - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
-      '/personaldaten': 'Personaldaten - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
-      '/meine-vertraege': 'Meine Verträge - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
-      '/administration': 'Administration - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich'
+      "/": "DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events",
+      "/angebot":
+        "Angebot anfordern - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events",
+      "/presse":
+        "Presse - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events",
+      "/impressum":
+        "Impressum - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events",
+      "/datenschutz":
+        "Datenschutz - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events",
+      "/agb":
+        "AGB - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events",
+      "/anmelden":
+        "Anmelden - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich",
+      "/meine-angebote":
+        "Meine Angebote - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich",
+      "/meine-anfragen":
+        "Meine Anfragen - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich",
+      "/anstehende-events":
+        "Anstehende Events - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich",
+      "/meine-events":
+        "Meine Events - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich",
+      "/qualifikationen":
+        "Qualifikationen - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich",
+      "/personaldaten":
+        "Personaldaten - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich",
+      "/meine-vertraege":
+        "Meine Verträge - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich",
+      "/administration":
+        "Administration - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich",
     };
 
-    const title = pageTitles[location.pathname] || `${location.pathname} | NION Events`;
+    const title =
+      pageTitles[location.pathname] || `${location.pathname} | NION Events`;
     trackPageView(location.pathname, title);
   }, [location]);
 
@@ -89,14 +107,70 @@ const AppContent = () => {
             <Route path="/anmelden" element={<Auth />} />
             <Route path="/email-preview/:token" element={<EmailPreview />} />
             <Route path="/personaldaten" element={<Personaldaten />} />
-            <Route path="/meine-angebote" element={<PersonalDataGuard><MeineAngebote /></PersonalDataGuard>} />
-            <Route path="/meine-anfragen" element={<PersonalDataGuard><MeineAnfragen /></PersonalDataGuard>} />
-            <Route path="/anstehende-events" element={<PersonalDataGuard><AnstehendeEventsEnhanced /></PersonalDataGuard>} />
-            <Route path="/meine-events" element={<PersonalDataGuard><MeineEvents /></PersonalDataGuard>} />
-            <Route path="/qualifikationen" element={<PersonalDataGuard><Qualifikationen /></PersonalDataGuard>} />
-            <Route path="/meine-vertraege" element={<PersonalDataGuard><MeineVertraege /></PersonalDataGuard>} />
-            <Route path="/stundenerfassung" element={<PersonalDataGuard><Stundenerfassung /></PersonalDataGuard>} />
-            <Route path="/administration" element={<PersonalDataGuard><Administration /></PersonalDataGuard>} />
+            <Route
+              path="/meine-angebote"
+              element={
+                <PersonalDataGuard>
+                  <MeineAngebote />
+                </PersonalDataGuard>
+              }
+            />
+            <Route
+              path="/meine-anfragen"
+              element={
+                <PersonalDataGuard>
+                  <MeineAnfragen />
+                </PersonalDataGuard>
+              }
+            />
+            <Route
+              path="/anstehende-events"
+              element={
+                <PersonalDataGuard>
+                  <AnstehendeEventsEnhanced />
+                </PersonalDataGuard>
+              }
+            />
+            <Route
+              path="/meine-events"
+              element={
+                <PersonalDataGuard>
+                  <MeineEvents />
+                </PersonalDataGuard>
+              }
+            />
+            <Route
+              path="/qualifikationen"
+              element={
+                <PersonalDataGuard>
+                  <Qualifikationen />
+                </PersonalDataGuard>
+              }
+            />
+            <Route
+              path="/meine-vertraege"
+              element={
+                <PersonalDataGuard>
+                  <MeineVertraege />
+                </PersonalDataGuard>
+              }
+            />
+            <Route
+              path="/stundenerfassung"
+              element={
+                <PersonalDataGuard>
+                  <Stundenerfassung />
+                </PersonalDataGuard>
+              }
+            />
+            <Route
+              path="/administration"
+              element={
+                <PersonalDataGuard>
+                  <Administration />
+                </PersonalDataGuard>
+              }
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

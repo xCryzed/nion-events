@@ -7,80 +7,80 @@ import { Resend } from "npm:resend@2.0.0";
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers":
-        "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface CustomerConfirmationRequest {
-    id: string;
-    name: string;
-    email: string;
-    phone?: string;
-    mobile?: string;
-    company?: string;
-    event_type?: string;
-    callback_time?: string;
-    venue?: string;
-    message: string;
-    created_at: string;
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  mobile?: string;
+  company?: string;
+  event_type?: string;
+  callback_time?: string;
+  venue?: string;
+  message: string;
+  created_at: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
-    // Handle CORS preflight requests
-    if (req.method === "OPTIONS") {
-        return new Response(null, { headers: corsHeaders });
-    }
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
 
-    try {
-        const customerRequest: CustomerConfirmationRequest = await req.json();
+  try {
+    const customerRequest: CustomerConfirmationRequest = await req.json();
 
-        console.log("Processing customer confirmation for:", customerRequest.email);
+    console.log("Processing customer confirmation for:", customerRequest.email);
 
-        // Helper function to get readable labels
-        const getEventTypeLabel = (eventType: string) => {
-            const eventTypes: { [key: string]: string } = {
-                'hochzeit': 'Hochzeit',
-                'firmenveranstaltung': 'Firmenveranstaltung',
-                'konferenz': 'Konferenz',
-                'gala': 'Gala-Event',
-                'geburtstag': 'Geburtstag',
-                'abschlussfeier': 'Abschlussfeier',
-                'abiball': 'Abiball',
-                'produktpräsentation': 'Produktpräsentation',
-                'messe': 'Messe',
-                'sonstiges': 'Sonstiges'
-            };
-            return eventTypes[eventType] || eventType;
-        };
+    // Helper function to get readable labels
+    const getEventTypeLabel = (eventType: string) => {
+      const eventTypes: { [key: string]: string } = {
+        hochzeit: "Hochzeit",
+        firmenveranstaltung: "Firmenveranstaltung",
+        konferenz: "Konferenz",
+        gala: "Gala-Event",
+        geburtstag: "Geburtstag",
+        abschlussfeier: "Abschlussfeier",
+        abiball: "Abiball",
+        produktpräsentation: "Produktpräsentation",
+        messe: "Messe",
+        sonstiges: "Sonstiges",
+      };
+      return eventTypes[eventType] || eventType;
+    };
 
-        const getCallbackTimeLabel = (callbackTime: string) => {
-            const callbackTimes: { [key: string]: string } = {
-                'morgens': 'Morgens (08:00 - 12:00 Uhr)',
-                'mittags': 'Mittags (12:00 - 15:00 Uhr)',
-                'nachmittags': 'Nachmittags (15:00 - 18:00 Uhr)',
-                'abends': 'Abends (18:00 - 20:00 Uhr)',
-                'wochenende': 'Am Wochenende',
-                'flexibel': 'Flexibel'
-            };
-            return callbackTimes[callbackTime] || callbackTime;
-        };
+    const getCallbackTimeLabel = (callbackTime: string) => {
+      const callbackTimes: { [key: string]: string } = {
+        morgens: "Morgens (08:00 - 12:00 Uhr)",
+        mittags: "Mittags (12:00 - 15:00 Uhr)",
+        nachmittags: "Nachmittags (15:00 - 18:00 Uhr)",
+        abends: "Abends (18:00 - 20:00 Uhr)",
+        wochenende: "Am Wochenende",
+        flexibel: "Flexibel",
+      };
+      return callbackTimes[callbackTime] || callbackTime;
+    };
 
-        // Format date
-        const formatDate = (dateString: string) => {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('de-DE', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        };
+    // Format date
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("de-DE", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    };
 
-        // Create HTML email template for customer confirmation
-        const htmlContent = `
+    // Create HTML email template for customer confirmation
+    const htmlContent = `
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -384,38 +384,58 @@ const handler = async (req: Request): Promise<Response> => {
                         <div class="info-label">E-Mail</div>
                         <div class="info-value">${customerRequest.email}</div>
                     </div>
-                    ${customerRequest.phone ? `
+                    ${
+                      customerRequest.phone
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Telefon</div>
                         <div class="info-value">${customerRequest.phone}</div>
                     </div>
-                    ` : ''}
-                    ${customerRequest.company ? `
+                    `
+                        : ""
+                    }
+                    ${
+                      customerRequest.company
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Unternehmen</div>
                         <div class="info-value">${customerRequest.company}</div>
                     </div>
-                    ` : ''}
-                    ${customerRequest.event_type ? `
+                    `
+                        : ""
+                    }
+                    ${
+                      customerRequest.event_type
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Veranstaltungsart</div>
                         <div class="info-value">${getEventTypeLabel(customerRequest.event_type)}</div>
                     </div>
-                    ` : ''}
-                    ${customerRequest.callback_time ? `
+                    `
+                        : ""
+                    }
+                    ${
+                      customerRequest.callback_time
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Gewünschte Rückrufzeit</div>
                         <div class="info-value">${getCallbackTimeLabel(customerRequest.callback_time)}</div>
                     </div>
-                    ` : ''}
+                    `
+                        : ""
+                    }
                 </div>
                 
-                ${customerRequest.venue ? `
+                ${
+                  customerRequest.venue
+                    ? `
                 <div class="info-item" style="margin-bottom: 15px;">
                     <div class="info-label">Veranstaltungsort</div>
                     <div class="info-value">${customerRequest.venue}</div>
                 </div>
-                ` : ''}
+                `
+                    : ""
+                }
                 
                 <div class="message-box">
                     <div class="info-label">Ihre Nachricht</div>
@@ -474,33 +494,33 @@ const handler = async (req: Request): Promise<Response> => {
 </body>
 </html>`;
 
-        // Send customer confirmation email
-        const emailResponse = await resend.emails.send({
-            from: "NION Events <info@nion-events.de>",
-            to: [customerRequest.email],
-            subject: `Vielen Dank für Ihre Anfrage, ${customerRequest.name}! 🎉 (Referenz: ${customerRequest.id})`,
-            html: htmlContent,
-        });
+    // Send customer confirmation email
+    const emailResponse = await resend.emails.send({
+      from: "NION Events <info@nion-events.de>",
+      to: [customerRequest.email],
+      subject: `Vielen Dank für Ihre Anfrage, ${customerRequest.name}! 🎉 (Referenz: ${customerRequest.id})`,
+      html: htmlContent,
+    });
 
-        console.log("Customer confirmation email sent successfully:", emailResponse);
+    console.log(
+      "Customer confirmation email sent successfully:",
+      emailResponse,
+    );
 
-        return new Response(JSON.stringify({ success: true, emailResponse }), {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-                ...corsHeaders,
-            },
-        });
-    } catch (error: any) {
-        console.error("Error in send-customer-confirmation function:", error);
-        return new Response(
-            JSON.stringify({ error: error.message }),
-            {
-                status: 500,
-                headers: { "Content-Type": "application/json", ...corsHeaders },
-            }
-        );
-    }
+    return new Response(JSON.stringify({ success: true, emailResponse }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        ...corsHeaders,
+      },
+    });
+  } catch (error: any) {
+    console.error("Error in send-customer-confirmation function:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
 };
 
 serve(handler);

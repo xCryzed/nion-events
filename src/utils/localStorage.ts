@@ -4,17 +4,18 @@
  */
 export const clearFormData = () => {
   const keys = Object.keys(localStorage);
-  const formKeys = keys.filter(key => 
-    key.startsWith('form-') || 
-    key.startsWith('personal-data') ||
-    key.includes('stepper') ||
-    key.includes('formData')
+  const formKeys = keys.filter(
+    (key) =>
+      key.startsWith("form-") ||
+      key.startsWith("personal-data") ||
+      key.includes("stepper") ||
+      key.includes("formData"),
   );
-  
-  formKeys.forEach(key => {
+
+  formKeys.forEach((key) => {
     localStorage.removeItem(key);
   });
-  
+
   console.log(`Cleared ${formKeys.length} form data keys from localStorage`);
 };
 
@@ -23,9 +24,9 @@ export const clearFormData = () => {
  */
 export const clearAllUserData = () => {
   const keys = Object.keys(localStorage);
-  const preserveKeys = ['theme', 'language', 'cookie-consent'];
-  
-  keys.forEach(key => {
+  const preserveKeys = ["theme", "language", "cookie-consent"];
+
+  keys.forEach((key) => {
     if (!preserveKeys.includes(key)) {
       localStorage.removeItem(key);
     }
