@@ -31,6 +31,23 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import {
   Mail,
   Search,
   Trash2,
@@ -40,6 +57,7 @@ import {
   XCircle,
   Send,
   Loader2,
+  UserPlus,
 } from 'lucide-react';
 import { format, parseISO, isValid, isPast } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -62,6 +80,10 @@ const InvitationsTab = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState<'employee' | 'administrator'>('employee');
+  const [sendingInvite, setSendingInvite] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -215,6 +237,78 @@ const InvitationsTab = () => {
     }
   };
 
+  const handleInviteEmployee = async () => {
+    if (!inviteEmail.trim()) {
+      toast({
+        title: 'Fehler',
+        description: 'Bitte geben Sie eine E-Mail-Adresse ein.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setSendingInvite(true);
+    try {
+      // Get current user profile for inviter name
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('user_id', user?.id)
+        .maybeSingle();
+
+      const inviterName = profile?.first_name && profile?.last_name 
+        ? `${profile.first_name} ${profile.last_name}`
+        : 'Das NION Events Team';
+
+      // Create invitation in database
+      const { error: insertError } = await supabase
+        .from('employee_invitations')
+        .insert({
+          email: inviteEmail.trim().toLowerCase(),
+          role: inviteRole,
+          invited_by: user?.id,
+          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
+        });
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      // Send invitation email
+      const { error: emailError } = await supabase.functions.invoke('send-employee-invitation', {
+        body: {
+          email: inviteEmail.trim().toLowerCase(),
+          inviterName,
+        },
+      });
+
+      if (emailError) {
+        throw emailError;
+      }
+
+      toast({
+        title: 'Einladung gesendet',
+        description: `Einladung wurde erfolgreich an ${inviteEmail} gesendet.`,
+      });
+
+      setInviteEmail('');
+      setInviteRole('employee');
+      setInviteDialogOpen(false);
+      fetchInvitations(); // Refresh the list
+
+    } catch (error: any) {
+      console.error('Error sending invitation:', error);
+      toast({
+        title: 'Fehler',
+        description: 'Einladung konnte nicht gesendet werden.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSendingInvite(false);
+    }
+  };
+
   const getStatusBadge = (invitation: Invitation) => {
     const expiresAt = new Date(invitation.expires_at);
     const isExpired = isPast(expiresAt);
@@ -316,18 +410,87 @@ const InvitationsTab = () => {
       {/* Invitations Table */}
       <Card>
         <CardContent className="p-6">
-          <div className="flex items-center space-x-2 mb-4">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Einladungen durchsuchen..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
-            />
-            <Button variant="outline" onClick={fetchInvitations} size="sm">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Aktualisieren
-            </Button>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Einladungen durchsuchen..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" onClick={fetchInvitations} size="sm">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Aktualisieren
+              </Button>
+              
+              <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Mitarbeiter einladen
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Neuen Mitarbeiter einladen</DialogTitle>
+                    <DialogDescription>
+                      Senden Sie eine Einladung an die E-Mail-Adresse des neuen Mitarbeiters.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="email">E-Mail-Adresse</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="mitarbeiter@example.com"
+                        value={inviteEmail}
+                        onChange={(e) => setInviteEmail(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="role">Rolle</Label>
+                      <Select value={inviteRole} onValueChange={(value: 'employee' | 'administrator') => setInviteRole(value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Rolle auswählen" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="employee">Mitarbeiter</SelectItem>
+                          <SelectItem value="administrator">Administrator</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setInviteEmail('');
+                        setInviteRole('employee');
+                        setInviteDialogOpen(false);
+                      }}
+                    >
+                      Abbrechen
+                    </Button>
+                    <Button
+                      onClick={handleInviteEmployee}
+                      disabled={sendingInvite}
+                    >
+                      {sendingInvite ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <UserPlus className="h-4 w-4 mr-2" />
+                      )}
+                      Einladung senden
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
 
           <div className="rounded-md border">

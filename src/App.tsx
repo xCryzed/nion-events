@@ -18,10 +18,15 @@ import Administration from "./pages/Administration";
 import Angebot from "./pages/Angebot";
 import MeineAngebote from "./pages/MeineAngebote";
 import MeineAnfragen from "./pages/MeineAnfragen";
-import AnstehendeEvents from "./pages/AnstehendeEvents";
+import AnstehendeEventsEnhanced from "./pages/AnstehendeEventsEnhanced";
 import Personaldaten from "./pages/Personaldaten";
 import EmailPreview from "./pages/EmailPreview";
 import { PersonalDataGuard } from "./components/PersonalDataGuard";
+
+import Qualifikationen from "./pages/Qualifikationen";
+import MeineEvents from "./pages/MeineEvents";
+import Stundenerfassung from "./pages/Stundenerfassung";
+import MeineVertraege from "./pages/MeineVertraege";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +46,10 @@ const PageTracker = () => {
       '/meine-angebote': 'Meine Angebote - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
       '/meine-anfragen': 'Meine Anfragen - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Kundenbereich',
       '/anstehende-events': 'Anstehende Events - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
+      '/meine-events': 'Meine Events - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
+      '/qualifikationen': 'Qualifikationen - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
       '/personaldaten': 'Personaldaten - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
+      '/meine-vertraege': 'Meine Verträge - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich',
       '/administration': 'Administration - DJ Aachen & Eventtechnik | Hochzeiten, Firmenfeiern & Partys | NION Events Mitarbeiterbereich'
     };
 
@@ -83,7 +91,11 @@ const AppContent = () => {
             <Route path="/personaldaten" element={<Personaldaten />} />
             <Route path="/meine-angebote" element={<PersonalDataGuard><MeineAngebote /></PersonalDataGuard>} />
             <Route path="/meine-anfragen" element={<PersonalDataGuard><MeineAnfragen /></PersonalDataGuard>} />
-            <Route path="/anstehende-events" element={<PersonalDataGuard><AnstehendeEvents /></PersonalDataGuard>} />
+            <Route path="/anstehende-events" element={<PersonalDataGuard><AnstehendeEventsEnhanced /></PersonalDataGuard>} />
+            <Route path="/meine-events" element={<PersonalDataGuard><MeineEvents /></PersonalDataGuard>} />
+            <Route path="/qualifikationen" element={<PersonalDataGuard><Qualifikationen /></PersonalDataGuard>} />
+            <Route path="/meine-vertraege" element={<PersonalDataGuard><MeineVertraege /></PersonalDataGuard>} />
+            <Route path="/stundenerfassung" element={<PersonalDataGuard><Stundenerfassung /></PersonalDataGuard>} />
             <Route path="/administration" element={<PersonalDataGuard><Administration /></PersonalDataGuard>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

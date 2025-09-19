@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { trackError } from '@/hooks/use-google-analytics';
-import { Menu, X, LogOut, Settings, Users, Calendar, User as UserIcon, FileText, Shield, MessageSquare } from 'lucide-react';
+import { Menu, X, LogOut, Settings, Users, Calendar, User as UserIcon, FileText, Shield, MessageSquare, Award, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -258,7 +258,8 @@ const Header = () => {
                           <span className="text-foreground font-medium">{getDisplayName()}</span>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuContent align="end" className="w-56">
+                        <div className="px-2 py-1 text-xs text-muted-foreground">Kunden</div>
                         <DropdownMenuItem asChild>
                           <Link
                               to="/meine-anfragen"
@@ -279,8 +280,11 @@ const Header = () => {
                             Meine Angebote
                           </Link>
                         </DropdownMenuItem>
+                        
                         {(isEmployee || isAdmin) && (
                             <>
+                              <div className="h-px bg-border mx-2 my-1" />
+                              <div className="px-2 py-1 text-xs text-muted-foreground">Mitarbeiter</div>
                               <DropdownMenuItem asChild>
                                 <Link
                                     to="/anstehende-events"
@@ -301,20 +305,57 @@ const Header = () => {
                                   Personaldaten
                                 </Link>
                               </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <Link
+                                    to="/meine-events"
+                                    className="cursor-pointer flex items-center"
+                                    onClick={() => trackEvent('click', 'navigation', 'header_meine_events')}
+                                >
+                                  <Calendar className="mr-2 h-4 w-4" />
+                                  Meine Events
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <Link
+                                    to="/meine-vertraege"
+                                    className="cursor-pointer flex items-center"
+                                    onClick={() => trackEvent('click', 'navigation', 'header_meine_vertraege')}
+                                >
+                                  <FileText className="mr-2 h-4 w-4" />
+                                  Meine Verträge
+                                </Link>
+                              </DropdownMenuItem>
+                               <DropdownMenuItem asChild>
+                                 <Link
+                                     to="/stundenerfassung"
+                                     className="cursor-pointer flex items-center"
+                                     onClick={() => trackEvent('click', 'navigation', 'header_stundenerfassung')}
+                                 >
+                                   <Clock className="mr-2 h-4 w-4" />
+                                   Stundenerfassung
+                                 </Link>
+                               </DropdownMenuItem>
                             </>
                         )}
+                        
                         {isAdmin && (
-                            <DropdownMenuItem asChild>
-                              <Link
-                                  to="/administration"
-                                  className="cursor-pointer flex items-center"
-                                  onClick={() => trackEvent('click', 'admin', 'header_administration')}
-                              >
-                                <Shield className="mr-2 h-4 w-4" />
-                                Administration
-                              </Link>
-                            </DropdownMenuItem>
+                            <>
+                              <div className="h-px bg-border mx-2 my-1" />
+                              <div className="px-2 py-1 text-xs text-muted-foreground">Administration</div>
+                              <DropdownMenuItem asChild>
+                                <Link
+                                    to="/administration"
+                                    className="cursor-pointer flex items-center"
+                                    onClick={() => trackEvent('click', 'admin', 'header_administration')}
+                                >
+                                  <Shield className="mr-2 h-4 w-4" />
+                                  Administration
+                                </Link>
+                              </DropdownMenuItem>
+                            </>
                         )}
+                        
+                        <div className="h-px bg-border mx-2 my-1" />
                         <DropdownMenuItem
                             onClick={() => {
                               trackEvent('click', 'auth', 'header_logout');
@@ -390,6 +431,27 @@ const Header = () => {
                             onClick={() => setIsMenuOpen(false)}
                         >
                           Personaldaten
+                        </Link>
+                        <Link
+                            to="/meine-events"
+                            className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                          Meine Events
+                        </Link>
+                         <Link
+                            to="/qualifikationen"
+                            className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                          Qualifikationen
+                        </Link>
+                        <Link
+                            to="/stundenerfassung"
+                            className="block text-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                          Stundenerfassung
                         </Link>
                       </>
                   )}

@@ -11,11 +11,15 @@ import ProfessionalContactRequestsTab from '@/components/admin/ProfessionalConta
 import ProfessionalUsersTab from '@/components/admin/ProfessionalUsersTab';
 import SettingsTab from '@/components/admin/SettingsTab';
 import EventsTab from '@/components/admin/EventsTab';
-import PersonnelTab from '@/components/admin/PersonnelTab';
+import QualificationsTab from '@/components/admin/QualificationsTab';
+import EnhancedEventsTab from '@/components/admin/EnhancedEventsTab';
+import EmployeeQualificationsTab from '@/components/admin/EmployeeQualificationsTab';
+import QualificationRequestsTab from '@/components/admin/QualificationRequestsTab';
 import InvitationsTab from '@/components/admin/InvitationsTab';
 import ProfessionalDashboard from '@/components/admin/ProfessionalDashboard';
 import AnalyticsTab from '@/components/admin/AnalyticsTab';
 import SystemLogsTab from '@/components/admin/SystemLogsTab';
+import TimeRecordsTab from '@/components/admin/TimeRecordsTab';
 import { Session } from '@supabase/supabase-js';
 import { Menu, Shield, AlertTriangle, Loader2 } from 'lucide-react';
 
@@ -194,13 +198,20 @@ const Administration = () => {
             case 'contacts':
                 return <ProfessionalContactRequestsTab />;
             case 'events':
+                return <EnhancedEventsTab />;
+            case 'qualifications':
                 return (
                     <div className="space-y-6">
                         <div>
-                            <h1 className="text-2xl font-bold">Veranstaltungen</h1>
-                            <p className="text-muted-foreground">Interne Events und Personal-Planung</p>
+                            <h1 className="text-2xl font-bold">Qualifikationen</h1>
+                            <p className="text-muted-foreground">Qualifikationen und Anfragen verwalten</p>
                         </div>
-                        <EventsTab />
+                        <div className="space-y-8">
+                            <QualificationsTab />
+                            <div className="border-t pt-8">
+                                <QualificationRequestsTab />
+                            </div>
+                        </div>
                     </div>
                 );
             case 'users':
@@ -230,7 +241,17 @@ const Administration = () => {
                             <h1 className="text-2xl font-bold">Personalverwaltung</h1>
                             <p className="text-muted-foreground">Mitarbeiter-Personalakten verwalten</p>
                         </div>
-                        <PersonnelTab />
+                        <EmployeeQualificationsTab />
+                    </div>
+                );
+            case 'time-records':
+                return (
+                    <div className="space-y-6">
+                        <div>
+                            <h1 className="text-2xl font-bold">Stundenerfassung</h1>
+                            <p className="text-muted-foreground">Arbeitszeiten der Mitarbeiter verwalten</p>
+                        </div>
+                        <TimeRecordsTab />
                     </div>
                 );
             case 'settings':
@@ -284,6 +305,8 @@ const Administration = () => {
                 return 'Einladungen';
             case 'personnel':
                 return 'Personalverwaltung';
+            case 'time-records':
+                return 'Stundenerfassung';
             case 'settings':
                 return 'Einstellungen';
             case 'security':
@@ -313,6 +336,8 @@ const Administration = () => {
                 return 'Mitarbeiter-Einladungen verwalten und überwachen';
             case 'personnel':
                 return 'Mitarbeiter-Personalakten verwalten und einsehen';
+            case 'time-records':
+                return 'Arbeitszeiten der Mitarbeiter verwalten und genehmigen';
             case 'settings':
                 return 'App-Einstellungen und Konfiguration verwalten';
             case 'security':

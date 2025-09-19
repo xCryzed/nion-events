@@ -15,6 +15,16 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
+import AnalyticsTab from './admin/AnalyticsTab';
+import EventsTab from './admin/EventsTab';
+import UsersTab from './admin/UsersTab';
+import ContactRequestsTab from './admin/ContactRequestsTab';
+import InvitationsTab from './admin/InvitationsTab';
+import SystemLogsTab from './admin/SystemLogsTab';
+import SettingsTab from './admin/SettingsTab';
+import QualificationsTab from './admin/QualificationsTab';
+import PersonnelTab from './admin/PersonnelTab';
+import TimeRecordsTab from './admin/TimeRecordsTab';
 
 interface DashboardStats {
     totalContacts: number;

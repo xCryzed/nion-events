@@ -26,6 +26,8 @@ import {
   Database,
   Shield,
   ChevronRight,
+  Award,
+  Clock,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -126,6 +128,20 @@ export function ProfessionalAdminSidebar({
           icon: FileText,
           count: personnelCount,
           description: 'Mitarbeiterdaten'
+        },
+        {
+          id: 'qualifications',
+          title: 'Qualifikationen',
+          icon: Award,
+          count: null,
+          description: 'Qualifikationen verwalten'
+        },
+        {
+          id: 'time-records',
+          title: 'Stundenerfassung',
+          icon: Clock,
+          count: null,
+          description: 'Arbeitszeiten verwalten'
         },
       ]
     },

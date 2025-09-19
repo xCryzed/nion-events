@@ -263,6 +263,50 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_qualifications: {
+        Row: {
+          acquired_date: string | null
+          created_at: string
+          expires_at: string | null
+          expires_date: string | null
+          id: string
+          proof_files: Json | null
+          qualification_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          acquired_date?: string | null
+          created_at?: string
+          expires_at?: string | null
+          expires_date?: string | null
+          id?: string
+          proof_files?: Json | null
+          qualification_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          acquired_date?: string | null
+          created_at?: string
+          expires_at?: string | null
+          expires_date?: string | null
+          id?: string
+          proof_files?: Json | null
+          qualification_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_qualifications_qualification_id_fkey"
+            columns: ["qualification_id"]
+            isOneToOne: false
+            referencedRelation: "qualifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_registrations: {
         Row: {
           created_at: string
@@ -393,6 +437,7 @@ export type Database = {
       }
       internal_events: {
         Row: {
+          contract_required: boolean | null
           created_at: string
           created_by: string | null
           description: string | null
@@ -402,12 +447,15 @@ export type Database = {
           id: string
           location: string
           notes: string | null
+          pricing_structure: Json | null
+          qualification_requirements: Json | null
           staff_requirements: Json | null
           status: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          contract_required?: boolean | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -417,12 +465,15 @@ export type Database = {
           id?: string
           location: string
           notes?: string | null
+          pricing_structure?: Json | null
+          qualification_requirements?: Json | null
           staff_requirements?: Json | null
           status?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          contract_required?: boolean | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -432,6 +483,8 @@ export type Database = {
           id?: string
           location?: string
           notes?: string | null
+          pricing_structure?: Json | null
+          qualification_requirements?: Json | null
           staff_requirements?: Json | null
           status?: string | null
           title?: string
@@ -466,6 +519,87 @@ export type Database = {
         }
         Relationships: []
       }
+      qualification_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          proof_files: Json | null
+          qualification_id: string
+          requested_at: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          proof_files?: Json | null
+          qualification_id: string
+          requested_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          proof_files?: Json | null
+          qualification_id?: string
+          requested_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      qualifications: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_expirable: boolean | null
+          name: string
+          proof_types: string[] | null
+          requires_proof: boolean | null
+          updated_at: string
+          validity_period_months: number | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_expirable?: boolean | null
+          name: string
+          proof_types?: string[] | null
+          requires_proof?: boolean | null
+          updated_at?: string
+          validity_period_months?: number | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_expirable?: boolean | null
+          name?: string
+          proof_types?: string[] | null
+          requires_proof?: boolean | null
+          updated_at?: string
+          validity_period_months?: number | null
+        }
+        Relationships: []
+      }
       rate_limit_requests: {
         Row: {
           created_at: string
@@ -496,6 +630,59 @@ export type Database = {
         }
         Relationships: []
       }
+      time_records: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          break_minutes: number
+          created_at: string
+          end_time: string
+          event_id: string
+          id: string
+          notes: string | null
+          start_time: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          break_minutes?: number
+          created_at?: string
+          end_time: string
+          event_id: string
+          id?: string
+          notes?: string | null
+          start_time: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          break_minutes?: number
+          created_at?: string
+          end_time?: string
+          event_id?: string
+          id?: string
+          notes?: string | null
+          start_time?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_records_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "internal_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -519,6 +706,74 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      work_contracts: {
+        Row: {
+          additional_agreements: string | null
+          contract_html: string
+          created_at: string
+          employer_signature_date: string | null
+          end_date: string
+          event_id: string
+          hourly_wage: number
+          id: string
+          job_title: string
+          signature_data_url: string | null
+          signed_at: string | null
+          signed_by_employee: boolean | null
+          signed_by_employer: boolean | null
+          staff_category: string
+          start_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_agreements?: string | null
+          contract_html: string
+          created_at?: string
+          employer_signature_date?: string | null
+          end_date: string
+          event_id: string
+          hourly_wage: number
+          id?: string
+          job_title: string
+          signature_data_url?: string | null
+          signed_at?: string | null
+          signed_by_employee?: boolean | null
+          signed_by_employer?: boolean | null
+          staff_category: string
+          start_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_agreements?: string | null
+          contract_html?: string
+          created_at?: string
+          employer_signature_date?: string | null
+          end_date?: string
+          event_id?: string
+          hourly_wage?: number
+          id?: string
+          job_title?: string
+          signature_data_url?: string | null
+          signed_at?: string | null
+          signed_by_employee?: boolean | null
+          signed_by_employer?: boolean | null
+          staff_category?: string
+          start_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_work_contracts_event"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "internal_events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -544,6 +799,16 @@ export type Database = {
       generate_offer_number: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_expiring_qualifications: {
+        Args: { days_ahead?: number }
+        Returns: {
+          days_until_expiry: number
+          expires_at: string
+          qualification_id: string
+          qualification_name: string
+          user_id: string
+        }[]
       }
       get_user_role: {
         Args: { _user_id: string }

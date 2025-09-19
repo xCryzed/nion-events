@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Calendar, MapPin, Users, Plus, Minus, Trash2, Edit, Eye, UserCheck, UserX, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -88,10 +89,18 @@ const EventsTab = () => {
         { category: 'DJ', count: 1, filled: 0 }
     ]);
 
+    // Personal assignment state
+    const [showPersonalDialog, setShowPersonalDialog] = useState(false);
+    const [selectedEventForPersonal, setSelectedEventForPersonal] = useState<string>('');
+    const [availableEmployees, setAvailableEmployees] = useState<any[]>([]);
+    const [selectedEmployee, setSelectedEmployee] = useState('');
+    const [selectedStaffCategory, setSelectedStaffCategory] = useState('');
+
     useEffect(() => {
         fetchEvents();
         fetchArchivedEvents();
         fetchAllRegistrations();
+        fetchAvailableEmployees();
     }, []);
 
     const fetchEvents = async () => {
@@ -207,6 +216,70 @@ const EventsTab = () => {
             setEventRegistrations(registrationsByEvent);
         } catch (error) {
             console.error('Error fetching registrations:', error);
+        }
+    };
+
+    const fetchAvailableEmployees = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select(`
+                    user_id,
+                    first_name,
+                    last_name,
+                    user_roles!inner(role)
+                `)
+                .in('user_roles.role', ['employee', 'administrator']);
+
+            if (error) throw error;
+            setAvailableEmployees(data || []);
+        } catch (error) {
+            console.error('Error fetching employees:', error);
+        }
+    };
+
+    const addPersonalToEvent = (eventId: string) => {
+        setSelectedEventForPersonal(eventId);
+        setSelectedEmployee('');
+        setSelectedStaffCategory('DJ');
+        setShowPersonalDialog(true);
+    };
+
+    const assignPersonalToEvent = async () => {
+        if (!selectedEmployee || !selectedStaffCategory || !selectedEventForPersonal) return;
+
+        try {
+            // Check if this person is already assigned to this event
+            const { data: existingRegistration, error: checkError } = await supabase
+                .from('event_registrations')
+                .select('id')
+                .eq('event_id', selectedEventForPersonal)
+                .eq('user_id', selectedEmployee)
+                .eq('staff_category', selectedStaffCategory)
+                .single();
+
+            if (existingRegistration) {
+                toast.error('Diese Person ist bereits für diese Kategorie zugewiesen');
+                return;
+            }
+
+            const { error } = await supabase
+                .from('event_registrations')
+                .insert({
+                    event_id: selectedEventForPersonal,
+                    user_id: selectedEmployee,
+                    staff_category: selectedStaffCategory,
+                    status: 'bestätigt'
+                });
+
+            if (error) throw error;
+
+            toast.success('Personal erfolgreich zugewiesen');
+            setShowPersonalDialog(false);
+            fetchAllRegistrations();
+        } catch (error) {
+            console.error('Error assigning personal:', error);
+            toast.error('Fehler beim Zuweisen des Personals');
         }
     };
 
@@ -515,14 +588,22 @@ const EventsTab = () => {
                                 </div>
                             )}
 
-                            {/* Event Registrations Section */}
+                                {/* Event Registrations Section */}
                             {expandedEvents.has(event.id) && (
                                 <div className="mt-6 pt-6 border-t">
                                     <div className="flex items-center justify-between mb-4">
                                         <h4 className="font-semibold text-lg flex items-center gap-2">
                                             <Users className="h-5 w-5" />
-                                            Anmeldungen ({eventRegistrations[event.id]?.length || 0})
+                                            Personalzuweisung ({eventRegistrations[event.id]?.length || 0})
                                         </h4>
+                                        <Button
+                                            onClick={() => addPersonalToEvent(event.id)}
+                                            variant="outline"
+                                            size="sm"
+                                        >
+                                            <Plus className="w-4 h-4 mr-1" />
+                                            Personal hinzufügen
+                                        </Button>
                                     </div>
 
                                     {eventRegistrations[event.id]?.length > 0 ? (
@@ -547,37 +628,40 @@ const EventsTab = () => {
                                                         </Badge>
                                                     </div>
 
-                                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3">
                                                         <p className="text-xs text-muted-foreground">
                                                             {format(new Date(registration.created_at), 'dd.MM.yyyy HH:mm', { locale: de })}
                                                         </p>
 
-                                                        {!isArchived && (
-                                                            <Select
-                                                                value={registration.status}
-                                                                onValueChange={(value) => updateRegistrationStatus(registration.id, value)}
-                                                            >
-                                                                <SelectTrigger className="w-[130px]">
-                                                                    <SelectValue />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="angemeldet">Angemeldet</SelectItem>
-                                                                    <SelectItem value="bestätigt">Bestätigt</SelectItem>
-                                                                    <SelectItem value="abgelehnt">Abgelehnt</SelectItem>
-                                                                    <SelectItem value="zurückgezogen">Zurückgezogen</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        )}
+                                                        <Select
+                                                            value={registration.status}
+                                                            onValueChange={(value) => updateRegistrationStatus(registration.id, value)}
+                                                        >
+                                                            <SelectTrigger className="w-[130px]">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="angemeldet">Angemeldet</SelectItem>
+                                                                <SelectItem value="bestätigt">Bestätigt</SelectItem>
+                                                                <SelectItem value="abgelehnt">Abgelehnt</SelectItem>
+                                                                <SelectItem value="zurückgezogen">Zurückgezogen</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
-                                    ) : (
+                                     ) : (
                                         <div className="text-center py-8 text-muted-foreground">
                                             <UserCheck className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                                            <p className="text-sm">Noch keine Anmeldungen für dieses Event</p>
+                                            <p className="text-sm">
+                                                {isArchived 
+                                                    ? 'Kein Personal für dieses Event zugewiesen'
+                                                    : 'Noch keine Anmeldungen für dieses Event'
+                                                }
+                                            </p>
                                         </div>
-                                    )}
+                                     )}
                                 </div>
                             )}
                         </CardContent>
@@ -818,6 +902,63 @@ const EventsTab = () => {
                     {renderEventList(archivedEvents, true)}
                 </TabsContent>
             </Tabs>
+
+            {/* Personal Assignment Dialog */}
+            <Dialog open={showPersonalDialog} onOpenChange={setShowPersonalDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Personal zu Event hinzufügen</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div>
+                            <Label htmlFor="employee-select">Mitarbeiter auswählen</Label>
+                            <Select value={selectedEmployee} onValueChange={setSelectedEmployee}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Mitarbeiter auswählen..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {availableEmployees.map((employee) => (
+                                        <SelectItem key={employee.user_id} value={employee.user_id}>
+                                            {employee.first_name} {employee.last_name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div>
+                            <Label htmlFor="category-select">Position</Label>
+                            <Select value={selectedStaffCategory} onValueChange={setSelectedStaffCategory}>
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {STAFF_CATEGORIES.map((category) => (
+                                        <SelectItem key={category} value={category}>
+                                            {category}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="flex gap-2 justify-end">
+                            <Button 
+                                variant="outline" 
+                                onClick={() => setShowPersonalDialog(false)}
+                            >
+                                Abbrechen
+                            </Button>
+                            <Button 
+                                onClick={assignPersonalToEvent}
+                                disabled={!selectedEmployee || !selectedStaffCategory}
+                            >
+                                Zuweisen
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

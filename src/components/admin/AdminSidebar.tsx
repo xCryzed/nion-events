@@ -20,7 +20,9 @@ import {
   Users,
   UserCheck,
   Settings,
-  Home
+  Home,
+  Award,
+  Clock
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -87,6 +89,18 @@ export function AdminSidebar({
       title: 'Personal',
       icon: UserCheck,
       count: personnelCount
+    },
+    {
+      id: 'qualifications',
+      title: 'Qualifikationen',
+      icon: Award,
+      count: null
+    },
+    {
+      id: 'time-records',
+      title: 'Stundenerfassung',
+      icon: Clock,
+      count: null
     },
     {
       id: 'settings',

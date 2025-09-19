@@ -37,7 +37,7 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  UserPlus,
+  
 } from 'lucide-react';
 import { format, parseISO, isValid } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -69,13 +69,12 @@ const PersonnelTab = () => {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState<string | null>(null);
-  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [sendingInvite, setSendingInvite] = useState(false);
+  const [employeeQualifications, setEmployeeQualifications] = useState<{ [userId: string]: any[] }>({});
   const { toast } = useToast();
 
   useEffect(() => {
     fetchEmployees();
+    fetchEmployeeQualifications();
   }, []);
 
   useEffect(() => {
@@ -162,6 +161,40 @@ const PersonnelTab = () => {
     }
   };
 
+  const fetchEmployeeQualifications = async () => {
+    try {
+      // Fetch employee qualifications separately to avoid complex joins
+      const { data: qualificationData, error } = await supabase
+        .from('employee_qualifications')
+        .select('user_id, qualification_id');
+
+      if (error) {
+        throw error;
+      }
+
+      // Get all qualification names
+      const { data: qualifications } = await supabase
+        .from('qualifications')
+        .select('id, name');
+
+      // Group qualifications by user_id
+      const qualificationsByUser: { [userId: string]: any[] } = {};
+      qualificationData?.forEach((eq) => {
+        if (!qualificationsByUser[eq.user_id]) {
+          qualificationsByUser[eq.user_id] = [];
+        }
+        const qualification = qualifications?.find(q => q.id === eq.qualification_id);
+        if (qualification) {
+          qualificationsByUser[eq.user_id].push(qualification);
+        }
+      });
+
+      setEmployeeQualifications(qualificationsByUser);
+    } catch (error) {
+      console.error('Error fetching employee qualifications:', error);
+    }
+  };
+
   const handleViewPersonnelFile = (employee: Employee) => {
     setSelectedEmployee(employee);
     setDialogOpen(true);
@@ -203,103 +236,6 @@ const PersonnelTab = () => {
       });
     } finally {
       setDownloadingPdf(null);
-    }
-  };
-
-  const handleInviteEmployee = async () => {
-    if (!inviteEmail.trim()) {
-      toast({
-        title: 'Fehler',
-        description: 'Bitte geben Sie eine E-Mail-Adresse ein.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const email = inviteEmail.trim().toLowerCase();
-
-    setSendingInvite(true);
-    try {
-      // Check if user already exists or has pending invitation
-      const { data: checkResult, error: checkError } = await supabase.functions.invoke('check-user-exists', {
-        body: { email },
-      });
-
-      if (checkError) {
-        throw checkError;
-      }
-
-      if (checkResult?.exists) {
-        toast({
-          title: 'Einladung nicht möglich',
-          description: checkResult.message,
-          variant: 'destructive',
-        });
-        setSendingInvite(false);
-        return;
-      }
-
-      // Get current user profile for inviter name
-      const { data: { user } } = await supabase.auth.getUser();
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name')
-        .eq('user_id', user?.id)
-        .maybeSingle();
-
-      const inviterName = profile?.first_name && profile?.last_name 
-        ? `${profile.first_name} ${profile.last_name}`
-        : 'Das NION Events Team';
-
-      // Create invitation record
-      const { data: invitation, error: invitationError } = await supabase
-        .from('employee_invitations')
-        .insert({
-          email: email,
-          invited_by: user?.id,
-          role: 'employee'
-        })
-        .select()
-        .single();
-
-      if (invitationError) {
-        throw invitationError;
-      }
-
-      // Send invitation email
-      const { error: emailError } = await supabase.functions.invoke('send-employee-invitation', {
-        body: {
-          email: email,
-          inviterName,
-        },
-      });
-
-      if (emailError) {
-        // Delete the invitation record if email sending fails
-        await supabase
-          .from('employee_invitations')
-          .delete()
-          .eq('id', invitation.id);
-        throw emailError;
-      }
-
-      toast({
-        title: 'Einladung gesendet',
-        description: `Einladung wurde erfolgreich an ${email} gesendet.`,
-      });
-
-      setInviteEmail('');
-      setInviteDialogOpen(false);
-      
-    } catch (error: any) {
-      console.error('Error sending invitation:', error);
-      toast({
-        title: 'Fehler',
-        description: error.message || 'Einladung konnte nicht gesendet werden.',
-        variant: 'destructive',
-      });
-    } finally {
-      setSendingInvite(false);
     }
   };
 
@@ -390,85 +326,30 @@ const PersonnelTab = () => {
       {/* Search and Filters */}
       <Card>
         <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Mitarbeiter suchen..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="max-w-sm"
-              />
-            </div>
-            
-            <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Mitarbeiter einladen
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Neuen Mitarbeiter einladen</DialogTitle>
-                  <DialogDescription>
-                    Senden Sie eine Einladung an die E-Mail-Adresse des neuen Mitarbeiters.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="email" className="text-sm font-medium">
-                      E-Mail-Adresse
-                    </label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="mitarbeiter@beispiel.de"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setInviteEmail('');
-                        setInviteDialogOpen(false);
-                      }}
-                    >
-                      Abbrechen
-                    </Button>
-                    <Button
-                      onClick={handleInviteEmployee}
-                      disabled={sendingInvite}
-                    >
-                      {sendingInvite ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : (
-                        <UserPlus className="h-4 w-4 mr-2" />
-                      )}
-                      Einladung senden
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+          <div className="flex items-center space-x-2 mb-4">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Mitarbeiter suchen..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
           </div>
 
           {/* Employees Table */}
           <div className="rounded-md border">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>E-Mail</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Eintrittsdatum</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Letzte Aktualisierung</TableHead>
-                  <TableHead className="text-right">Aktionen</TableHead>
-                </TableRow>
+                                <TableRow>
+                                  <TableHead>Name</TableHead>
+                                  <TableHead>E-Mail</TableHead>
+                                  <TableHead>Position</TableHead>
+                                  <TableHead>Qualifikationen</TableHead>
+                                  <TableHead>Eintrittsdatum</TableHead>
+                                  <TableHead>Status</TableHead>
+                                  <TableHead>Letzte Aktualisierung</TableHead>
+                                  <TableHead className="text-right">Aktionen</TableHead>
+                                </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredEmployees.map((employee) => {
@@ -486,9 +367,22 @@ const PersonnelTab = () => {
                         </div>
                       </TableCell>
                       <TableCell>{employee.email}</TableCell>
-                      <TableCell>
-                        {employee.personal_data?.job_title || '-'}
-                      </TableCell>
+                                      <TableCell>
+                                        {employee.personal_data?.job_title || '-'}
+                                      </TableCell>
+                                      <TableCell>
+                                        <div className="flex flex-wrap gap-1">
+                                          {employeeQualifications[employee.user_id]?.length > 0 ? (
+                                            employeeQualifications[employee.user_id].map((qual, index) => (
+                                              <Badge key={index} variant="secondary" className="text-xs">
+                                                {qual.name}
+                                              </Badge>
+                                            ))
+                                          ) : (
+                                            <span className="text-muted-foreground text-sm">Keine</span>
+                                          )}
+                                        </div>
+                                      </TableCell>
                       <TableCell>
                         {employee.personal_data?.start_date
                           ? (() => {
